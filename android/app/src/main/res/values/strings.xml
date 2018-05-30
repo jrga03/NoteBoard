@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">NoteBoard</string>
+    <string name="facebook_app_id">167557223939153</string>
+    <string name="fb_login_protocol_scheme">fb167557223939153</string>
+</resources>
