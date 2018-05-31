@@ -11,6 +11,9 @@
 #import <React/RCTRootView.h>
 #import <RNGoogleSignin/RNGoogleSignin.h>
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
+#import <Firebase.h>
+@import Firebase;
+@import GoogleMaps; //add this line if you want to use Google Maps
 
 @implementation AppDelegate
 
@@ -22,7 +25,12 @@
 {
   NSURL *jsCodeLocation;
 
+  [GMSServices provideAPIKey:@"AIzaSyDbNRYm1CGnAkTcn_9gwDM4OHX-UN0DaME"];
+
+
   jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
+
+  [FIRApp configure];
 
   RCTRootView *rootView = [[RCTRootView alloc] initWithBundleURL:jsCodeLocation
                                                       moduleName:@"NoteBoard"

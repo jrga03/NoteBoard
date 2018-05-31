@@ -3,12 +3,14 @@ package com.noteboard;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
-import io.invertase.firebase.RNFirebasePackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
+
 import com.oblador.vectoricons.VectorIconsPackage;
+
+import io.invertase.firebase.RNFirebasePackage;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookSdk;
@@ -16,6 +18,8 @@ import com.facebook.reactnative.androidsdk.FBSDKPackage;
 import com.facebook.appevents.AppEventsLogger;
 
 import co.apptailor.googlesignin.RNGoogleSigninPackage;
+
+import com.airbnb.android.react.maps.MapsPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -38,6 +42,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new MapsPackage(),
             new RNFirebasePackage(),
             new FBSDKPackage(mCallbackManager),
             new RNGoogleSigninPackage(),
