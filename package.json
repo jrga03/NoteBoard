@@ -4,7 +4,11 @@
   "private": true,
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
-    "test": "jest"
+    "test": "jest",
+    "launch-android-23": "emulator -avd Nexus_5X_API_23",
+    "launch-android-27": "emulator -avd Nexus_5X_API_27",
+    "launch-ios-8-plus": "react-native run-ios --simulator='iPhone 8 Plus'",
+    "launch-devices" : "npm run launch-ios-8-plus && npm run launch-android-27"
   },
   "dependencies": {
     "moment": "^2.22.1",

@@ -1,12 +1,12 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, FlatList, StyleSheet } from "react-native";
 
-export default class HomeScreen extends Component {
+export default class Notification extends Component {
     render() {
         const { container } = styles;
         return (
             <View style={container}>
-                <Text>HELLO WORLD</Text>
+                <Text>NOTIFICATIONS!</Text>
             </View>
         );
     }
@@ -14,9 +14,8 @@ export default class HomeScreen extends Component {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        backgroundColor: "tomato",
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "green",
     },
 });

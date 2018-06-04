@@ -5,29 +5,31 @@ import {
     Platform,
     TextInput,
     StyleSheet,
-    // AsyncStorage,
     TouchableOpacity,
     ActivityIndicator,
 } from "react-native";
-// import {} from "react-navigation";
-import { SocialIcon } from "react-native-elements";
+import { NavigationActions, StackActions } from "react-navigation";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { SocialIcon } from "react-native-elements";
 
 import { SWATCH } from "../../constants";
 
-export default class SignInScreen extends Component {
+const resetToHome = StackActions.reset({
+    index: 0,
+    actions: [NavigationActions.navigate("Home")],
+});
+
+export default class SignInPassword extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            email: "",
-        };
 
-        this.inputs = {};
+        this.state = {
+            password: "",
+        };
     }
 
     render() {
         const {
-            formText,
             container,
             formHeader,
             submitButton,
@@ -35,7 +37,6 @@ export default class SignInScreen extends Component {
             formContainer,
             formTextButton,
             submitButtonText,
-            newUserContainer,
             socialButtonsContainer,
             formTextForgotContainer,
             socialButton,
@@ -43,6 +44,7 @@ export default class SignInScreen extends Component {
             spacerThick,
             submitButtonContainer,
             containedButton,
+            backButtonContainer,
         } = styles;
 
         return (
@@ -55,31 +57,14 @@ export default class SignInScreen extends Component {
                 contentContainerStyle={container}>
                 <View style={formContainer}>
                     <View style={spacerThin} />
-                    <Text style={formHeader}>Welcome!</Text>
+                    <Text style={formHeader}>
+                        {`${"< PERSON'S NAME HERE >"}`}
+                    </Text>
                     <View style={spacerThin} />
                     <TextInput
-                        placeholder="Enter your email"
-                        placeholderTextColor={SWATCH.GRAY}
-                        style={formTextField}
-                        numberOfLines={1}
-                        maxLength={64}
-                        autoCorrect={false}
-                        autoCapitalize="none"
-                        editable={true}
-                        blurOnSubmit={false}
-                        onSubmitEditing={() =>
-                            this.props.navigation.navigate("Password")
-                        }
-                        value={this.state.email}
-                        keyboardType="email-address"
-                        underlineColorAndroid="transparent"
-                        returnKeyType="next"
-                        onChangeText={(email) => this.setState({ email })}
-                    />
-                    {/* <View style={spacerThin} /> */}
-
-                    {/* <Text style={formHeader}>Password</Text>
-                    <TextInput
+                        autoFocus={true}
+                        placeholder="Enter your password"
+                        placeholderTextColor="gray"
                         style={formTextField}
                         numberOfLines={1}
                         maxLength={64}
@@ -87,51 +72,30 @@ export default class SignInScreen extends Component {
                         autoCapitalize="none"
                         editable={true}
                         blurOnSubmit={true}
-                        onSubmitEditing={() => {}}
-                        ref={(ref) => (this.inputs["password"] = ref)}
+                        onSubmitEditing={() =>
+                            this.props.navigation.navigate("Home")
+                        }
                         value={this.state.password}
                         keyboardType="default"
-                        secureTextEntry={true}
                         underlineColorAndroid="transparent"
+                        secureTextEntry={true}
+                        returnKeyType="done"
                         onChangeText={(password) => this.setState({ password })}
-                    /> */}
+                    />
 
-                    <View style={socialButtonsContainer}>
-                        <SocialIcon
-                            // light
-                            style={[containedButton, socialButton]}
-                            type="facebook"
-                            raised={true}
-                            onPress={() =>
-                                this.props.navigation.navigate("Home")
-                            }
-                            iconSize={16}
-                            iconColor={SWATCH.WHITE}
-                            // underlayColor="yellow"
-                        />
-                        <SocialIcon
-                            // light
-                            style={[containedButton, socialButton]}
-                            type="google-plus-official"
-                            raised={true}
-                            onPress={() =>
-                                this.props.navigation.navigate("Home")
-                            }
-                            iconSize={16}
-                            iconColor={SWATCH.WHITE}
-                            // underlayColor="yellow"
-                        />
+                    <View style={formTextForgotContainer}>
+                        <TouchableOpacity>
+                            <Text style={formTextButton}>Forgot password?</Text>
+                        </TouchableOpacity>
                     </View>
-                    {/* <View style={spacerThick} /> */}
-                    {/* <View style={spacerThin} /> */}
 
                     <View style={[containedButton, submitButtonContainer]}>
                         <TouchableOpacity
                             onPress={() =>
-                                this.props.navigation.navigate("Password")
+                                this.props.navigation.navigate("Home")
                             }>
                             <View style={submitButton}>
-                                <Text style={submitButtonText}>NEXT</Text>
+                                <Text style={submitButtonText}>SIGN IN</Text>
                             </View>
                         </TouchableOpacity>
                     </View>
@@ -139,16 +103,12 @@ export default class SignInScreen extends Component {
                     <View style={spacerThin} />
                 </View>
 
-                {/* <View style={spacerThick} /> */}
                 <View style={spacerThin} />
 
-                <View style={newUserContainer}>
-                    {/* <Text style={[formText]}>New User? </Text> */}
-                    <TouchableOpacity>
-                        <Text
-                            style={[formText, formTextButton]}>
-                            SIGN UP
-                        </Text>
+                <View style={backButtonContainer}>
+                    <TouchableOpacity
+                        onPress={() => this.props.navigation.goBack()}>
+                        <Text style={formTextButton}>Back</Text>
                     </TouchableOpacity>
                 </View>
             </KeyboardAwareScrollView>
@@ -203,26 +163,27 @@ const styles = StyleSheet.create({
     submitButtonText: {
         color: SWATCH.WHITE,
     },
-    formText: {},
     formTextButton: {
         fontWeight: "bold",
+        color: SWATCH.GRAY,
     },
-    newUserContainer: {
-        // flexDirection: "row",
-        alignItems: "center",
-    },
-    socialButtonsContainer: {
+    formTextForgotContainer: {
         flexBasis: 100,
-        flexDirection: "row",
         justifyContent: "center",
         alignItems: "center",
     },
+    socialButtonsContainer: {
+        flexDirection: "row",
+        justifyContent: "center",
+    },
     socialButton: {
         marginHorizontal: 15,
-        // marginLeft: 20,
         backgroundColor: SWATCH.BLACK,
         width: 30,
         height: 30,
+    },
+    backButtonContainer: {
+        alignItems: "center",
     },
     spacerThin: {
         padding: 10,
