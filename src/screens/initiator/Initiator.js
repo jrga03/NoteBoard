@@ -51,7 +51,6 @@ export default class Initiator extends Component {
         return (
             <View style={styles.container}>
                 <ActivityIndicator size="large" />
-                <StatusBar />
             </View>
         );
     }

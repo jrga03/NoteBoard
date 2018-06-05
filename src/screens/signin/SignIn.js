@@ -27,7 +27,6 @@ export default class SignInScreen extends Component {
 
     render() {
         const {
-            formText,
             container,
             formHeader,
             submitButton,
@@ -146,7 +145,7 @@ export default class SignInScreen extends Component {
                     {/* <Text style={[formText]}>New User? </Text> */}
                     <TouchableOpacity>
                         <Text
-                            style={[formText, formTextButton]}>
+                            style={formTextButton}>
                             SIGN UP
                         </Text>
                     </TouchableOpacity>
@@ -203,7 +202,6 @@ const styles = StyleSheet.create({
     submitButtonText: {
         color: SWATCH.WHITE,
     },
-    formText: {},
     formTextButton: {
         fontWeight: "bold",
     },

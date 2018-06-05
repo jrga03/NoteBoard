@@ -14,7 +14,8 @@ export default class Notification extends Component {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: "tomato",
+        flex: 1,
+        backgroundColor: "teal",
         justifyContent: "center",
         alignItems: "center",
     },

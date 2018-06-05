@@ -5,7 +5,7 @@
  */
 
 import React, { Component } from "react";
-import { YellowBox } from "react-native";
+import { View, StatusBar, YellowBox } from "react-native";
 import Root from "./src/router/router";
 
 YellowBox.ignoreWarnings([
@@ -17,6 +17,11 @@ YellowBox.ignoreWarnings([
 
 export default class App extends Component {
     render() {
-        return <Root />;
+        return (
+            <View style={{flex: 1}}>
+                <Root />
+                <StatusBar barStyle="light-content" />
+            </View>
+        );
     }
 }
