@@ -5,5 +5,9 @@ export const SWATCH = {
 
     BLACK: "black",
 
-    GRAY: "dimgray",
+    GRAY: "gray",
+
+    LIGHT_GRAY: "lightgray",
 };
+
+export const LAYOUT_MARGIN = 17;
