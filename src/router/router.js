@@ -9,14 +9,15 @@ import {
 } from "react-navigation";
 import { Icon } from "react-native-elements";
 
+import { SWATCH } from "../constants";
+
 import Initiator from "../screens/initiator/Initiator";
 import SignInScreen from "../screens/signin/SignIn";
 import NotesScreen from "../screens/notes/Notes";
 import SignInPassword from "../screens/signin/SignInPassword";
 import NotificationScreen from "../screens/notifications/Notifications";
 import SettingsScreen from "../screens/settings/Settings";
-
-import { SWATCH } from "../constants";
+import NoteItemScreen from "../screens/notes/NoteItem";
 
 const commonNavigationOptions = (navigation, screenProps, ...props) => ({
     headerLeft: (
@@ -57,6 +58,12 @@ const commonNavigationOptions = (navigation, screenProps, ...props) => ({
 const NotesStack = createStackNavigator(
     {
         Notes: NotesScreen,
+        NoteItem: {
+            screen: NoteItemScreen,
+            navigationOptions: {
+                header: null,
+            },
+        },
     },
     {
         initialRouteName: "Notes",
