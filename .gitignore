@@ -56,5 +56,5 @@ buck-out/
 *.jsbundle
 
 # Google configuration
-GoogleService-Info.*.plist
+GoogleService-Info.plist
 google-services.json
