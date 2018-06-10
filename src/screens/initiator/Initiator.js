@@ -6,40 +6,28 @@ import {
     AsyncStorage,
     ActivityIndicator,
 } from "react-native";
-import { NavigationActions, StackActions } from "react-navigation";
-import { GoogleSignin } from "react-native-google-signin";
+import { GoogleService } from "../../services";
 
 export default class Initiator extends Component {
     constructor(props) {
         super(props);
-        // this._bootstrap();
     }
 
-    // _bootstrap = async () => {
-    //     try {
-    //     } catch (err) {
-    //         console.log("Google signin error", err.code, err.message);
-    //     }
-    // };
-    
     async componentDidMount() {
         try {
-            await GoogleSignin.hasPlayServices({ autoResolve: true });
-            await GoogleSignin.configure({
-                iosClientId:
-                    "604168385941-oor808u3jmq0l9sme0jaqum2r0cgcpq2.apps.googleusercontent.com",
-                webClientId:
-                    "604168385941-5unq3p22khg777375e1flqmnj2f40ns4.apps.googleusercontent.com",
-                offlineAccess: false,
-            });
+            await GoogleService.initializeSignin();
 
-            const googleUser = await GoogleSignin.currentUserAsync();
-            
+            const googleUser = await GoogleService.isUserLoggedIn();
+
             if (googleUser === null) {
                 const user = await AsyncStorage.getItem("CURRENT_USER");
                 this.props.navigation.navigate(user ? "Home" : "SignIn");
             } else {
-                console.log("Google userAsync", googleUser);
+                const user = {
+                    ...googleUser,
+                    loggedInUsing: "Google",
+                };
+                console.log("Google userAsync", user);
                 this.props.navigation.navigate("Home");
             }
         } catch (error) {

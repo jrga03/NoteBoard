@@ -14,6 +14,7 @@ import { SocialIcon } from "react-native-elements";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 import { SWATCH } from "../../constants";
+import { GoogleService, FacebookService } from "../../services";
 
 export default class SignInScreen extends Component {
     constructor(props) {
@@ -24,6 +25,18 @@ export default class SignInScreen extends Component {
 
         this.inputs = {};
     }
+
+    componentDidMount() {
+        GoogleService.initializeSignin();
+    }
+
+    handleGoogleSignIn = () => {
+        GoogleService.signIn();
+    };
+
+    handleFacebookSignIn = () => {
+        FacebookService.signIn();
+    };
 
     render() {
         const {
@@ -101,9 +114,7 @@ export default class SignInScreen extends Component {
                             style={[containedButton, socialButton]}
                             type="facebook"
                             raised={true}
-                            onPress={() =>
-                                this.props.navigation.navigate("Home")
-                            }
+                            onPress={this.handleFacebookSignIn}
                             iconSize={16}
                             iconColor={SWATCH.WHITE}
                             // underlayColor="yellow"
@@ -113,9 +124,7 @@ export default class SignInScreen extends Component {
                             style={[containedButton, socialButton]}
                             type="google-plus-official"
                             raised={true}
-                            onPress={() =>
-                                this.props.navigation.navigate("Home")
-                            }
+                            onPress={this.handleGoogleSignIn}
                             iconSize={16}
                             iconColor={SWATCH.WHITE}
                             // underlayColor="yellow"
@@ -144,10 +153,7 @@ export default class SignInScreen extends Component {
                 <View style={newUserContainer}>
                     {/* <Text style={[formText]}>New User? </Text> */}
                     <TouchableOpacity>
-                        <Text
-                            style={formTextButton}>
-                            SIGN UP
-                        </Text>
+                        <Text style={formTextButton}>SIGN UP</Text>
                     </TouchableOpacity>
                 </View>
             </KeyboardAwareScrollView>

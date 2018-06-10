@@ -32,10 +32,10 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>com.googleusercontent.apps.604168385941-bnjj6bb3a4l9gv20nkl57d2o9p43hgnu</string>
+			<string>com.googleusercontent.apps.604168385941-564sugmijrebh8dg3vpt5i2tr5df4bee</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.604168385941-bnjj6bb3a4l9gv20nkl57d2o9p43hgnu</string>
+				<string>com.googleusercontent.apps.604168385941-564sugmijrebh8dg3vpt5i2tr5df4bee</string>
 			</array>
 		</dict>
 		<dict>
@@ -46,6 +46,16 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>com.noteboard</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>604168385941-564sugmijrebh8dg3vpt5i2tr5df4bee.apps.googleusercontent.com</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>604168385941-564sugmijrebh8dg3vpt5i2tr5df4bee.apps.googleusercontent.com</string>
 			</array>
 		</dict>
 	</array>
