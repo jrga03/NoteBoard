@@ -6,7 +6,7 @@
 
 import React, { Component } from "react";
 import { View, StatusBar, YellowBox } from "react-native";
-import Root from "./src/router/router";
+import Root from "./router/router";
 
 YellowBox.ignoreWarnings([
     "Warning: isMounted(...)",

@@ -113,6 +113,7 @@ const MainDrawer = createDrawerNavigator(
     {
         initialRouteName: "NotesStack",
         headerMode: "none",
+        backBehavior: "initialRoute"
         // getCustomActionCreators: (route, stateKey) => {
         //     console.log("MainDrawer", route, stateKey);
         //     return {
