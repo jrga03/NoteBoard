@@ -54,3 +54,7 @@ buck-out/
 
 # Bundle artifact
 *.jsbundle
+
+# Google configuration
+GoogleService-Info.*.plist
+google-services.json
