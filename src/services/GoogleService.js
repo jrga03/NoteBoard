@@ -1,7 +1,7 @@
 import { GoogleSignin } from "react-native-google-signin";
 
 class _GoogleService {
-    async initializeSignin() {
+    async initialize() {
         try {
             await GoogleSignin.hasPlayServices({ autoResolve: true });
             await GoogleSignin.configure({
@@ -31,6 +31,16 @@ class _GoogleService {
             console.log("Google Signed In", userWithTag);
         } catch (error) {
             console.log("GOOGLE SIGN IN ERROR", error);
+        }
+    }
+
+    async signOut() {
+        try {
+            await this.initialize();
+            await GoogleSignin.revokeAccess();
+            await GoogleSignin.signOut();
+        } catch (error) {
+            console.log("GOOGLE SIGN OUT ERROR:", error);
         }
     }
 }

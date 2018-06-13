@@ -6,16 +6,19 @@ import {
     StyleSheet,
     TouchableOpacity,
 } from "react-native";
-// import { NavigationActions, StackActions } from "react-navigation";
 import { Icon } from "react-native-elements";
 
 import { SWATCH, LAYOUT_MARGIN } from "../../constants";
-
-// const resetAction = StackActions.reset({
-//     index: 0,
-// });
+import { GoogleService, FacebookService } from "../../services";
 
 export default class Settings extends Component {
+
+    logout = () => {
+        GoogleService.signOut();
+        FacebookService.signOut();
+        this.props.navigation.navigate("SignIn");
+    }
+
     renderItem = ({ item }) => {
         const { itemContainer, itemContainerText, iconContainer } = styles;
 
@@ -44,7 +47,7 @@ export default class Settings extends Component {
         const { itemContainer } = styles;
         return (
             <TouchableOpacity
-                onPress={() => this.props.navigation.navigate("SignIn")}>
+                onPress={this.logout}>
                 <Text style={itemContainer}>Logout</Text>
             </TouchableOpacity>
         );

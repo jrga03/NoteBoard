@@ -1,33 +1,24 @@
 import React, { Component } from "react";
 import {
     View,
-    StatusBar,
+    // StatusBar,
     StyleSheet,
-    AsyncStorage,
+    // AsyncStorage,
     ActivityIndicator,
 } from "react-native";
 import { GoogleService } from "../../services";
 
 export default class Initiator extends Component {
-    constructor(props) {
-        super(props);
-    }
-
     async componentDidMount() {
         try {
-            await GoogleService.initializeSignin();
+            await GoogleService.initialize();
 
             const googleUser = await GoogleService.isUserLoggedIn();
 
             if (googleUser === null) {
-                const user = await AsyncStorage.getItem("CURRENT_USER");
-                this.props.navigation.navigate(user ? "Home" : "SignIn");
+                this.props.navigation.navigate("SignIn");
             } else {
-                const user = {
-                    ...googleUser,
-                    loggedInUsing: "Google",
-                };
-                console.log("Google userAsync", user);
+                console.log("Google userAsync", googleUser);
                 this.props.navigation.navigate("Home");
             }
         } catch (error) {

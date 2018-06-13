@@ -6,6 +6,10 @@ import {
 } from "react-native-fbsdk";
 
 class _FacebookService {
+    async getAccessToken() {
+        return await AccessToken.getCurrentAccessToken();
+    }
+
     async signIn(/*callback*/) {
         try {
             const requestPermissions = [
@@ -24,6 +28,7 @@ class _FacebookService {
 
                 // request access token for graph request
                 let getToken = await AccessToken.getCurrentAccessToken();
+                console.log(getToken);
                 const accessToken = getToken.accessToken;
 
                 // this function returns the retrieved user profile
@@ -69,6 +74,10 @@ class _FacebookService {
             // console.log('Login fail with error: ', error);
             // return callback(error, null);
         }
+    }
+
+    signOut() {
+        LoginManager.logOut();
     }
 }
 

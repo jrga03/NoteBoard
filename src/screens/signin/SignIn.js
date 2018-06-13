@@ -12,11 +12,13 @@ import {
 // import {} from "react-navigation";
 import { SocialIcon } from "react-native-elements";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { connect } from "react-redux";
 
 import { SWATCH } from "../../constants";
 import { GoogleService, FacebookService } from "../../services";
+import { getGoogleUser } from "../../actions";
 
-export default class SignInScreen extends Component {
+class SignInScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -27,11 +29,16 @@ export default class SignInScreen extends Component {
     }
 
     componentDidMount() {
-        GoogleService.initializeSignin();
+        GoogleService.initialize();
+        console.log("this.props", this.props);
     }
 
     handleGoogleSignIn = () => {
-        GoogleService.signIn();
+        // GoogleService.signIn();
+        this.props.getGoogleUser();
+        setTimeout(() => {
+            console.log(this.props);
+        }, 1000)
     };
 
     handleFacebookSignIn = () => {
@@ -160,6 +167,19 @@ export default class SignInScreen extends Component {
         );
     }
 }
+
+const mapStateToProps = (state) => ({
+    ...state,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+    getGoogleUser: () => dispatch({ type: "GET_GOOGLE" }),
+});
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(SignInScreen);
 
 const styles = StyleSheet.create({
     container: {
