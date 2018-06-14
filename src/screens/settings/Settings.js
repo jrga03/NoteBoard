@@ -2,22 +2,23 @@ import React, { Component } from "react";
 import {
     View,
     Text,
-    SectionList,
     StyleSheet,
+    SectionList,
     TouchableOpacity,
 } from "react-native";
 import { Icon } from "react-native-elements";
+import { connect } from "react-redux";
 
-import { SWATCH, LAYOUT_MARGIN } from "../../constants";
-import { GoogleService, FacebookService } from "../../services";
+import { SWATCH, LAYOUT_MARGIN, LOGOUT_USER } from "../../constants";
+// import { GoogleService, FacebookService } from "../../services";
 
-export default class Settings extends Component {
-
+class Settings extends Component {
     logout = () => {
-        GoogleService.signOut();
-        FacebookService.signOut();
-        this.props.navigation.navigate("SignIn");
-    }
+        // GoogleService.signOut();
+        // FacebookService.signOut();
+        // this.props.navigation.navigate("SignIn");
+        this.props.logoutUser();
+    };
 
     renderItem = ({ item }) => {
         const { itemContainer, itemContainerText, iconContainer } = styles;
@@ -46,8 +47,7 @@ export default class Settings extends Component {
     renderListFooter = () => {
         const { itemContainer } = styles;
         return (
-            <TouchableOpacity
-                onPress={this.logout}>
+            <TouchableOpacity onPress={this.logout}>
                 <Text style={itemContainer}>Logout</Text>
             </TouchableOpacity>
         );
@@ -74,6 +74,15 @@ export default class Settings extends Component {
         );
     }
 }
+
+const mapDispatchToProps = (dispatch) => ({
+    logoutUser: () => dispatch({ type: LOGOUT_USER }),
+});
+
+export default connect(
+    null,
+    mapDispatchToProps
+)(Settings);
 
 const styles = StyleSheet.create({
     container: {

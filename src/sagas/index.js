@@ -7,16 +7,23 @@ import {
     GET_FACEBOOK,
     GET_FACEBOOK_SUCCESS,
     GET_FACEBOOK_FAIL,
+    LOGOUT_USER,
 } from "../constants";
 import { GoogleService, FacebookService } from "../services";
 import NavigationService from "../utilities/NavigationService";
 
-function* helloSaga() {
-    console.log("Hello Sagas!");
-}
+// function* helloSaga() {
+//     console.log("Hello Sagas!");
+// }
 
 function navigateToHome() {
     NavigationService.navigate("Home");
+}
+
+async function logoutUser() {
+    FacebookService.signOut();
+    await GoogleService.signOut();
+    NavigationService.navigate("SignIn");
 }
 
 async function logInGoogle() {
@@ -25,36 +32,35 @@ async function logInGoogle() {
             if (err) {
                 throw err;
             } else {
-                console.log(res);
                 return res;
             }
         });
     } catch (error) {
-        // console.log(error);
         throw error;
     }
 }
 
-function logInFacebook() {
-    FacebookService.signIn((err, res) => {
-        if (err) {
-            throw err;
-        } else {
-            return res;
-        }
-    });
+async function logInFacebook() {
+    try {
+        await FacebookService.signIn((err, res) => {
+            if (err) {
+                throw err;
+            } else {
+                return res;
+            }
+        });
+    } catch (error) {
+        throw error;
+    }
 }
 
 function* getGoogleUser() {
     try {
         const user = yield call(logInGoogle);
-        yield console.log("user", user);
         yield put({ type: GET_GOOGLE_SUCCESS, user });
     } catch (error) {
-        // yield console.log("ERROR: ", error);
         yield put({ type: GET_GOOGLE_FAIL, error });
     }
-    // yield put({ type: GET_GOOGLE_SUCCESS, })
 }
 
 function* getFacebookUser() {
@@ -75,14 +81,22 @@ function* watchGetFacebookUser() {
 }
 
 function* watchLoginSuccess() {
-    yield takeLatest([GET_GOOGLE_SUCCESS, GET_FACEBOOK_SUCCESS], navigateToHome);
+    yield takeLatest(
+        [GET_GOOGLE_SUCCESS, GET_FACEBOOK_SUCCESS],
+        navigateToHome
+    );
+}
+
+function* watchLogout() {
+    yield takeLatest(LOGOUT_USER, logoutUser);
 }
 
 export default function* rootSaga() {
     yield all([
-        helloSaga(),
+        // helloSaga(),
         watchGetGoogleUser(),
         watchGetFacebookUser(),
         watchLoginSuccess(),
+        watchLogout(),
     ]);
 }

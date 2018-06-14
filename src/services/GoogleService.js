@@ -22,7 +22,6 @@ class _GoogleService {
     }
 
     async signIn(callback) {
-        console.log("Google!")
         this.initialize();
         try {
             const user = await GoogleSignin.signIn();
@@ -30,7 +29,7 @@ class _GoogleService {
             //     ...user,
             //     loggedInUsing: "Google",
             // };
-            console.log("Google Signed In", user);
+            // console.log("Google Signed In", user);
             callback(null, user);
         } catch (error) {
             console.log("GOOGLE SIGN IN ERROR", error);
@@ -38,15 +37,15 @@ class _GoogleService {
         }
     }
 
-    async signOut(callback) {
+    async signOut(/*callback*/) {
         try {
             await this.initialize();
             await GoogleSignin.revokeAccess();
             await GoogleSignin.signOut();
-            callback(null, true);
+            // callback(null, true);
         } catch (error) {
-            // console.log("GOOGLE SIGN OUT ERROR:", error);
-            callback(error, null);
+            console.log("GOOGLE SIGN OUT ERROR:", error);
+            // callback(error, null);
         }
     }
 }

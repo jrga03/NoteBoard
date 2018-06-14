@@ -27,7 +27,7 @@ class _FacebookService {
             );
 
             if (result.isCancelled) {
-                // return callback(result, null);
+                return callback(result, null);
             } else {
                 // console.log('Login success with permissions: ', result.grantedPermissions);
 
@@ -39,7 +39,7 @@ class _FacebookService {
                 const responseInfoCallback = (error, result) => {
                     if (error) {
                         // console.log('response error', error);
-                        // return callback(error, null);
+                        return callback(error, null);
                     } else {
                         // console.log('response result', result);
 
@@ -48,8 +48,10 @@ class _FacebookService {
                             id: result.id || "",
                             email: result.email || "",
                             full_name: result.name || "",
+                            ...getToken,
                         };
 
+                        // console.log("Facebook signed in: ", user);
                         return callback(null, user);
                     }
                 };
@@ -79,6 +81,7 @@ class _FacebookService {
     }
 
     signOut() {
+        // console.log("FB out");
         LoginManager.logOut();
     }
 }

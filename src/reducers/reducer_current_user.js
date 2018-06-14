@@ -6,6 +6,7 @@ import {
     GET_FACEBOOK,
     GET_FACEBOOK_FAIL,
     GET_FACEBOOK_SUCCESS,
+    LOGOUT_USER,
 } from "../constants";
 
 const initialState = {
@@ -40,6 +41,8 @@ export default function(state = initialState, action) {
                 user: null,
                 error: action.error,
             };
+        case LOGOUT_USER:
+            return { ...state, user: null, error: action.error };
     }
     return state;
 }
