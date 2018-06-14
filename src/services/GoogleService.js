@@ -21,26 +21,32 @@ class _GoogleService {
         return await GoogleSignin.currentUserAsync();
     }
 
-    async signIn() {
+    async signIn(callback) {
+        console.log("Google!")
+        this.initialize();
         try {
             const user = await GoogleSignin.signIn();
-            const userWithTag = {
-                ...user,
-                loggedInUsing: "Google",
-            };
-            console.log("Google Signed In", userWithTag);
+            // const userWithTag = {
+            //     ...user,
+            //     loggedInUsing: "Google",
+            // };
+            console.log("Google Signed In", user);
+            callback(null, user);
         } catch (error) {
             console.log("GOOGLE SIGN IN ERROR", error);
+            callback(error, null);
         }
     }
 
-    async signOut() {
+    async signOut(callback) {
         try {
             await this.initialize();
             await GoogleSignin.revokeAccess();
             await GoogleSignin.signOut();
+            callback(null, true);
         } catch (error) {
-            console.log("GOOGLE SIGN OUT ERROR:", error);
+            // console.log("GOOGLE SIGN OUT ERROR:", error);
+            callback(error, null);
         }
     }
 }

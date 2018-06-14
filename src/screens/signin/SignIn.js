@@ -14,9 +14,9 @@ import { SocialIcon } from "react-native-elements";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { connect } from "react-redux";
 
-import { SWATCH } from "../../constants";
+import { SWATCH, GET_GOOGLE, GET_FACEBOOK } from "../../constants";
 import { GoogleService, FacebookService } from "../../services";
-import { getGoogleUser } from "../../actions";
+import { loginGoogleUser } from "../../actions";
 
 class SignInScreen extends Component {
     constructor(props) {
@@ -29,20 +29,24 @@ class SignInScreen extends Component {
     }
 
     componentDidMount() {
-        GoogleService.initialize();
+        // GoogleService.initialize();
         console.log("this.props", this.props);
     }
 
     handleGoogleSignIn = () => {
         // GoogleService.signIn();
-        this.props.getGoogleUser();
+        this.props.loginGoogleUser();
         setTimeout(() => {
             console.log(this.props);
-        }, 1000)
+        }, 1000);
     };
 
     handleFacebookSignIn = () => {
-        FacebookService.signIn();
+        // FacebookService.signIn();
+        this.props.loginFacebookUser();
+        setTimeout(() => {
+            console.log(this.props);
+        }, 1000);
     };
 
     render() {
@@ -168,16 +172,17 @@ class SignInScreen extends Component {
     }
 }
 
-const mapStateToProps = (state) => ({
-    ...state,
-});
+// const mapStateToProps = (state) => ({
+//     ...state,
+// });
 
 const mapDispatchToProps = (dispatch) => ({
-    getGoogleUser: () => dispatch({ type: "GET_GOOGLE" }),
+    loginGoogleUser: () => dispatch({ type: GET_GOOGLE }),
+    loginFacebookUser: () => dispatch({ type: GET_FACEBOOK }),
 });
 
 export default connect(
-    mapStateToProps,
+    null,
     mapDispatchToProps
 )(SignInScreen);
 

@@ -10,7 +10,12 @@ class _FacebookService {
         return await AccessToken.getCurrentAccessToken();
     }
 
-    async signIn(/*callback*/) {
+    async refreshAccessToken() {
+        const refreshToken = AccessToken.refreshCurrentAccessTokenAsync();
+        return await refreshToken;
+    }
+
+    async signIn(callback) {
         try {
             const requestPermissions = [
                 "public_profile",
@@ -28,7 +33,6 @@ class _FacebookService {
 
                 // request access token for graph request
                 let getToken = await AccessToken.getCurrentAccessToken();
-                console.log(getToken);
                 const accessToken = getToken.accessToken;
 
                 // this function returns the retrieved user profile
@@ -44,11 +48,9 @@ class _FacebookService {
                             id: result.id || "",
                             email: result.email || "",
                             full_name: result.name || "",
-                            loggedInUsing: "Facebook",
                         };
 
-                        console.log("Facebook Signed In ", user);
-                        // return callback(null, user);
+                        return callback(null, user);
                     }
                 };
 
@@ -72,7 +74,7 @@ class _FacebookService {
             }
         } catch (error) {
             // console.log('Login fail with error: ', error);
-            // return callback(error, null);
+            return callback(error, null);
         }
     }
 

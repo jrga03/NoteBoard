@@ -7,6 +7,7 @@ import createSagaMiddleware from "redux-saga";
 import Root from "./router/router";
 import reducers from "./reducers";
 import rootSaga from "./sagas";
+import NavigationService from "./utilities/NavigationService";
 
 // const storeWithMiddleware = applyMiddleware()(createStore);
 
@@ -22,7 +23,13 @@ export default class App extends Component {
         return (
             <Provider store={storeWithMiddleware}>
                 <View style={{ flex: 1 }}>
-                    <Root />
+                    <Root
+                        ref={(navigatorRef) => {
+                            NavigationService.setTopLevelNavigator(
+                                navigatorRef
+                            );
+                        }}
+                    />
                     <StatusBar barStyle="light-content" />
                 </View>
             </Provider>
