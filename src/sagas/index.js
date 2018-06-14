@@ -9,8 +9,7 @@ import {
     GET_FACEBOOK_FAIL,
     LOGOUT_USER,
 } from "../constants";
-import { GoogleService, FacebookService } from "../services";
-import NavigationService from "../utilities/NavigationService";
+import { GoogleService, FacebookService, NavigationService } from "../services";
 
 // function* helloSaga() {
 //     console.log("Hello Sagas!");

@@ -7,7 +7,7 @@ import createSagaMiddleware from "redux-saga";
 import Root from "./router/router";
 import reducers from "./reducers";
 import rootSaga from "./sagas";
-import NavigationService from "./utilities/NavigationService";
+import { NavigationService } from "./services";
 
 // const storeWithMiddleware = applyMiddleware()(createStore);
 
