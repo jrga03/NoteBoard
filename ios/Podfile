@@ -17,6 +17,8 @@ target 'NoteBoard' do
   end
 
   pod 'Firebase/Core'
+  pod 'Firebase/Auth'
+  pod 'Firebase/Database'
   pod 'GoogleSignIn'
 
   # See http://facebook.github.io/react-native/docs/integration-with-existing-apps.html#configuring-cocoapods-dependencies
