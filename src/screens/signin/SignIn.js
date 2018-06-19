@@ -13,6 +13,7 @@ import {
 import { SocialIcon } from "react-native-elements";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { connect } from "react-redux";
+import validator from "validator";
 
 import { SWATCH, GET_GOOGLE, GET_FACEBOOK } from "../../constants";
 // import { GoogleService, FacebookService } from "../../services";
@@ -23,9 +24,11 @@ class SignInScreen extends Component {
         super(props);
         this.state = {
             email: "",
+            isLoading: false,
+            errorText: false,
         };
 
-        this.inputs = {};
+        // this.inputs = {};
     }
 
     componentDidMount() {
@@ -49,6 +52,27 @@ class SignInScreen extends Component {
         // }, 1000);
     };
 
+    handleSubmit = () => {
+        if (this.validateInput()) {
+            this.setState({ isLoading: true });
+            /**
+             * CHECK IF EMAIL EXISTS IN DATABASE
+             */
+            this.props.navigation.navigate("Password", {
+                email: this.state.email,
+            });
+        }
+        this.setState({ isLoading: false });
+    };
+
+    validateInput() {
+        const isValid = validator.isEmail(this.state.email);
+        this.setState({
+            errorText: !isValid,
+        });
+        return isValid;
+    }
+
     render() {
         const {
             container,
@@ -60,13 +84,17 @@ class SignInScreen extends Component {
             submitButtonText,
             newUserContainer,
             socialButtonsContainer,
-            formTextForgotContainer,
+            // formTextForgotContainer,
             socialButton,
             spacerThin,
-            spacerThick,
+            // spacerThick,
             submitButtonContainer,
             containedButton,
+            errorTextStyle,
+            errorContainer,
         } = styles;
+
+        const { email, isLoading, errorText } = this.state;
 
         return (
             <KeyboardAwareScrollView
@@ -83,22 +111,32 @@ class SignInScreen extends Component {
                     <TextInput
                         placeholder="Enter your email"
                         placeholderTextColor={SWATCH.GRAY}
-                        style={formTextField}
+                        style={[
+                            formTextField,
+                            errorText
+                                ? { borderBottomColor: SWATCH.RED }
+                                : null,
+                        ]}
                         numberOfLines={1}
                         maxLength={64}
                         autoCorrect={false}
                         autoCapitalize="none"
                         editable={true}
                         blurOnSubmit={false}
-                        onSubmitEditing={() =>
-                            this.props.navigation.navigate("Password")
-                        }
-                        value={this.state.email}
+                        onSubmitEditing={this.handleSubmit}
+                        value={email}
                         keyboardType="email-address"
                         underlineColorAndroid="transparent"
                         returnKeyType="next"
-                        onChangeText={(email) => this.setState({ email })}
+                        onChangeText={(email) =>
+                            this.setState({ email, errorText: false })
+                        }
                     />
+                    <View style={errorContainer}>
+                        {errorText && (
+                            <Text style={errorTextStyle}>Enter an email</Text>
+                        )}
+                    </View>
                     {/* <View style={spacerThin} /> */}
 
                     {/* <Text style={formHeader}>Password</Text>
@@ -145,12 +183,16 @@ class SignInScreen extends Component {
                     {/* <View style={spacerThin} /> */}
 
                     <View style={[containedButton, submitButtonContainer]}>
-                        <TouchableOpacity
-                            onPress={() =>
-                                this.props.navigation.navigate("Password")
-                            }>
+                        <TouchableOpacity onPress={this.handleSubmit}>
                             <View style={submitButton}>
-                                <Text style={submitButtonText}>NEXT</Text>
+                                {isLoading ? (
+                                    <ActivityIndicator
+                                        size="small"
+                                        color={SWATCH.WHITE}
+                                    />
+                                ) : (
+                                    <Text style={submitButtonText}>NEXT</Text>
+                                )}
                             </View>
                         </TouchableOpacity>
                     </View>
@@ -256,7 +298,16 @@ const styles = StyleSheet.create({
     spacerThin: {
         padding: 10,
     },
-    spacerThick: {
-        padding: 20,
+    // spacerThick: {
+    //     padding: 20,
+    // },
+    errorContainer: {
+        height: 14,
+        width: "80%",
+        paddingHorizontal: 10,
+    },
+    errorTextStyle: {
+        color: SWATCH.RED,
+        // justifyContent: "flex-start",
     },
 });

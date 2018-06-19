@@ -8,16 +8,17 @@ import {
     TouchableOpacity,
     ActivityIndicator,
 } from "react-native";
-import { NavigationActions, StackActions } from "react-navigation";
+// import { NavigationActions, StackActions } from "react-navigation";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { SocialIcon } from "react-native-elements";
+// import { SocialIcon } from "react-native-elements";
+import validator from "validator";
 
 import { SWATCH } from "../../constants";
 
-const resetToHome = StackActions.reset({
-    index: 0,
-    actions: [NavigationActions.navigate("Home")],
-});
+// const resetToHome = StackActions.reset({
+//     index: 0,
+//     actions: [NavigationActions.navigate("Home")],
+// });
 
 export default class SignInPassword extends Component {
     constructor(props) {
@@ -25,7 +26,26 @@ export default class SignInPassword extends Component {
 
         this.state = {
             password: "",
+            isLoading: false,
+            errorText: false,
         };
+    }
+
+    handleSubmit = () => {
+        if (this.validateInput()) {
+            this.setState({ isLoading: true });
+            /**
+             * HANDLE USING FIREBASE
+             */
+            this.props.navigation.navigate("Home");
+        }
+        this.setState({ isLoading: false });
+    };
+
+    validateInput() {
+        const isEmpty = validator.isEmpty(this.state.password);
+        this.setState({ errorText: isEmpty });
+        return !isEmpty;
     }
 
     render() {
@@ -37,15 +57,19 @@ export default class SignInPassword extends Component {
             formContainer,
             formTextButton,
             submitButtonText,
-            socialButtonsContainer,
+            // socialButtonsContainer,
             formTextForgotContainer,
-            socialButton,
+            // socialButton,
             spacerThin,
-            spacerThick,
+            // spacerThick,
             submitButtonContainer,
             containedButton,
             backButtonContainer,
+            errorTextStyle,
+            errorContainer,
         } = styles;
+
+        const { password, isLoading, errorText } = this.state;
 
         return (
             <KeyboardAwareScrollView
@@ -58,30 +82,42 @@ export default class SignInPassword extends Component {
                 <View style={formContainer}>
                     <View style={spacerThin} />
                     <Text style={formHeader}>
-                        {`${"< PERSON'S NAME HERE >"}`}
+                        {this.props.navigation.state.params.email}
                     </Text>
                     <View style={spacerThin} />
                     <TextInput
                         autoFocus={true}
                         placeholder="Enter your password"
                         placeholderTextColor="gray"
-                        style={formTextField}
+                        style={[
+                            formTextField,
+                            errorText
+                                ? { borderBottomColor: SWATCH.RED }
+                                : null,
+                        ]}
                         numberOfLines={1}
                         maxLength={64}
                         autoCorrect={false}
                         autoCapitalize="none"
                         editable={true}
                         blurOnSubmit={true}
-                        onSubmitEditing={() =>
-                            this.props.navigation.navigate("Home")
-                        }
-                        value={this.state.password}
+                        onSubmitEditing={this.handleSubmit}
+                        value={password}
                         keyboardType="default"
                         underlineColorAndroid="transparent"
                         secureTextEntry={true}
                         returnKeyType="done"
-                        onChangeText={(password) => this.setState({ password })}
+                        onChangeText={(password) =>
+                            this.setState({ password, errorText: false })
+                        }
                     />
+                    <View style={errorContainer}>
+                        {errorText && (
+                            <Text style={errorTextStyle}>
+                                Enter your password
+                            </Text>
+                        )}
+                    </View>
 
                     <View style={formTextForgotContainer}>
                         <TouchableOpacity>
@@ -90,12 +126,18 @@ export default class SignInPassword extends Component {
                     </View>
 
                     <View style={[containedButton, submitButtonContainer]}>
-                        <TouchableOpacity
-                            onPress={() =>
-                                this.props.navigation.navigate("Home")
-                            }>
+                        <TouchableOpacity onPress={this.handleSubmit}>
                             <View style={submitButton}>
-                                <Text style={submitButtonText}>SIGN IN</Text>
+                                {isLoading ? (
+                                    <ActivityIndicator
+                                        size="small"
+                                        color={SWATCH.WHITE}
+                                    />
+                                ) : (
+                                    <Text style={submitButtonText}>
+                                        SIGN IN
+                                    </Text>
+                                )}
                             </View>
                         </TouchableOpacity>
                     </View>
@@ -172,23 +214,32 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
     },
-    socialButtonsContainer: {
-        flexDirection: "row",
-        justifyContent: "center",
-    },
-    socialButton: {
-        marginHorizontal: 15,
-        backgroundColor: SWATCH.BLACK,
-        width: 30,
-        height: 30,
-    },
+    // socialButtonsContainer: {
+    //     flexDirection: "row",
+    //     justifyContent: "center",
+    // },
+    // socialButton: {
+    //     marginHorizontal: 15,
+    //     backgroundColor: SWATCH.BLACK,
+    //     width: 30,
+    //     height: 30,
+    // },
     backButtonContainer: {
         alignItems: "center",
     },
     spacerThin: {
         padding: 10,
     },
-    spacerThick: {
-        padding: 20,
+    // spacerThick: {
+    //     padding: 20,
+    // },
+    errorContainer: {
+        height: 14,
+        width: "80%",
+        paddingHorizontal: 10,
+    },
+    errorTextStyle: {
+        color: SWATCH.RED,
+        // justifyContent: "flex-start",
     },
 });

@@ -14,6 +14,8 @@ const SWATCH = {
 
     GRAY: "gray",
 
+    RED: "red",
+
     LIGHT_GRAY: "lightgray",
 };
 

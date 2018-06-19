@@ -6,7 +6,7 @@ import {
     // AsyncStorage,
     ActivityIndicator,
 } from "react-native";
-import firebase from 'react-native-firebase';
+import firebase from "react-native-firebase";
 
 import { GoogleService } from "../../services";
 
@@ -26,6 +26,10 @@ export default class Initiator extends Component {
         } catch (error) {
             console.log("ERROR: ", error);
         }
+
+        firebase.auth().onAuthStateChanged((user) => {
+            this.props.navigation.navigate(user ? "Home" : "SignIn");
+        });
     }
 
     render() {
