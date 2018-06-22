@@ -15,7 +15,8 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { connect } from "react-redux";
 import validator from "validator";
 
-import { SWATCH, GET_GOOGLE, GET_FACEBOOK } from "../../constants";
+import { SWATCH } from "../../constants";
+import { getGoogleUser, getFacebookUser } from "../../actions";
 // import { GoogleService, FacebookService } from "../../services";
 // import { loginGoogleUser } from "../../actions";
 
@@ -25,7 +26,8 @@ class SignInScreen extends Component {
         this.state = {
             email: "",
             isLoading: false,
-            errorText: false,
+            error: false,
+            errorText: null,
         };
 
         // this.inputs = {};
@@ -33,7 +35,7 @@ class SignInScreen extends Component {
 
     componentDidMount() {
         // GoogleService.initialize();
-        // console.log("this.props", this.props);
+        console.log("this.props", this.props);
     }
 
     handleGoogleSignIn = () => {
@@ -66,11 +68,13 @@ class SignInScreen extends Component {
     };
 
     validateInput() {
-        const isValid = validator.isEmail(this.state.email);
+        const isEmail = validator.isEmail(this.state.email);
+        const errorText = isEmail ? null : "Enter a valid email";
         this.setState({
-            errorText: !isValid,
+            error: !isEmail,
+            errorText,
         });
-        return isValid;
+        return isEmail;
     }
 
     render() {
@@ -94,7 +98,7 @@ class SignInScreen extends Component {
             errorContainer,
         } = styles;
 
-        const { email, isLoading, errorText } = this.state;
+        const { email, isLoading, error, errorText } = this.state;
 
         return (
             <KeyboardAwareScrollView
@@ -113,9 +117,7 @@ class SignInScreen extends Component {
                         placeholderTextColor={SWATCH.GRAY}
                         style={[
                             formTextField,
-                            errorText
-                                ? { borderBottomColor: SWATCH.RED }
-                                : null,
+                            error ? { borderBottomColor: SWATCH.RED } : null,
                         ]}
                         numberOfLines={1}
                         maxLength={64}
@@ -129,12 +131,12 @@ class SignInScreen extends Component {
                         underlineColorAndroid="transparent"
                         returnKeyType="next"
                         onChangeText={(email) =>
-                            this.setState({ email, errorText: false })
+                            this.setState({ email, error: false })
                         }
                     />
                     <View style={errorContainer}>
-                        {errorText && (
-                            <Text style={errorTextStyle}>Enter an email</Text>
+                        {error && (
+                            <Text style={errorTextStyle}>{errorText}</Text>
                         )}
                     </View>
                     {/* <View style={spacerThin} /> */}
@@ -214,17 +216,17 @@ class SignInScreen extends Component {
     }
 }
 
-// const mapStateToProps = (state) => ({
-//     ...state,
-// });
+const mapStateToProps = (state) => ({
+    ...state,
+});
 
 const mapDispatchToProps = (dispatch) => ({
-    loginGoogleUser: () => dispatch({ type: GET_GOOGLE }),
-    loginFacebookUser: () => dispatch({ type: GET_FACEBOOK }),
+    loginGoogleUser: () => dispatch(getGoogleUser()),
+    loginFacebookUser: () => dispatch(getFacebookUser()),
 });
 
 export default connect(
-    null,
+    mapStateToProps,
     mapDispatchToProps
 )(SignInScreen);
 

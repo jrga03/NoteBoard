@@ -22,7 +22,7 @@ class _GoogleService {
     }
 
     async signIn(callback) {
-        this.initialize();
+        await this.initialize();
         try {
             const user = await GoogleSignin.signIn();
             // const userWithTag = {

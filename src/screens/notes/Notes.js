@@ -7,11 +7,26 @@ import {
     TouchableOpacity,
 } from "react-native";
 import { Icon } from "react-native-elements";
-import { SWATCH, LAYOUT_MARGIN } from "../../constants";
+import { connect } from "react-redux";
 
+import { SWATCH, LAYOUT_MARGIN } from "../../constants";
 import NoteMemo from "./NoteMemo";
 
-export default class Notes extends Component {
+class Notes extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {};
+    }
+
+    componentDidMount() {
+        console.log("home props", this.props);
+    }
+
+    componentDidUpdate() {
+        console.log("home props update", this.props);
+        
+    }
+
     handleMemoPress = () => this.props.navigation.navigate("NoteItem");
 
     renderNoteItem = ({ item }) => {
@@ -34,6 +49,14 @@ export default class Notes extends Component {
         );
     }
 }
+
+const mapStateToProps = (state) => ({ ...state });
+const mapDispatchToProps = (dispatch) => ({});
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(Notes);
 
 const styles = StyleSheet.create({
     container: {

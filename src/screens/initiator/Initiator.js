@@ -6,28 +6,28 @@ import {
     // AsyncStorage,
     ActivityIndicator,
 } from "react-native";
-import firebase from "react-native-firebase";
+// import firebase from "react-native-firebase";
+import { FirebaseService } from "../../services";
 
-import { GoogleService } from "../../services";
+// import { GoogleService } from "../../services";
 
 export default class Initiator extends Component {
-    async componentDidMount() {
-        try {
-            // const user = await firebase.auth().onAuthStateChanged();
+    componentDidMount() {
+        // try {
+        //     // const user = await firebase.auth().onAuthStateChanged();
 
-            console.log("didmount");
+        //     console.log("didmount");
 
-            // if (googleUser === null) {
-            //     this.props.navigation.navigate("SignIn");
-            // } else {
-            //     console.log("Google userAsync", googleUser);
-            //     this.props.navigation.navigate("Home");
-            // }
-        } catch (error) {
-            console.log("ERROR: ", error);
-        }
-
-        firebase.auth().onAuthStateChanged((user) => {
+        //     // if (googleUser === null) {
+        //     //     this.props.navigation.navigate("SignIn");
+        //     // } else {
+        //     //     console.log("Google userAsync", googleUser);
+        //     //     this.props.navigation.navigate("Home");
+        //     // }
+        // } catch (error) {
+        //     console.log("ERROR: ", error);
+        // }
+        FirebaseService.isUserLoggedIn((user) => {
             this.props.navigation.navigate(user ? "Home" : "SignIn");
         });
     }

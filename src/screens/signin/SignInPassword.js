@@ -27,7 +27,8 @@ export default class SignInPassword extends Component {
         this.state = {
             password: "",
             isLoading: false,
-            errorText: false,
+            error: false,
+            errorText: null,
         };
     }
 
@@ -44,7 +45,11 @@ export default class SignInPassword extends Component {
 
     validateInput() {
         const isEmpty = validator.isEmpty(this.state.password);
-        this.setState({ errorText: isEmpty });
+        const errorText = isEmpty ? "Enter a password" : null;
+        this.setState({
+            error: isEmpty,
+            errorText,
+        });
         return !isEmpty;
     }
 
@@ -69,7 +74,7 @@ export default class SignInPassword extends Component {
             errorContainer,
         } = styles;
 
-        const { password, isLoading, errorText } = this.state;
+        const { password, isLoading, error, errorText } = this.state;
 
         return (
             <KeyboardAwareScrollView
@@ -91,9 +96,7 @@ export default class SignInPassword extends Component {
                         placeholderTextColor="gray"
                         style={[
                             formTextField,
-                            errorText
-                                ? { borderBottomColor: SWATCH.RED }
-                                : null,
+                            error ? { borderBottomColor: SWATCH.RED } : null,
                         ]}
                         numberOfLines={1}
                         maxLength={64}
@@ -108,14 +111,12 @@ export default class SignInPassword extends Component {
                         secureTextEntry={true}
                         returnKeyType="done"
                         onChangeText={(password) =>
-                            this.setState({ password, errorText: false })
+                            this.setState({ password, error: false })
                         }
                     />
                     <View style={errorContainer}>
-                        {errorText && (
-                            <Text style={errorTextStyle}>
-                                Enter your password
-                            </Text>
+                        {error && (
+                            <Text style={errorTextStyle}>{errorText}</Text>
                         )}
                     </View>
 
