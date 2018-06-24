@@ -56,21 +56,23 @@ function* watchGetEmail() {
 /**
  * Google Login
  */
-async function logInGoogle() {
-    let user;
-    await GoogleService.signIn((err, res) => {
-        if (err) {
-            throw err;
-        } else {
-            user = res;
-        }
-    });
-    return user;
+function* logInGoogle() {
+    return yield cps(GoogleService.signIn)
+    // let user;
+    // await GoogleService.signIn((err, res) => {
+    //     if (err) {
+    //         throw err;
+    //     } else {
+    //         user = res;
+    //     }
+    // });
+    // return user;
 }
 
 function* getGoogleUser() {
     try {
         const user = yield call(logInGoogle);
+        console.log("getGoogleUser", user);
         yield put({ type: GET_GOOGLE_SUCCESS, user });
     } catch (error) {
         yield put({ type: GET_GOOGLE_FAIL, error });
@@ -84,19 +86,13 @@ function* watchGetGoogleUser() {
 /**
  * Facebook Login
  */
-function logInFacebook(callback) {
-    FacebookService.signIn((err, res) => {
-        if (err) {
-            return callback(err, null);
-        } else {
-            return callback(null, res);
-        }
-    });
+function* logInFacebook() {
+    return yield cps(FacebookService.signIn);
 }
 
 function* getFacebookUser() {
     try {
-        const user = yield cps(logInFacebook);
+        const user = yield call(logInFacebook);
         yield put({ type: GET_FACEBOOK_SUCCESS, user });
     } catch (error) {
         yield put({ type: GET_FACEBOOK_FAIL, error });

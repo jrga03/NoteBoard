@@ -22,7 +22,7 @@ class _GoogleService {
     }
 
     async signIn(callback) {
-        await this.initialize();
+        // await this.initialize();
         try {
             const user = await GoogleSignin.signIn();
             // const userWithTag = {
@@ -39,8 +39,19 @@ class _GoogleService {
 
     async signOut(/*callback*/) {
         try {
-            await this.initialize();
-            await GoogleSignin.revokeAccess();
+            // await this.initialize();
+            await GoogleSignin.configure({
+                // scopes: [],
+                iosClientId:
+                    "604168385941-564sugmijrebh8dg3vpt5i2tr5df4bee.apps.googleusercontent.com",
+                webClientId:
+                    "604168385941-5unq3p22khg777375e1flqmnj2f40ns4.apps.googleusercontent.com",
+                offlineAccess: false,
+            });
+            const user = await this.isUserLoggedIn();
+            if (user !== null) {
+                await GoogleSignin.revokeAccess();
+            }
             await GoogleSignin.signOut();
             // callback(null, true);
         } catch (error) {
