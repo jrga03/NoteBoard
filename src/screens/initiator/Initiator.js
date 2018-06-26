@@ -27,7 +27,11 @@ export default class Initiator extends Component {
         // } catch (error) {
         //     console.log("ERROR: ", error);
         // }
+        // console.log("equal to", firebase.database().ref('user_emails').equalTo('jasonacido@gmail.com'));
         FirebaseService.isUserLoggedIn((user) => {
+            if (user !== null) {
+                console.log("INITIATOR USER", user.toJSON());
+            }
             this.props.navigation.navigate(user ? "Home" : "SignIn");
         });
     }

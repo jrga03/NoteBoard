@@ -17,7 +17,11 @@ import validator from "validator";
 
 import { SWATCH } from "../../constants";
 import { getGoogleUser, getFacebookUser } from "../../actions";
-// import { GoogleService, FacebookService } from "../../services";
+import {
+    GoogleService,
+    FacebookService,
+    FirebaseService,
+} from "../../services";
 // import { loginGoogleUser } from "../../actions";
 
 class SignInScreen extends Component {
@@ -34,11 +38,13 @@ class SignInScreen extends Component {
     }
 
     componentDidMount() {
-        // GoogleService.initialize();
-        console.log("this.props", this.props);
+        GoogleService.initialize();
+        // console.log("this.props", this.props);
     }
 
     handleGoogleSignIn = () => {
+        // console.log("press Google");
+
         // GoogleService.signIn();
         this.props.loginGoogleUser();
         // setTimeout(() => {
@@ -54,17 +60,30 @@ class SignInScreen extends Component {
         // }, 1000);
     };
 
+    handleSignUp = () => {
+        /**
+         * SIGNUP
+         */
+    };
+
     handleSubmit = () => {
         if (this.validateInput()) {
             this.setState({ isLoading: true });
-            /**
-             * CHECK IF EMAIL EXISTS IN DATABASE
-             */
-            this.props.navigation.navigate("Password", {
-                email: this.state.email,
+
+            FirebaseService.checkIfEmailExists(this.state.email, (err, res) => {
+                if (res) {
+                    this.props.navigation.navigate("Password", {
+                        email: this.state.email,
+                    });
+                } else {
+                    this.setState({
+                        error: true,
+                        errorText: "Couldn't find your email",
+                    });
+                }
+                this.setState({ isLoading: false });
             });
         }
-        this.setState({ isLoading: false });
     };
 
     validateInput() {
@@ -123,7 +142,7 @@ class SignInScreen extends Component {
                         maxLength={64}
                         autoCorrect={false}
                         autoCapitalize="none"
-                        editable={true}
+                        editable={!isLoading}
                         blurOnSubmit={false}
                         onSubmitEditing={this.handleSubmit}
                         value={email}
@@ -166,6 +185,7 @@ class SignInScreen extends Component {
                             type="facebook"
                             raised={true}
                             onPress={this.handleFacebookSignIn}
+                            disabled={isLoading}
                             iconSize={16}
                             iconColor={SWATCH.WHITE}
                             // underlayColor="yellow"
@@ -176,6 +196,7 @@ class SignInScreen extends Component {
                             type="google-plus-official"
                             raised={true}
                             onPress={this.handleGoogleSignIn}
+                            disabled={isLoading}
                             iconSize={16}
                             iconColor={SWATCH.WHITE}
                             // underlayColor="yellow"
@@ -185,7 +206,9 @@ class SignInScreen extends Component {
                     {/* <View style={spacerThin} /> */}
 
                     <View style={[containedButton, submitButtonContainer]}>
-                        <TouchableOpacity onPress={this.handleSubmit}>
+                        <TouchableOpacity
+                            onPress={this.handleSubmit}
+                            disabled={isLoading}>
                             <View style={submitButton}>
                                 {isLoading ? (
                                     <ActivityIndicator
@@ -207,7 +230,9 @@ class SignInScreen extends Component {
 
                 <View style={newUserContainer}>
                     {/* <Text style={[formText]}>New User? </Text> */}
-                    <TouchableOpacity>
+                    <TouchableOpacity
+                        onPress={this.handleSignUp}
+                        disabled={isLoading}>
                         <Text style={formTextButton}>SIGN UP</Text>
                     </TouchableOpacity>
                 </View>
@@ -309,6 +334,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
     },
     errorTextStyle: {
+        position: "absolute",
         color: SWATCH.RED,
         // justifyContent: "flex-start",
     },

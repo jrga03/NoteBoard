@@ -3,6 +3,7 @@ import {
     GET_GOOGLE,
     GET_FACEBOOK,
     GET_EMAIL,
+    LOGOUT_USER,
 } from "../constants";
 
 export function currentUser(user) {
@@ -31,5 +32,11 @@ export function getGoogleUser() {
 export function getFacebookUser() {
     return {
         type: GET_FACEBOOK,
+    };
+}
+
+export function logoutUser() {
+    return {
+        type: LOGOUT_USER,
     };
 }

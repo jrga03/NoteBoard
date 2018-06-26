@@ -4,6 +4,7 @@ import {
     GraphRequest,
     GraphRequestManager,
 } from "react-native-fbsdk";
+import { FirebaseService } from "./FirebaseService";
 
 class _FacebookService {
     async getAccessToken() {
@@ -33,46 +34,62 @@ class _FacebookService {
 
                 // request access token for graph request
                 let getToken = await AccessToken.getCurrentAccessToken();
+
+                if (!getToken) {
+                    throw "Something went wrong obtaining the users access token";
+                }
+
                 const accessToken = getToken.accessToken;
 
-                // this function returns the retrieved user profile
-                const responseInfoCallback = (error, result) => {
-                    if (error) {
-                        // console.log('response error', error);
-                        return callback(error, null);
+                await FirebaseService.logInUsingSocial("Facebook", accessToken, (err, res) => {
+                    if (!err & res) {
+                        return callback(null, res);
                     } else {
-                        // console.log('response result', result);
-
-                        const user = {
-                            ...result,
-                            id: result.id || "",
-                            email: result.email || "",
-                            full_name: result.name || "",
-                            ...getToken,
-                        };
-
-                        // console.log("Facebook signed in: ", user);
-                        return callback(null, user);
+                        return callback(err, null);
                     }
-                };
+                });
 
-                // retrieve user profile
-                const infoRequest = new GraphRequest(
-                    "/me",
-                    {
-                        accessToken: accessToken,
-                        parameters: {
-                            fields: {
-                                string:
-                                    "id,email,name,first_name,last_name,gender",
-                            },
-                        },
-                    },
-                    responseInfoCallback
-                );
 
-                // Start the graph request.
-                new GraphRequestManager().addRequest(infoRequest).start();
+
+
+                // // this function returns the retrieved user profile
+                // const responseInfoCallback = (error, result) => {
+                //     if (error) {
+                //         // console.log('response error', error);
+                //         return callback(error, null);
+                //     } else {
+                //         // console.log('response result', result);
+
+                //         const user = {
+                //             ...result,
+                //             id: result.id || "",
+                //             email: result.email || "",
+                //             full_name: result.name || "",
+                //             ...getToken,
+                //         };
+
+                //         // console.log("Facebook signed in: ", user);
+                //         return callback(null, user);
+                //     }
+                // };
+
+                // // retrieve user profile
+                // const infoRequest = new GraphRequest(
+                //     "/me",
+                //     {
+                //         accessToken: accessToken,
+                //         parameters: {
+                //             fields: {
+                //                 string:
+                //                     "id,email,name,first_name,last_name,gender",
+                //             },
+                //         },
+                //     },
+                //     responseInfoCallback
+                // );
+
+                // // Start the graph request.
+                // new GraphRequestManager().addRequest(infoRequest).start();
             }
         } catch (error) {
             // console.log('Login fail with error: ', error);

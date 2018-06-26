@@ -20,7 +20,12 @@ import {
     GET_EMAIL_SUCCESS,
     LOGOUT_USER,
 } from "../constants";
-import { GoogleService, FacebookService, NavigationService } from "../services";
+import {
+    GoogleService,
+    FacebookService,
+    FirebaseService,
+    NavigationService,
+} from "../services";
 
 // function* helloSaga() {
 //     console.log("Hello Sagas!");
@@ -57,7 +62,7 @@ function* watchGetEmail() {
  * Google Login
  */
 function* logInGoogle() {
-    return yield cps(GoogleService.signIn)
+    return yield cps(GoogleService.signIn);
     // let user;
     // await GoogleService.signIn((err, res) => {
     //     if (err) {
@@ -93,7 +98,11 @@ function* logInFacebook() {
 function* getFacebookUser() {
     try {
         const user = yield call(logInFacebook);
-        yield put({ type: GET_FACEBOOK_SUCCESS, user });
+        if (user) {
+            yield put({ type: GET_FACEBOOK_SUCCESS, user });
+        } else {
+            throw "NO USER!";
+        }
     } catch (error) {
         yield put({ type: GET_FACEBOOK_FAIL, error });
     }
@@ -113,10 +122,20 @@ function* watchLoginSuccess() {
     );
 }
 
-async function logoutUser() {
-    FacebookService.signOut();
-    await GoogleService.signOut();
-    NavigationService.navigate("SignIn");
+function logoutUser() {
+    // try {
+    // FacebookService.signOut();
+    // await GoogleService.signOut();
+    FirebaseService.signOut((err, res) => {
+        if (!err & res) {
+            NavigationService.navigate("SignIn");
+        } else {
+            console.log(err);
+        }
+    });
+    // } catch (error) {
+    //     console.log(error);
+    // }
 }
 
 function* watchLogout() {

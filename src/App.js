@@ -3,36 +3,12 @@ import { View, StatusBar, Platform, YellowBox } from "react-native";
 import { Provider } from "react-redux";
 import { createStore, applyMiddleware, compose } from "redux";
 import createSagaMiddleware from "redux-saga";
-// import firebase from "react-native-firebase";
+import firebase from "react-native-firebase";
 
 import Root from "./router/router";
 import reducers from "./reducers";
 import rootSaga from "./sagas";
 import { NavigationService } from "./services";
-
-// const iosConfig = {
-//     clientId:
-//         "604168385941-564sugmijrebh8dg3vpt5i2tr5df4bee.apps.googleusercontent.com",
-//     appId: "1:604168385941:ios:ac070bda8a2575b8",
-//     apiKey: "AIzaSyBK8pCjM1ANlH8oBDgFuUXCJDIPXzFCS10",
-//     databaseURL: "https://note-board-1527334009294.firebaseio.com/",
-//     storageBucket: "note-board-1527334009294.appspot.com",
-//     messagingSenderId: "604168385941",
-//     projectId: "note-board-1527334009294",
-//     persistence: true,
-// };
-
-// const androidConfig = {
-//     clientId:
-//         "604168385941-s3ir3m3puo5um9hpsig7trvfjfbafreq.apps.googleusercontent.com",
-//     appId: "1:604168385941:android:ac070bda8a2575b8",
-//     apiKey: "AIzaSyCNFx__Cp3WdKYlK--LeH4KdrgqkxBf3j0",
-//     databaseURL: "https://note-board-1527334009294.firebaseio.com/",
-//     storageBucket: "note-board-1527334009294.appspot.com",
-//     messagingSenderId: "604168385941",
-//     projectId: "note-board-1527334009294",
-//     persistence: true,
-// };
 
 // const storeWithMiddleware = applyMiddleware()(createStore);
 
@@ -44,6 +20,22 @@ const storeWithMiddleware = createStore(
 sagaMiddleware.run(rootSaga);
 
 export default class App extends Component {
+    constructor(props) {
+        super(props);
+
+        this.unsubscriber = null;
+    }
+
+    componentDidMount() {
+        this.unsubscriber = firebase.auth().onAuthStateChanged((user) => {});
+    }
+
+    componentWillUnmount() {
+        if (this.unsubscriber) {
+            this.unsubscriber();
+        }
+    }
+
     render() {
         return (
             <Provider store={storeWithMiddleware}>

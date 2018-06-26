@@ -14,6 +14,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import validator from "validator";
 
 import { SWATCH } from "../../constants";
+import { FirebaseService } from "../../services";
 
 // const resetToHome = StackActions.reset({
 //     index: 0,
@@ -32,15 +33,39 @@ export default class SignInPassword extends Component {
         };
     }
 
+    handleForgotPassword = () => {
+        /**
+         * FORGOT PASSWORD
+         */
+    };
+
     handleSubmit = () => {
         if (this.validateInput()) {
             this.setState({ isLoading: true });
             /**
              * HANDLE USING FIREBASE
              */
-            this.props.navigation.navigate("Home");
+            const userCredentials = {
+                email: this.props.navigation.state.params.email,
+                password: this.state.password,
+            };
+            FirebaseService.logInUsingEmail(
+                userCredentials,
+                (error, response) => {
+                    if (!error && response) {
+                        this.props.navigation.navigate("Home");
+                    } else {
+                        console.log(error);
+                        this.setState({
+                            error: true,
+                            errorText:
+                                "Wrong password. Try again or click Forgot Password to reset it.",
+                        });
+                    }
+                    this.setState({ isLoading: false });
+                }
+            );
         }
-        this.setState({ isLoading: false });
     };
 
     validateInput() {
@@ -102,7 +127,7 @@ export default class SignInPassword extends Component {
                         maxLength={64}
                         autoCorrect={false}
                         autoCapitalize="none"
-                        editable={true}
+                        editable={!isLoading}
                         blurOnSubmit={true}
                         onSubmitEditing={this.handleSubmit}
                         value={password}
@@ -121,13 +146,17 @@ export default class SignInPassword extends Component {
                     </View>
 
                     <View style={formTextForgotContainer}>
-                        <TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={this.handleForgotPassword}
+                            disabled={isLoading}>
                             <Text style={formTextButton}>Forgot password?</Text>
                         </TouchableOpacity>
                     </View>
 
                     <View style={[containedButton, submitButtonContainer]}>
-                        <TouchableOpacity onPress={this.handleSubmit}>
+                        <TouchableOpacity
+                            onPress={this.handleSubmit}
+                            disabled={isLoading}>
                             <View style={submitButton}>
                                 {isLoading ? (
                                     <ActivityIndicator
@@ -150,7 +179,8 @@ export default class SignInPassword extends Component {
 
                 <View style={backButtonContainer}>
                     <TouchableOpacity
-                        onPress={() => this.props.navigation.goBack()}>
+                        onPress={() => this.props.navigation.goBack()}
+                        disabled={isLoading}>
                         <Text style={formTextButton}>Back</Text>
                     </TouchableOpacity>
                 </View>
@@ -240,6 +270,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
     },
     errorTextStyle: {
+        position: "absolute",
         color: SWATCH.RED,
         // justifyContent: "flex-start",
     },

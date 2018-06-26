@@ -9,14 +9,11 @@ import {
 import { Icon } from "react-native-elements";
 import { connect } from "react-redux";
 
-import { SWATCH, LAYOUT_MARGIN, LOGOUT_USER } from "../../constants";
-// import { GoogleService, FacebookService } from "../../services";
+import { SWATCH, LAYOUT_MARGIN } from "../../constants";
+import { logoutUser } from "../../actions";
 
 class Settings extends Component {
     logout = () => {
-        // GoogleService.signOut();
-        // FacebookService.signOut();
-        // this.props.navigation.navigate("SignIn");
         this.props.logoutUser();
     };
 
@@ -76,7 +73,7 @@ class Settings extends Component {
 }
 
 const mapDispatchToProps = (dispatch) => ({
-    logoutUser: () => dispatch({ type: LOGOUT_USER }),
+    logoutUser: () => dispatch(logoutUser()),
 });
 
 export default connect(
