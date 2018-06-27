@@ -1,8 +1,8 @@
 import {
     AccessToken,
     LoginManager,
-    GraphRequest,
-    GraphRequestManager,
+    // GraphRequest,
+    // GraphRequestManager,
 } from "react-native-fbsdk";
 import { FirebaseService } from "./FirebaseService";
 
@@ -42,7 +42,7 @@ class _FacebookService {
                 const accessToken = getToken.accessToken;
 
                 await FirebaseService.logInUsingSocial("Facebook", accessToken, (err, res) => {
-                    if (!err & res) {
+                    if (!err && res) {
                         return callback(null, res);
                     } else {
                         return callback(err, null);
@@ -97,10 +97,10 @@ class _FacebookService {
         }
     }
 
-    signOut() {
-        // console.log("FB out");
-        LoginManager.logOut();
-    }
+    // signOut() {
+    //     // console.log("FB out");
+    //     LoginManager.logOut();
+    // }
 }
 
 const FacebookService = new _FacebookService();

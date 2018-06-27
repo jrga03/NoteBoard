@@ -13,13 +13,10 @@ export function currentUser(user) {
     };
 }
 
-export function getEmailUser(email, password) {
+export function getEmailUser(user) {
     return {
         type: GET_EMAIL,
-        payload: {
-            email,
-            password,
-        },
+        payload: user,
     };
 }
 

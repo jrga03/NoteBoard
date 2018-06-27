@@ -12,16 +12,18 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 // import { SocialIcon } from "react-native-elements";
 import validator from "validator";
+import { connect } from "react-redux";
 
 import { SWATCH } from "../../constants";
 import { FirebaseService } from "../../services";
+import { getEmailUser } from "../../actions";
 
 // const resetToHome = StackActions.reset({
 //     index: 0,
 //     actions: [NavigationActions.navigate("Home")],
 // });
 
-export default class SignInPassword extends Component {
+class SignInPassword extends Component {
     constructor(props) {
         super(props);
 
@@ -41,30 +43,31 @@ export default class SignInPassword extends Component {
 
     handleSubmit = () => {
         if (this.validateInput()) {
-            this.setState({ isLoading: true });
-            /**
-             * HANDLE USING FIREBASE
-             */
+            // this.setState({ isLoading: true });
+            console.log("submit")
             const userCredentials = {
                 email: this.props.navigation.state.params.email,
                 password: this.state.password,
             };
-            FirebaseService.logInUsingEmail(
-                userCredentials,
-                (error, response) => {
-                    if (!error && response) {
-                        this.props.navigation.navigate("Home");
-                    } else {
-                        console.log(error);
-                        this.setState({
-                            error: true,
-                            errorText:
-                                "Wrong password. Try again or click Forgot Password to reset it.",
-                        });
-                    }
-                    this.setState({ isLoading: false });
-                }
-            );
+
+            this.props.logInEmailUser(userCredentials);
+
+            // FirebaseService.logInUsingEmail(
+            //     userCredentials,
+            //     (error, response) => {
+            //         if (!error && response) {
+            //             this.props.navigation.navigate("Home");
+            //         } else {
+            //             console.log(error);
+            //             this.setState({
+            //                 error: true,
+            //                 errorText:
+            //                     "Wrong password. Try again or click Forgot Password to reset it.",
+            //             });
+            //         }
+            //         this.setState({ isLoading: false });
+            //     }
+            // );
         }
     };
 
@@ -188,6 +191,15 @@ export default class SignInPassword extends Component {
         );
     }
 }
+
+const mapDispatchToProps = (dispatch) => ({
+    logInEmailUser: (credentials) => dispatch(getEmailUser(credentials)),
+});
+
+export default connect(
+    null,
+    mapDispatchToProps
+)(SignInPassword);
 
 const styles = StyleSheet.create({
     container: {

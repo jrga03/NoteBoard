@@ -42,7 +42,7 @@ export default class NoteMemo extends Component {
         const { memo } = this.props;
         const { title, contents, lastEditedAt } = memo;
 
-        console.log(memo);
+        // console.log(memo);
 
         return (
             <TouchableOpacity onPress={this.props.onPress}>

@@ -27,16 +27,17 @@ import firebase from "react-native-firebase";
 
 class _FirebaseService {
     isUserLoggedIn(callback) {
-        firebase.auth().onAuthStateChanged((user) => {
-            // console.log("serive", user);
+        /**
+         * REFACTOR SAGA ASAP TO ACCOMMODATE LOGIN FLOW
+         */
+        firebase.auth().onAuthStateChanged((data) => {
+            console.log("authstate", data)
+            const user = data ? data.toJSON() : null;
             return callback(user);
         });
     }
 
     checkIfEmailExists(data, callback) {
-        /**
-         * REFACTOR to ASYNC
-         */
         firebase
             .database()
             .ref("user_emails")
@@ -45,21 +46,33 @@ class _FirebaseService {
             );
     }
 
-    logInUsingEmail(data, callback) {
-        /**
-         * REFACTOR to ASYNC
-         */
-        firebase
-            .auth()
-            .signInAndRetrieveDataWithEmailAndPassword(
-                data.email,
-                data.password
-            )
-            .then((data) => {
-                // console.log("email login", data.user.toJSON());
-                callback(null, data.user.toJSON());
-            })
-            .catch((error) => callback(error, null));
+    async logInUsingEmail(data, callback) {
+        console.log("data passed to firebase", data, callback);
+        console.log("stophere");
+        try {
+            const result = await firebase
+                .auth()
+                .signInAndRetrieveDataWithEmailAndPassword(
+                    data.email,
+                    data.password
+                );
+            console.log("firebase login email", result);
+            return callback(null, result.user.toJSON());
+        } catch (error) {
+            console.log("LOGIN EMAIL ERROR", error);
+            return callback(error, null);
+        }
+        // firebase
+        //     .auth()
+        //     .signInAndRetrieveDataWithEmailAndPassword(
+        //         data.email,
+        //         data.password
+        //     )
+        //     .then((data) => {
+        //         // console.log("email login", data.user.toJSON());
+        //         callback(null, data.user.toJSON());
+        //     })
+        //     .catch((error) => callback(error, null));
     }
 
     async logInUsingSocial(type, data, callback) {
@@ -82,10 +95,10 @@ class _FirebaseService {
         }
 
         try {
-            const data = await firebase
+            const result = await firebase
                 .auth()
                 .signInAndRetrieveDataWithCredential(credential);
-            return callback(null, data.user.toJSON());
+            return callback(null, result.user.toJSON());
         } catch (error) {
             return callback(error, null);
         }

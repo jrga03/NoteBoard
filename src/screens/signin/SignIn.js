@@ -39,7 +39,7 @@ class SignInScreen extends Component {
 
     componentDidMount() {
         GoogleService.initialize();
-        // console.log("this.props", this.props);
+        console.log("signIn this.props", this.props);
     }
 
     handleGoogleSignIn = () => {
@@ -118,6 +118,7 @@ class SignInScreen extends Component {
         } = styles;
 
         const { email, isLoading, error, errorText } = this.state;
+        const { isFetching } = this.props.user;
 
         return (
             <KeyboardAwareScrollView
@@ -142,7 +143,7 @@ class SignInScreen extends Component {
                         maxLength={64}
                         autoCorrect={false}
                         autoCapitalize="none"
-                        editable={!isLoading}
+                        editable={!isLoading || !isFetching}
                         blurOnSubmit={false}
                         onSubmitEditing={this.handleSubmit}
                         value={email}
@@ -185,7 +186,7 @@ class SignInScreen extends Component {
                             type="facebook"
                             raised={true}
                             onPress={this.handleFacebookSignIn}
-                            disabled={isLoading}
+                            disabled={isLoading || isFetching}
                             iconSize={16}
                             iconColor={SWATCH.WHITE}
                             // underlayColor="yellow"
@@ -196,7 +197,7 @@ class SignInScreen extends Component {
                             type="google-plus-official"
                             raised={true}
                             onPress={this.handleGoogleSignIn}
-                            disabled={isLoading}
+                            disabled={isLoading || isFetching}
                             iconSize={16}
                             iconColor={SWATCH.WHITE}
                             // underlayColor="yellow"
@@ -208,9 +209,9 @@ class SignInScreen extends Component {
                     <View style={[containedButton, submitButtonContainer]}>
                         <TouchableOpacity
                             onPress={this.handleSubmit}
-                            disabled={isLoading}>
+                            disabled={isLoading || isFetching}>
                             <View style={submitButton}>
-                                {isLoading ? (
+                                {isLoading || isFetching ? (
                                     <ActivityIndicator
                                         size="small"
                                         color={SWATCH.WHITE}
@@ -232,7 +233,7 @@ class SignInScreen extends Component {
                     {/* <Text style={[formText]}>New User? </Text> */}
                     <TouchableOpacity
                         onPress={this.handleSignUp}
-                        disabled={isLoading}>
+                        disabled={isLoading || isFetching}>
                         <Text style={formTextButton}>SIGN UP</Text>
                     </TouchableOpacity>
                 </View>

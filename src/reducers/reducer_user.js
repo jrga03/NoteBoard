@@ -7,6 +7,9 @@ import {
     GET_FACEBOOK_FAIL,
     GET_FACEBOOK_SUCCESS,
     LOGOUT_USER,
+    GET_EMAIL,
+    GET_EMAIL_SUCCESS,
+    GET_EMAIL_FAIL,
 } from "../constants";
 
 const initialState = {
@@ -17,8 +20,19 @@ const initialState = {
 
 export default function(state = initialState, action) {
     switch (action.type) {
-        // case CURRENT_USER:
-        //     return action.payload;
+        case CURRENT_USER:
+            return { ...state, user: action.user };
+        case GET_EMAIL:
+            return { ...state, isFetching: true };
+        case GET_EMAIL_SUCCESS:
+            return { ...state, isFetching: false, user: action.user };
+        case GET_EMAIL_FAIL:
+            return {
+                ...state,
+                isFetching: false,
+                user: null,
+                error: action.error,
+            };
         case GET_GOOGLE:
             return { ...state, isFetching: true };
         case GET_GOOGLE_SUCCESS:

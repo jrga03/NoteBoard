@@ -38,17 +38,18 @@ function navigateToHome() {
 /**
  * Email Login
  */
-async function logInEmail() {
-    try {
-    } catch (error) {
-        throw error;
-    }
+function* logInEmail(credentials) {
+    return yield cps(FirebaseService.logInUsingEmail, credentials);
 }
 
-function* getEmailUser() {
+function* getEmailUser({ payload }) {
     try {
-        const user = yield call(logInEmail);
-        yield put({ type: GET_EMAIL_SUCCESS, user });
+        const user = yield call(logInEmail, payload);
+        // if (user) {
+        //     yield put({ type: GET_EMAIL_SUCCESS, user });
+        // } else {
+        //     throw "NO USER!";
+        // }
     } catch (error) {
         yield put({ type: GET_EMAIL_FAIL, error });
     }
@@ -63,22 +64,17 @@ function* watchGetEmail() {
  */
 function* logInGoogle() {
     return yield cps(GoogleService.signIn);
-    // let user;
-    // await GoogleService.signIn((err, res) => {
-    //     if (err) {
-    //         throw err;
-    //     } else {
-    //         user = res;
-    //     }
-    // });
-    // return user;
 }
 
 function* getGoogleUser() {
     try {
         const user = yield call(logInGoogle);
-        console.log("getGoogleUser", user);
-        yield put({ type: GET_GOOGLE_SUCCESS, user });
+        // console.log("getGoogleUser", user);
+        if (user) {
+            yield put({ type: GET_GOOGLE_SUCCESS, user });
+        } else {
+            throw "NO USER!";
+        }
     } catch (error) {
         yield put({ type: GET_GOOGLE_FAIL, error });
     }
@@ -127,7 +123,7 @@ function logoutUser() {
     // FacebookService.signOut();
     // await GoogleService.signOut();
     FirebaseService.signOut((err, res) => {
-        if (!err & res) {
+        if (!err && res) {
             NavigationService.navigate("SignIn");
         } else {
             console.log(err);

@@ -27,7 +27,7 @@ export default class App extends Component {
     }
 
     componentDidMount() {
-        this.unsubscriber = firebase.auth().onAuthStateChanged((user) => {});
+        this.unsubscriber = firebase.auth().onAuthStateChanged(() => null);
     }
 
     componentWillUnmount() {
