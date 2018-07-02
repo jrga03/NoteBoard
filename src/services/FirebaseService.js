@@ -31,9 +31,9 @@ class _FirebaseService {
          * REFACTOR SAGA ASAP TO ACCOMMODATE LOGIN FLOW
          */
         firebase.auth().onAuthStateChanged((data) => {
-            console.log("authstate", data)
             const user = data ? data.toJSON() : null;
-            return callback(user);
+            // console.log("authstate", user);
+            return callback(null, user);
         });
     }
 
@@ -46,20 +46,16 @@ class _FirebaseService {
             );
     }
 
-    async logInUsingEmail(data, callback) {
-        console.log("data passed to firebase", data, callback);
-        console.log("stophere");
+    async logInUsingEmail({ email, password }, callback) {
+        // console.log("data passed to firebase", email, password, callback);
         try {
             const result = await firebase
                 .auth()
-                .signInAndRetrieveDataWithEmailAndPassword(
-                    data.email,
-                    data.password
-                );
-            console.log("firebase login email", result);
+                .signInAndRetrieveDataWithEmailAndPassword(email, password);
+            // console.log("firebase login email", result);
             return callback(null, result.user.toJSON());
         } catch (error) {
-            console.log("LOGIN EMAIL ERROR", error);
+            // console.log("LOGIN EMAIL ERROR", error);
             return callback(error, null);
         }
         // firebase

@@ -4,12 +4,13 @@ import {
     GET_FACEBOOK,
     GET_EMAIL,
     LOGOUT_USER,
-} from "../constants";
+    LOGIN_REQUEST,
+    LOGIN,
+} from "./constants";
 
-export function currentUser(user) {
+export function loginFlowStart() {
     return {
-        type: CURRENT_USER,
-        payload: user,
+        type: LOGIN,
     };
 }
 

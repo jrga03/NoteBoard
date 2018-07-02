@@ -16,7 +16,7 @@ import { connect } from "react-redux";
 import validator from "validator";
 
 import { SWATCH } from "../../constants";
-import { getGoogleUser, getFacebookUser } from "../../actions";
+import { getGoogleUser, getFacebookUser, loginFlowStart } from "../../actions";
 import {
     GoogleService,
     FacebookService,
@@ -39,6 +39,7 @@ class SignInScreen extends Component {
 
     componentDidMount() {
         GoogleService.initialize();
+        this.props.startLoginFlow();
         console.log("signIn this.props", this.props);
     }
 
@@ -64,6 +65,7 @@ class SignInScreen extends Component {
         /**
          * SIGNUP
          */
+        this.props.navigation.navigate("SignUp");
     };
 
     handleSubmit = () => {
@@ -247,6 +249,7 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
+    startLoginFlow: () => dispatch(loginFlowStart()),
     loginGoogleUser: () => dispatch(getGoogleUser()),
     loginFacebookUser: () => dispatch(getFacebookUser()),
 });

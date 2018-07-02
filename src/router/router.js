@@ -18,6 +18,7 @@ import SignInPassword from "../screens/signin/SignInPassword";
 import NotificationScreen from "../screens/notifications/Notifications";
 import SettingsScreen from "../screens/settings/Settings";
 import NoteItemScreen from "../screens/notes/NoteItem";
+import SignUpScreen from "../screens/signup/SignUp";
 
 const commonNavigationOptions = (navigation, screenProps, ...props) => ({
     headerLeft: (
@@ -159,6 +160,7 @@ const SignInStack = createStackNavigator(
     {
         SignInPage: SignInScreen,
         Password: SignInPassword,
+        SignUp: SignUpScreen,
     },
     {
         initialRouteName: "SignInPage",

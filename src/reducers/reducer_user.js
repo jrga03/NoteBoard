@@ -10,7 +10,9 @@ import {
     GET_EMAIL,
     GET_EMAIL_SUCCESS,
     GET_EMAIL_FAIL,
-} from "../constants";
+    LOGIN_SUCCESS,
+    LOGIN_FAIL,
+} from "../actions/constants";
 
 const initialState = {
     isFetching: false,
@@ -22,39 +24,64 @@ export default function(state = initialState, action) {
     switch (action.type) {
         case CURRENT_USER:
             return { ...state, user: action.user };
+
         case GET_EMAIL:
             return { ...state, isFetching: true };
-        case GET_EMAIL_SUCCESS:
-            return { ...state, isFetching: false, user: action.user };
-        case GET_EMAIL_FAIL:
-            return {
-                ...state,
-                isFetching: false,
-                user: null,
-                error: action.error,
-            };
+
+        // case GET_EMAIL_SUCCESS:
+        //     return { ...state, isFetching: false, user: action.user };
+
+        // case GET_EMAIL_FAIL:
+        //     return {
+        //         ...state,
+        //         isFetching: false,
+        //         user: null,
+        //         error: action.error,
+        //     };
+
         case GET_GOOGLE:
             return { ...state, isFetching: true };
-        case GET_GOOGLE_SUCCESS:
-            return { ...state, isFetching: false, user: action.user };
-        case GET_GOOGLE_FAIL:
-            return {
-                ...state,
-                isFetching: false,
-                user: null,
-                error: action.error,
-            };
+
+        // case GET_GOOGLE_SUCCESS:
+        //     return { ...state, isFetching: false, user: action.user };
+
+        // case GET_GOOGLE_FAIL:
+        //     return {
+        //         ...state,
+        //         isFetching: false,
+        //         user: null,
+        //         error: action.error,
+        //     };
+
         case GET_FACEBOOK:
             return { ...state, isFetching: true };
-        case GET_FACEBOOK_SUCCESS:
-            return { ...state, isFetching: false, user: action.user };
-        case GET_FACEBOOK_FAIL:
+
+        // case GET_FACEBOOK_SUCCESS:
+        //     return { ...state, isFetching: false, user: action.user };
+
+        // case GET_FACEBOOK_FAIL:
+        //     return {
+        //         ...state,
+        //         isFetching: false,
+        //         user: null,
+        //         error: action.error,
+        //     };
+
+        case LOGIN_SUCCESS:
+            return {
+                ...state,
+                isFetching: false,
+                user: action.user,
+            };
+
+        case LOGIN_FAIL:
             return {
                 ...state,
                 isFetching: false,
                 user: null,
                 error: action.error,
             };
+
         case LOGOUT_USER:
             return { ...state, user: null, error: action.error };
     }

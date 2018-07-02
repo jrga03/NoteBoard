@@ -44,7 +44,7 @@ class SignInPassword extends Component {
     handleSubmit = () => {
         if (this.validateInput()) {
             // this.setState({ isLoading: true });
-            console.log("submit")
+            // console.log("submit")
             const userCredentials = {
                 email: this.props.navigation.state.params.email,
                 password: this.state.password,
@@ -103,6 +103,7 @@ class SignInPassword extends Component {
         } = styles;
 
         const { password, isLoading, error, errorText } = this.state;
+        const { isFetching } = this.props.user;
 
         return (
             <KeyboardAwareScrollView
@@ -130,7 +131,7 @@ class SignInPassword extends Component {
                         maxLength={64}
                         autoCorrect={false}
                         autoCapitalize="none"
-                        editable={!isLoading}
+                        editable={!isLoading || !isFetching}
                         blurOnSubmit={true}
                         onSubmitEditing={this.handleSubmit}
                         value={password}
@@ -151,7 +152,7 @@ class SignInPassword extends Component {
                     <View style={formTextForgotContainer}>
                         <TouchableOpacity
                             onPress={this.handleForgotPassword}
-                            disabled={isLoading}>
+                            disabled={isLoading || isFetching}>
                             <Text style={formTextButton}>Forgot password?</Text>
                         </TouchableOpacity>
                     </View>
@@ -159,9 +160,9 @@ class SignInPassword extends Component {
                     <View style={[containedButton, submitButtonContainer]}>
                         <TouchableOpacity
                             onPress={this.handleSubmit}
-                            disabled={isLoading}>
+                            disabled={isLoading || isFetching}>
                             <View style={submitButton}>
-                                {isLoading ? (
+                                {isLoading || isFetching ? (
                                     <ActivityIndicator
                                         size="small"
                                         color={SWATCH.WHITE}
@@ -183,7 +184,7 @@ class SignInPassword extends Component {
                 <View style={backButtonContainer}>
                     <TouchableOpacity
                         onPress={() => this.props.navigation.goBack()}
-                        disabled={isLoading}>
+                        disabled={isLoading || isFetching}>
                         <Text style={formTextButton}>Back</Text>
                     </TouchableOpacity>
                 </View>
@@ -192,12 +193,16 @@ class SignInPassword extends Component {
     }
 }
 
+const mapStateToProps = ({ user }) => ({
+    user,
+});
+
 const mapDispatchToProps = (dispatch) => ({
     logInEmailUser: (credentials) => dispatch(getEmailUser(credentials)),
 });
 
 export default connect(
-    null,
+    mapStateToProps,
     mapDispatchToProps
 )(SignInPassword);
 
