@@ -12,6 +12,7 @@ import {
     GET_EMAIL_FAIL,
     LOGIN_SUCCESS,
     LOGIN_FAIL,
+    REGISTER_USER,
 } from "../actions/constants";
 
 const initialState = {
@@ -66,6 +67,9 @@ export default function(state = initialState, action) {
         //         user: null,
         //         error: action.error,
         //     };
+
+        case REGISTER_USER:
+            return { ...state, isFetching: true };
 
         case LOGIN_SUCCESS:
             return {

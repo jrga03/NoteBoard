@@ -32,7 +32,7 @@ class _FirebaseService {
          */
         firebase.auth().onAuthStateChanged((data) => {
             const user = data ? data.toJSON() : null;
-            // console.log("authstate", user);
+            console.log("authstatechange", user);
             return callback(null, user);
         });
     }
@@ -69,6 +69,31 @@ class _FirebaseService {
         //         callback(null, data.user.toJSON());
         //     })
         //     .catch((error) => callback(error, null));
+    }
+
+    async registerUser({ email, password, displayName }, callback) {
+        try {
+            const result = await firebase
+                .auth()
+                .createUserAndRetrieveDataWithEmailAndPassword(email, password);
+
+            const { user } = result;
+
+            await user.updateProfile({ displayName });
+
+            const credential = firebase.auth.EmailAuthProvider.credential(
+                email,
+                password
+            );
+            const reAuth = await user.reauthenticateAndRetrieveDataWithCredential(
+                credential
+            );
+            const reAuthUser = reAuth.user;
+
+            return callback(null, reAuthUser.toJSON());
+        } catch (error) {
+            return callback(error, null);
+        }
     }
 
     async logInUsingSocial(type, data, callback) {

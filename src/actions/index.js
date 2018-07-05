@@ -6,6 +6,7 @@ import {
     LOGOUT_USER,
     LOGIN_REQUEST,
     LOGIN,
+    REGISTER_USER,
 } from "./constants";
 
 export function loginFlowStart() {
@@ -30,6 +31,13 @@ export function getGoogleUser() {
 export function getFacebookUser() {
     return {
         type: GET_FACEBOOK,
+    };
+}
+
+export function registerEmailUser(user) {
+    return {
+        type: REGISTER_USER,
+        payload: user,
     };
 }
 

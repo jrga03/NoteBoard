@@ -8,32 +8,37 @@ import {
     TouchableOpacity,
     ActivityIndicator,
 } from "react-native";
-// import { NavigationActions, StackActions } from "react-navigation";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-// import { SocialIcon } from "react-native-elements";
+import { Icon } from "react-native-elements";
 import validator from "validator";
 import { connect } from "react-redux";
 
 import { SWATCH } from "../../constants";
-import { FirebaseService } from "../../services";
-import { getEmailUser } from "../../actions";
+// import { FirebaseService } from "../../services";
+import { registerEmailUser } from "../../actions";
 
-// const resetToHome = StackActions.reset({
-//     index: 0,
-//     actions: [NavigationActions.navigate("Home")],
-// });
-
-export default class SignUp extends Component {
+class SignUp extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            displayName: "",
-            email: "",
-            password: "",
-            isLoading: false,
-            error: false,
-            errorText: null,
+            displayName: {
+                value: "",
+                error: false,
+                errorText: null,
+            },
+            email: {
+                value: "",
+                error: false,
+                errorText: null,
+            },
+            password: {
+                value: "",
+                error: false,
+                errorText: null,
+            },
+            // isFetching: false,
+            showPassword: false,
         };
 
         this.inputs = {};
@@ -43,48 +48,81 @@ export default class SignUp extends Component {
         this.inputs[reference].focus();
     }
 
-    handleForgotPassword = () => {
-        /**
-         * FORGOT PASSWORD
-         */
-    };
-
     handleSubmit = () => {
-        // if (this.validateInput()) {
-        //     // this.setState({ isLoading: true });
-        //     // console.log("submit")
-        //     const userCredentials = {
-        //         email: this.state.email,
-        //         password: this.state.password,
-        //     };
-        //     // this.props.logInEmailUser(userCredentials);
-        //     // FirebaseService.logInUsingEmail(
-        //     //     userCredentials,
-        //     //     (error, response) => {
-        //     //         if (!error && response) {
-        //     //             this.props.navigation.navigate("Home");
-        //     //         } else {
-        //     //             console.log(error);
-        //     //             this.setState({
-        //     //                 error: true,
-        //     //                 errorText:
-        //     //                     "Wrong password. Try again or click Forgot Password to reset it.",
-        //     //             });
-        //     //         }
-        //     //         this.setState({ isLoading: false });
-        //     //     }
-        //     // );
-        // }
+        if (this.validateInput()) {
+            const userCredentials = {
+                displayName: this.state.displayName.value,
+                email: this.state.email.value,
+                password: this.state.password.value,
+            };
+
+            this.props.registerUser(userCredentials);
+        }
     };
 
     validateInput() {
-        const isEmpty = validator.isEmpty(this.state.password);
-        const errorText = isEmpty ? "Enter a password" : null;
+        const { displayName, email, password } = this.state;
+
+        const isNameEmpty = validator.isEmpty(displayName.value.trim());
+        const isNameAlphaNum = validator.isAlphanumeric(
+            displayName.value.trim()
+        );
+        const nameValid = !isNameEmpty && isNameAlphaNum;
+        const nameErrorText = isNameEmpty
+            ? "Enter a name"
+            : isNameAlphaNum
+                ? null
+                : "Use alphanumeric characters";
+
+        const isEmailEmpty = validator.isEmpty(email.value.trim());
+        const isEmail = validator.isEmail(email.value.trim());
+        const emailValid = !isEmailEmpty && isEmail;
+        const emailErrorText = emailValid ? null : "Enter an email address";
+
+        const isPasswordEmpty = validator.isEmpty(password.value);
+        const isPasswordSecure = password.value.length >= 8;
+        const passwordValid = !isPasswordEmpty && isPasswordSecure;
+        const passwordErrorText = isPasswordEmpty
+            ? "Enter a password"
+            : isPasswordSecure
+                ? null
+                : "Use 8 or more characters";
+
         this.setState({
-            error: isEmpty,
-            errorText,
+            displayName: {
+                ...displayName,
+                error: !nameValid,
+                errorText: nameErrorText,
+            },
+            email: {
+                ...email,
+                error: !emailValid,
+                errorText: emailErrorText,
+            },
+            password: {
+                ...password,
+                error: !passwordValid,
+                errorText: passwordErrorText,
+            },
         });
-        return !isEmpty;
+        return nameValid && emailValid && passwordValid;
+    }
+
+    renderVisibilityIcon() {
+        return (
+            <View style={styles.visibilityIcon}>
+                <TouchableOpacity
+                    onPressIn={() => this.setState({ showPassword: true })}
+                    onPressOut={() => this.setState({ showPassword: false })}
+                    disabled={this.props.user.isFetching}>
+                    <Icon
+                        type="material-icon"
+                        name="visibility"
+                        color={SWATCH.BLACK}
+                    />
+                </TouchableOpacity>
+            </View>
+        );
     }
 
     render() {
@@ -96,8 +134,7 @@ export default class SignUp extends Component {
             formContainer,
             formTextButton,
             submitButtonText,
-            // socialButtonsContainer,
-            formTextForgotContainer,
+            passwordInputContainer,
             // socialButton,
             spacerThin,
             // spacerThick,
@@ -108,15 +145,8 @@ export default class SignUp extends Component {
             errorContainer,
         } = styles;
 
-        const {
-            displayName,
-            email,
-            password,
-            isLoading,
-            error,
-            errorText,
-        } = this.state;
-        // const { isFetching } = this.props.user;
+        const { displayName, email, password, showPassword } = this.state;
+        const { isFetching } = this.props.user;
 
         return (
             <KeyboardAwareScrollView
@@ -136,109 +166,132 @@ export default class SignUp extends Component {
                         placeholderTextColor="gray"
                         style={[
                             formTextField,
-                            error ? { borderBottomColor: SWATCH.RED } : null,
+                            displayName.error
+                                ? { borderBottomColor: SWATCH.RED }
+                                : null,
                         ]}
                         numberOfLines={1}
                         maxLength={64}
                         autoCorrect={false}
                         autoCapitalize="none"
-                        editable={!isLoading}
+                        editable={!isFetching}
                         blurOnSubmit={true}
                         onSubmitEditing={() => this.focusToNext("email")}
-                        value={displayName}
+                        value={displayName.value}
                         keyboardType="default"
                         underlineColorAndroid="transparent"
                         secureTextEntry={false}
-                        returnKeyType="done"
-                        onChangeText={(password) =>
-                            this.setState({ password, error: false })
+                        returnKeyType="next"
+                        onChangeText={(value) =>
+                            this.setState({
+                                displayName: {
+                                    value,
+                                    error: false,
+                                    errorText: "",
+                                },
+                            })
                         }
                         ref={(ref) => (this.inputs["displayName"] = ref)}
                     />
                     <View style={errorContainer}>
-                        {error && (
-                            <Text style={errorTextStyle}>{errorText}</Text>
+                        {displayName.error && (
+                            <Text style={errorTextStyle}>
+                                {displayName.errorText}
+                            </Text>
                         )}
                     </View>
 
                     <TextInput
-                        autoFocus={true}
                         placeholder="Email Address"
                         placeholderTextColor="gray"
                         style={[
                             formTextField,
-                            error ? { borderBottomColor: SWATCH.RED } : null,
+                            email.error
+                                ? { borderBottomColor: SWATCH.RED }
+                                : null,
                         ]}
                         numberOfLines={1}
                         maxLength={64}
                         autoCorrect={false}
                         autoCapitalize="none"
-                        editable={!isLoading}
+                        editable={!isFetching}
                         blurOnSubmit={true}
                         onSubmitEditing={() => this.focusToNext("password")}
-                        value={email}
+                        value={email.value}
                         keyboardType="email-address"
                         underlineColorAndroid="transparent"
                         secureTextEntry={false}
-                        returnKeyType="done"
-                        onChangeText={(password) =>
-                            this.setState({ password, error: false })
+                        returnKeyType="next"
+                        onChangeText={(value) =>
+                            this.setState({
+                                email: {
+                                    value,
+                                    error: false,
+                                    errorText: "",
+                                },
+                            })
                         }
                         ref={(ref) => (this.inputs["email"] = ref)}
                     />
                     <View style={errorContainer}>
-                        {error && (
-                            <Text style={errorTextStyle}>{errorText}</Text>
+                        {email.error && (
+                            <Text style={errorTextStyle}>
+                                {email.errorText}
+                            </Text>
                         )}
                     </View>
 
-                    <TextInput
-                        autoFocus={true}
-                        placeholder="Password"
-                        placeholderTextColor="gray"
-                        style={[
-                            formTextField,
-                            error ? { borderBottomColor: SWATCH.RED } : null,
-                        ]}
-                        numberOfLines={1}
-                        maxLength={64}
-                        autoCorrect={false}
-                        autoCapitalize="none"
-                        editable={!isLoading}
-                        blurOnSubmit={true}
-                        onSubmitEditing={this.handleSubmit}
-                        value={password}
-                        keyboardType="default"
-                        underlineColorAndroid="transparent"
-                        secureTextEntry={true}
-                        returnKeyType="done"
-                        onChangeText={(password) =>
-                            this.setState({ password, error: false })
-                        }
-                        ref={(ref) => (this.inputs["password"] = ref)}
-                    />
+                    <View style={passwordInputContainer}>
+                        <TextInput
+                            placeholder="Password"
+                            placeholderTextColor="gray"
+                            style={[
+                                formTextField,
+                                password.error
+                                    ? { borderBottomColor: SWATCH.RED }
+                                    : null,
+                            ]}
+                            numberOfLines={1}
+                            maxLength={64}
+                            autoCorrect={false}
+                            autoCapitalize="none"
+                            editable={!isFetching}
+                            blurOnSubmit={true}
+                            onSubmitEditing={this.handleSubmit}
+                            value={password.value}
+                            keyboardType="default"
+                            underlineColorAndroid="transparent"
+                            secureTextEntry={!showPassword}
+                            returnKeyType="done"
+                            onChangeText={(value) =>
+                                this.setState({
+                                    password: {
+                                        value,
+                                        error: false,
+                                        errorText: "",
+                                    },
+                                })
+                            }
+                            ref={(ref) => (this.inputs["password"] = ref)}
+                        />
+                        {this.renderVisibilityIcon()}
+                    </View>
                     <View style={errorContainer}>
-                        {error && (
-                            <Text style={errorTextStyle}>{errorText}</Text>
+                        {password.error && (
+                            <Text style={errorTextStyle}>
+                                {password.errorText}
+                            </Text>
                         )}
                     </View>
 
                     <View style={spacerThin} />
 
-                    {/* <View style={formTextForgotContainer}>
-                        <TouchableOpacity
-                            onPress={this.handleForgotPassword}
-                            disabled={isLoading}>
-                            <Text style={formTextButton}>Forgot password?</Text>
-                        </TouchableOpacity>
-                    </View> */}
-
                     <View style={[containedButton, submitButtonContainer]}>
                         <TouchableOpacity
                             onPress={this.handleSubmit}
-                            disabled={isLoading}>
+                            disabled={isFetching}>
                             <View style={submitButton}>
-                                {isLoading ? (
+                                {isFetching ? (
                                     <ActivityIndicator
                                         size="small"
                                         color={SWATCH.WHITE}
@@ -260,7 +313,7 @@ export default class SignUp extends Component {
                 <View style={backButtonContainer}>
                     <TouchableOpacity
                         onPress={() => this.props.navigation.goBack()}
-                        disabled={isLoading}>
+                        disabled={isFetching}>
                         <Text style={formTextButton}>Back</Text>
                     </TouchableOpacity>
                 </View>
@@ -269,18 +322,18 @@ export default class SignUp extends Component {
     }
 }
 
-// const mapStateToProps = ({ user }) => ({
-//     user,
-// });
+const mapStateToProps = ({ user }) => ({
+    user,
+});
 
-// const mapDispatchToProps = (dispatch) => ({
-//     logInEmailUser: (credentials) => dispatch(getEmailUser(credentials)),
-// });
+const mapDispatchToProps = (dispatch) => ({
+    registerUser: (credentials) => dispatch(registerEmailUser(credentials)),
+});
 
-// export default connect(
-//     mapStateToProps,
-//     mapDispatchToProps
-// )(SignInPassword);
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(SignUp);
 
 const styles = StyleSheet.create({
     container: {
@@ -324,8 +377,6 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         paddingVertical: 10,
-        // paddingHorizontal: 40,
-        // zIndex: 100,
     },
     submitButtonText: {
         color: SWATCH.WHITE,
@@ -334,21 +385,10 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         color: SWATCH.GRAY,
     },
-    formTextForgotContainer: {
-        flexBasis: 100,
+    passwordInputContainer: {
+        flexDirection: "row",
         justifyContent: "center",
-        alignItems: "center",
     },
-    // socialButtonsContainer: {
-    //     flexDirection: "row",
-    //     justifyContent: "center",
-    // },
-    // socialButton: {
-    //     marginHorizontal: 15,
-    //     backgroundColor: SWATCH.BLACK,
-    //     width: 30,
-    //     height: 30,
-    // },
     backButtonContainer: {
         alignItems: "center",
     },
@@ -366,6 +406,12 @@ const styles = StyleSheet.create({
     errorTextStyle: {
         position: "absolute",
         color: SWATCH.RED,
-        // justifyContent: "flex-start",
+    },
+    visibilityIcon: {
+        justifyContent: "center",
+        height: "100%",
+        position: "absolute",
+        right: 0,
+        paddingHorizontal: 5,
     },
 });

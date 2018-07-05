@@ -6,12 +6,12 @@ const auth = {
             return callback(err, res);
         });
     },
-    loginGoogle() {
+    loginGoogle(callback) {
         GoogleService.signIn((err, res) => {
             return callback(err, res);
         });
     },
-    loginFacebook() {
+    loginFacebook(callback) {
         FacebookService.signIn((err, res) => {
             return callback(err, res);
         });
@@ -28,7 +28,11 @@ const auth = {
             callback(err, user)
         );
     },
-    register(email, password) {},
+    register(credentials, callback) {
+        FirebaseService.registerUser(credentials, (err, res) => {
+            return callback(err, res);
+        });
+    },
 };
 
 export default auth;

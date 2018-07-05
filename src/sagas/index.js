@@ -91,7 +91,8 @@ function* authorize() {
                     user = yield cps(authentication.loginGoogle);
                     break;
                 case REGISTER_USER:
-                // register
+                    user = yield cps(authentication.register, request.payload);
+                    break;
                 default:
                     throw "NO ACTION MATCHED";
             }
@@ -111,7 +112,6 @@ function* authorize() {
     } catch (error) {
         // If we get an error we send Redux the appropiate action and return
         yield put({ type: LOGIN_FAIL, error });
-
         return false;
     } finally {
         // When done, we tell Redux we're not in the middle of a request any more
@@ -363,11 +363,11 @@ function* watchLogout() {
 
 export default function* rootSaga() {
     yield fork(loginFlow),
-    yield all([
-        // watchGetEmail(),
-        // watchGetGoogleUser(),
-        // watchGetFacebookUser(),
-        // watchLoginSuccess(),
-        watchLogout(),
-    ]);
+        yield all([
+            // watchGetEmail(),
+            // watchGetGoogleUser(),
+            // watchGetFacebookUser(),
+            // watchLoginSuccess(),
+            watchLogout(),
+        ]);
 }
