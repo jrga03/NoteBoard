@@ -3,6 +3,7 @@ import {
     View,
     Text,
     Platform,
+    Keyboard,
     TextInput,
     StyleSheet,
     TouchableOpacity,
@@ -50,9 +51,10 @@ class SignUp extends Component {
 
     handleSubmit = () => {
         if (this.validateInput()) {
+            Keyboard.dismiss;
             const userCredentials = {
-                displayName: this.state.displayName.value,
-                email: this.state.email.value,
+                displayName: this.state.displayName.value.trim(),
+                email: this.state.email.value.trim(),
                 password: this.state.password.value,
             };
 

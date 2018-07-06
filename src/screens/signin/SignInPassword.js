@@ -2,7 +2,9 @@ import React, { Component } from "react";
 import {
     View,
     Text,
+    Alert,
     Platform,
+    Keyboard,
     TextInput,
     StyleSheet,
     TouchableOpacity,
@@ -36,12 +38,36 @@ class SignInPassword extends Component {
     }
 
     handleForgotPassword = () => {
-        /**
-         * FORGOT PASSWORD
-         */
+        Keyboard.dismiss;
+        const { email } = this.props.navigation.state.params;
+
+        this.setState({ isLoading: true });
+
+        FirebaseService.forgotPassword(email, (err, res) => {
+            try {
+                if (err) throw err;
+
+                Alert.alert(
+                    "Password Reset",
+                    `A link has been sent to ${email} to reset your password.`,
+                    [
+                        {
+                            text: "Ok",
+                            onPress: () => null,
+                        },
+                    ],
+                    { cancelable: false }
+                );
+            } catch (error) {
+                alert("Something went wrong. Try again.");
+            } finally {
+                this.setState({ isLoading: false });
+            }
+        });
     };
 
     handleSubmit = () => {
+        Keyboard.dismiss;
         if (this.validateInput()) {
             // this.setState({ isLoading: true });
             // console.log("submit")

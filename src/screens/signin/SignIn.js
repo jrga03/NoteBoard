@@ -3,6 +3,7 @@ import {
     View,
     Text,
     Platform,
+    Keyboard,
     TextInput,
     StyleSheet,
     // AsyncStorage,
@@ -19,7 +20,7 @@ import { SWATCH } from "../../constants";
 import { getGoogleUser, getFacebookUser, loginFlowStart } from "../../actions";
 import {
     GoogleService,
-    FacebookService,
+    // FacebookService,
     FirebaseService,
 } from "../../services";
 // import { loginGoogleUser } from "../../actions";
@@ -40,10 +41,11 @@ class SignInScreen extends Component {
     componentDidMount() {
         GoogleService.initialize();
         this.props.startLoginFlow();
-        console.log("signIn this.props", this.props);
+        // console.log("signIn this.props", this.props);
     }
 
     handleGoogleSignIn = () => {
+        Keyboard.dismiss;
         // console.log("press Google");
 
         // GoogleService.signIn();
@@ -54,6 +56,7 @@ class SignInScreen extends Component {
     };
 
     handleFacebookSignIn = () => {
+        Keyboard.dismiss;
         // FacebookService.signIn();
         this.props.loginFacebookUser();
         // setTimeout(() => {
@@ -70,26 +73,49 @@ class SignInScreen extends Component {
 
     handleSubmit = () => {
         if (this.validateInput()) {
+            Keyboard.dismiss;
             this.setState({ isLoading: true });
 
-            FirebaseService.checkIfEmailExists(this.state.email, (err, res) => {
-                if (res) {
-                    this.props.navigation.navigate("Password", {
-                        email: this.state.email,
-                    });
-                } else {
-                    this.setState({
-                        error: true,
-                        errorText: "Couldn't find your email",
-                    });
+            FirebaseService.checkIfEmailExists(
+                this.state.email.trim(),
+                (err, res) => {
+                    try {
+                        if (err) throw err;
+
+                        if (res.find((val) => val === "password")) {
+                            this.props.navigation.navigate("Password", {
+                                email: this.state.email,
+                            });
+                        } else if (
+                            res.find((val) => val === "facebook.com") ||
+                            res.find((val) => val === "google.com")
+                        ) {
+                            this.setState({
+                                error: true,
+                                errorText:
+                                    "No email account found for this email. Try Google or Facebook login.",
+                            });
+                        } else {
+                            this.setState({
+                                error: true,
+                                errorText: "Couldn't find your email",
+                            });
+                        }
+                    } catch (error) {
+                        this.setState({
+                            error: true,
+                            errorText: "Something went wrong. Try again.",
+                        });
+                    } finally {
+                        this.setState({ isLoading: false, email: "" });
+                    }
                 }
-                this.setState({ isLoading: false });
-            });
+            );
         }
     };
 
     validateInput() {
-        const isEmail = validator.isEmail(this.state.email);
+        const isEmail = validator.isEmail(this.state.email.trim());
         const errorText = isEmail ? null : "Enter a valid email";
         this.setState({
             error: !isEmail,
@@ -161,29 +187,9 @@ class SignInScreen extends Component {
                             <Text style={errorTextStyle}>{errorText}</Text>
                         )}
                     </View>
-                    {/* <View style={spacerThin} /> */}
-
-                    {/* <Text style={formHeader}>Password</Text>
-                    <TextInput
-                        style={formTextField}
-                        numberOfLines={1}
-                        maxLength={64}
-                        autoCorrect={false}
-                        autoCapitalize="none"
-                        editable={true}
-                        blurOnSubmit={true}
-                        onSubmitEditing={() => {}}
-                        ref={(ref) => (this.inputs["password"] = ref)}
-                        value={this.state.password}
-                        keyboardType="default"
-                        secureTextEntry={true}
-                        underlineColorAndroid="transparent"
-                        onChangeText={(password) => this.setState({ password })}
-                    /> */}
 
                     <View style={socialButtonsContainer}>
                         <SocialIcon
-                            // light
                             style={[containedButton, socialButton]}
                             type="facebook"
                             raised={true}
@@ -191,10 +197,8 @@ class SignInScreen extends Component {
                             disabled={isLoading || isFetching}
                             iconSize={16}
                             iconColor={SWATCH.WHITE}
-                            // underlayColor="yellow"
                         />
                         <SocialIcon
-                            // light
                             style={[containedButton, socialButton]}
                             type="google-plus-official"
                             raised={true}
@@ -202,11 +206,8 @@ class SignInScreen extends Component {
                             disabled={isLoading || isFetching}
                             iconSize={16}
                             iconColor={SWATCH.WHITE}
-                            // underlayColor="yellow"
                         />
                     </View>
-                    {/* <View style={spacerThick} /> */}
-                    {/* <View style={spacerThin} /> */}
 
                     <View style={[containedButton, submitButtonContainer]}>
                         <TouchableOpacity
@@ -228,11 +229,9 @@ class SignInScreen extends Component {
                     <View style={spacerThin} />
                 </View>
 
-                {/* <View style={spacerThick} /> */}
                 <View style={spacerThin} />
 
                 <View style={newUserContainer}>
-                    {/* <Text style={[formText]}>New User? </Text> */}
                     <TouchableOpacity
                         onPress={this.handleSignUp}
                         disabled={isLoading || isFetching}>

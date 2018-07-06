@@ -37,13 +37,16 @@ class _FirebaseService {
         });
     }
 
-    checkIfEmailExists(data, callback) {
-        firebase
-            .database()
-            .ref("user_emails")
-            .on("value", (res) =>
-                callback(null, res.val().find((email) => email === data))
-            );
+    async checkIfEmailExists(data, callback) {
+        try {
+            const methods = await firebase
+                .auth()
+                .fetchSignInMethodsForEmail(data);
+
+            return callback(null, methods);
+        } catch (error) {
+            return callback(error, null);
+        }
     }
 
     async logInUsingEmail({ email, password }, callback) {
@@ -69,6 +72,18 @@ class _FirebaseService {
         //         callback(null, data.user.toJSON());
         //     })
         //     .catch((error) => callback(error, null));
+    }
+
+    async forgotPassword(email, callback) {
+        try {
+            const res = await firebase.auth().sendPasswordResetEmail(email);
+            console.log("send pw reset", res);
+
+            return callback(null, true);
+        } catch (error) {
+            console.log("error pw reset", error);
+            return callback(error, null);
+        }
     }
 
     async registerUser({ email, password, displayName }, callback) {
