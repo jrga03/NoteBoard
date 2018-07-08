@@ -74,7 +74,7 @@ function* authorize() {
                 GET_EMAIL,
                 GET_FACEBOOK,
                 GET_GOOGLE,
-                REGISTER_USER,
+                // REGISTER_USER,
             ]);
 
             switch (request.type) {
@@ -90,9 +90,9 @@ function* authorize() {
                 case GET_GOOGLE:
                     user = yield cps(authentication.loginGoogle);
                     break;
-                case REGISTER_USER:
-                    user = yield cps(authentication.register, request.payload);
-                    break;
+                // case REGISTER_USER:
+                //     user = yield cps(authentication.register, request.payload);
+                //     break;
                 default:
                     throw "NO ACTION MATCHED";
             }
@@ -217,25 +217,22 @@ function* logoutFlow() {
 function* registerFlow() {
     while (true) {
         // We always listen to `REGISTER_REQUEST` actions
-        const request = yield take("REGISTER_REQUEST");
-        const { username, password } = request.data;
+        const request = yield take(REGISTER_USER);
+        // const { username, password } = request.data;
+        const user = yield cps(authentication.register, request.payload);
 
         // We call the `authorize` task with the data, telling it that we are registering a user
         // This returns `true` if the registering was successful, `false` if not
-        const wasSuccessful = yield call(authorize, {
-            username,
-            password,
-            isRegistering: true,
-        });
+        // const wasSuccessful = yield call(authorize, {
+        //     username,
+        //     password,
+        //     isRegistering: true,
+        // });
 
         // If we could register a user, we send the appropiate actions
-        if (wasSuccessful) {
-            yield put({ type: "SET_AUTH", newAuthState: true }); // User is logged in (authorized) after being registered
-            yield put({
-                type: "CHANGE_FORM",
-                newFormState: { username: "", password: "" },
-            }); // Clear form
-            forwardTo("/dashboard"); // Go to dashboard page
+        if (user) {
+            yield put({ type: LOGIN_SUCCESS, user }); // User is logged in (authorized)
+            navigateTo("Home"); // Go to dashboard page
         }
     }
 }
@@ -363,11 +360,8 @@ function* watchLogout() {
 
 export default function* rootSaga() {
     yield fork(loginFlow),
+        yield fork(registerFlow),
         yield all([
-            // watchGetEmail(),
-            // watchGetGoogleUser(),
-            // watchGetFacebookUser(),
-            // watchLoginSuccess(),
             watchLogout(),
         ]);
 }

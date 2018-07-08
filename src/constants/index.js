@@ -1,4 +1,3 @@
-
 const SWATCH = {
     WHITE: "white",
 
@@ -11,9 +10,6 @@ const SWATCH = {
     LIGHT_GRAY: "lightgray",
 };
 
-const LAYOUT_MARGIN = 17;
+const LAYOUT_MARGIN = 10;
 
-export {
-    SWATCH,
-    LAYOUT_MARGIN,
-};
+export { SWATCH, LAYOUT_MARGIN };

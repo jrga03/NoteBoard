@@ -24,13 +24,17 @@ class Notes extends Component {
 
     componentDidUpdate() {
         console.log("home props update", this.props);
-        
     }
 
-    handleMemoPress = () => this.props.navigation.navigate("NoteItem");
+    handleMemoPress = (memo) =>
+        this.props.navigation.navigate("NoteItem", { memo });
 
     renderNoteItem = ({ item }) => {
-        return <NoteMemo memo={item} onPress={this.handleMemoPress} />;
+        return (
+            <TouchableOpacity onPress={() => this.handleMemoPress(item)}>
+                <NoteMemo memo={item} />
+            </TouchableOpacity>
+        );
     };
 
     render() {
@@ -43,7 +47,7 @@ class Notes extends Component {
                         (a, b) => a.lastEditedAt - b.lastEditedAt
                     )}
                     renderItem={this.renderNoteItem}
-                    keyExtractor={(item, index) => item + index}
+                    keyExtractor={(item) => `${item.id}`}
                 />
             </View>
         );
@@ -70,6 +74,7 @@ const styles = StyleSheet.create({
 
 const fakeData = [
     {
+        id: 0,
         title: "HELLO",
         type: "memo",
         contents: [
@@ -83,8 +88,10 @@ const fakeData = [
             },
         ],
         lastEditedAt: new Date(2018, 5, 9),
+        pinned: false,
     },
     {
+        id: 1,
         title: "CHECKLIST",
         type: "checklist",
         contents: [
@@ -98,5 +105,6 @@ const fakeData = [
             },
         ],
         lastEditedAt: new Date(2018, 4, 10),
+        pinned: true,
     },
 ];
