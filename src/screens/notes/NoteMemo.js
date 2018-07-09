@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { View, Text, FlatList, StyleSheet, Platform, TouchableOpacity } from "react-native";
 import { Icon } from "react-native-elements";
-import { SWATCH } from "../../constants";
+import { SWATCH, LAYOUT_MARGIN } from "../../constants";
 
 export default class NoteMemo extends Component {
     constructor(props) {
@@ -16,14 +16,28 @@ export default class NoteMemo extends Component {
         };
     }
     renderNoteContent = ({ item }) => {
-        const { checklistItemContainer, checkboxIconContainer, noteContentText } = styles;
-        const { type } = this.props.memo;
+        const {
+            noteContentText,
+            checkboxIconContainer,
+            checklistItemContainer,
+            noteContentTextListStyle,
+            noteContentTextTileStyle,
+            checkboxIconContainerListStyle,
+            checkboxIconContainerTileStyle,
+        } = styles;
+        const { memo, layout } = this.props;
+        const { type } = memo;
 
         if (type === "checklist") {
             if (!item.checked) {
                 return (
                     <View style={checklistItemContainer}>
-                        <View style={checkboxIconContainer}>
+                        <View
+                            style={[
+                                checkboxIconContainer,
+                                layout === "tile" ? checkboxIconContainerTileStyle : checkboxIconContainerListStyle,
+                            ]}>
+                            {/* style={[checkboxIconContainer, checkboxIconContainerTileStyle]}> */}
                             <Icon
                                 type="material-icons"
                                 name={"check-box-outline-blank"}
@@ -31,7 +45,13 @@ export default class NoteMemo extends Component {
                                 size={16}
                             />
                         </View>
-                        <Text style={noteContentText}>{item.content}</Text>
+                        <Text
+                            style={[
+                                noteContentText,
+                                layout === "tile" ? noteContentTextTileStyle : noteContentTextListStyle,
+                            ]}>
+                            {item.content}
+                        </Text>
                     </View>
                 );
             }
@@ -43,12 +63,12 @@ export default class NoteMemo extends Component {
     render() {
         const { container, titleText, checkedItemText } = styles;
         const { memo } = this.props;
-        const { title, contents, lastEditedAt, type } = memo;
+        const { title, contents, type } = memo;
 
         const checkedItemsCount = contents.reduce((acc, item) => (item.checked ? acc + 1 : acc), 0);
 
         return (
-            <View style={container}>
+            <View style={container} onLayout={(event) => console.log(event.nativeEvent.layout)}>
                 <Text style={titleText}>{title}</Text>
                 <FlatList
                     data={contents}
@@ -67,7 +87,7 @@ export default class NoteMemo extends Component {
 
 const styles = StyleSheet.create({
     container: {
-        marginVertical: 4,
+        marginVertical: LAYOUT_MARGIN / 2,
         backgroundColor: SWATCH.WHITE,
         width: "100%",
         padding: 7,
@@ -81,12 +101,19 @@ const styles = StyleSheet.create({
     },
     checklistItemContainer: {
         flexDirection: "row",
-        alignItems: "center",
+        alignItems: "flex-start",
+        justifyContent: "flex-start",
     },
     noteContentText: {
         color: SWATCH.BLACK,
-        textAlignVertical: "center",
         fontFamily: Platform.OS === "ios" ? "Helvetica" : "sans-serif",
+        textAlignVertical: "top",
+    },
+    noteContentTextTileStyle: {
+        flex: 0.9,
+    },
+    noteContentTextListStyle: {
+        flex: 0.95,
     },
     checkedItemText: {
         fontSize: 14,
@@ -97,6 +124,13 @@ const styles = StyleSheet.create({
         paddingBottom: Platform.OS === "ios" ? 4 : 2,
     },
     checkboxIconContainer: {
-        paddingRight: 10,
+        paddingTop: Platform.OS === "android" ? 2 : 0,
+        paddingRight: 8,
+    },
+    checkboxIconContainerTileStyle: {
+        flex: 0.1,
+    },
+    checkboxIconContainerListStyle: {
+        flex: 0.05,
     },
 });

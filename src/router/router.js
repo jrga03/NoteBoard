@@ -23,26 +23,19 @@ import NoteItemScreen from "../screens/notes/NoteItem";
 import SignUpScreen from "../screens/signup/SignUp";
 import ContactsScreen from "../screens/contacts/Contacts";
 
+const generateIcon = (type, name, color = SWATCH.BLACK, size = 27) => {
+    return <Icon name={name} type={type} color={color} size={size} />;
+};
+
 const commonNavigationOptions = (navigation, screenProps, ...props) => ({
     headerLeft: (
-        <TouchableOpacity
-            onPress={() => navigation.toggleDrawer({ key: "Main" })}>
-            <Icon
-                type="material-icons"
-                name="menu"
-                color={SWATCH.BLACK}
-                size={27}
-            />
+        <TouchableOpacity onPress={() => navigation.toggleDrawer({ key: "Main" })}>
+            {generateIcon("material-icons", "menu")}
         </TouchableOpacity>
     ),
     headerRight: (
         <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
-            <Icon
-                type="material-icons"
-                name="notifications"
-                color={SWATCH.BLACK}
-                size={27}
-            />
+            {generateIcon("material-icons", "notifications")}
         </TouchableOpacity>
     ),
     headerStyle: {
@@ -50,66 +43,6 @@ const commonNavigationOptions = (navigation, screenProps, ...props) => ({
         height: 50,
         paddingHorizontal: 10,
     },
-    headerTitleStyle: {
-        color: SWATCH.BLACK,
-        fontSize: 18,
-        textAlign: "left",
-        // alignSelf: "flex-start",
-        width: "100%",
-    },
-});
-const noteItemNavigationOptions = (navigation, screenProps, ...props) => ({
-    // headerLeft: (
-    //     <TouchableOpacity onPress={() => navigation.goBack()}>
-    //         <Icon
-    //             type="ionicicons"
-    //             name="ios-arrow-back"
-    //             color={SWATCH.BLACK}
-    //             size={27}
-    //         />
-    //     </TouchableOpacity>
-    // ),
-    headerRight: (
-        <View style={{ flexDirection: "row" }}>
-            <TouchableOpacity
-                style={{paddingHorizontal: 5}}
-                onPress={() => navigation.navigate("Notifications")}>
-                <Icon
-                    type="material-community"
-                    name="pin"
-                    color={SWATCH.BLACK}
-                    size={27}
-                />
-            </TouchableOpacity>
-            <TouchableOpacity
-                style={{paddingHorizontal: 5}}
-                onPress={() => navigation.navigate("Notifications")}>
-                <Icon
-                    type="material-icons"
-                    name="event-note"
-                    color={SWATCH.BLACK}
-                    size={27}
-                />
-            </TouchableOpacity>
-            <TouchableOpacity
-                style={{paddingHorizontal: 5}}
-                onPress={() => navigation.navigate("Notifications")}>
-                <Icon
-                    type="material-icons"
-                    name="archive"
-                    color={SWATCH.BLACK}
-                    size={27}
-                />
-            </TouchableOpacity>
-        </View>
-    ),
-    headerStyle: {
-        backgroundColor: SWATCH.GRAY,
-        height: 50,
-        paddingHorizontal: 10,
-    },
-    headerBackTitle: null,
-    headerTintColor: SWATCH.BLACK,
     headerTitleStyle: {
         color: SWATCH.BLACK,
         fontSize: 18,
@@ -119,13 +52,78 @@ const noteItemNavigationOptions = (navigation, screenProps, ...props) => ({
     },
 });
 
+const noteHomeNavigationOptions = (navigation, screenProps, ...props) => {
+    let layout = navigation.getParam("noteLayout", "tile");
+
+    toggleLayout = () => {
+        const noteLayout = layout === "tile" ? "list" : "tile";
+        navigation.setParams({ noteLayout });
+    };
+
+    return {
+        headerLeft: (
+            <TouchableOpacity onPress={() => navigation.toggleDrawer({ key: "Main" })}>
+                {generateIcon("material-icons", "menu")}
+            </TouchableOpacity>
+        ),
+        headerRight: (
+            <View style={{ flexDirection: "row" }}>
+                <TouchableOpacity style={{ paddingHorizontal: 10 }} onPress={() => null}>
+                    {generateIcon("material-icons", "search")}
+                </TouchableOpacity>
+                <TouchableOpacity style={{ paddingHorizontal: 10 }} onPress={toggleLayout}>
+                    {generateIcon("material-icons", layout === "tile" ? "view-quilt" : "view-stream")}
+                </TouchableOpacity>
+                <TouchableOpacity style={{ paddingLeft: 10 }} onPress={() => navigation.navigate("Notifications")}>
+                    {generateIcon("material-icons", "notifications")}
+                </TouchableOpacity>
+            </View>
+        ),
+        headerStyle: {
+            backgroundColor: SWATCH.GRAY,
+            height: 50,
+            paddingHorizontal: 10,
+        },
+        headerBackTitle: null,
+        headerTintColor: SWATCH.BLACK,
+        headerTitleStyle: {
+            color: SWATCH.BLACK,
+            fontSize: 18,
+            textAlign: "left",
+            width: "100%",
+        },
+    };
+};
+
+const noteItemNavigationOptions = (navigation, screenProps, ...props) => ({
+    headerRight: (
+        <View style={{ flexDirection: "row" }}>
+            <TouchableOpacity style={{ paddingHorizontal: 10 }} onPress={() => null}>
+                {generateIcon("material-community", "pin")}
+            </TouchableOpacity>
+            <TouchableOpacity style={{ paddingHorizontal: 10 }} onPress={() => null}>
+                {generateIcon("material-icons", "event-note")}
+            </TouchableOpacity>
+            <TouchableOpacity style={{ paddingLeft: 10 }} onPress={() => null}>
+                {generateIcon("material-icons", "archive")}
+            </TouchableOpacity>
+        </View>
+    ),
+    headerStyle: {
+        backgroundColor: SWATCH.GRAY,
+        height: 50,
+        paddingHorizontal: 10,
+    },
+    headerTintColor: SWATCH.BLACK,
+});
+
 const NotesStack = createStackNavigator(
     {
         Notes: {
             screen: NotesScreen,
             navigationOptions: ({ navigation, screenProps }) => ({
                 title: "Notes".toUpperCase(),
-                ...commonNavigationOptions(navigation, screenProps),
+                ...noteHomeNavigationOptions(navigation, screenProps),
             }),
         },
         NoteItem: {
@@ -139,6 +137,9 @@ const NotesStack = createStackNavigator(
     },
     {
         initialRouteName: "Notes",
+        initialRouteParams: {
+            noteLayout: "tile",
+        },
         // navigationOptions: ({ navigation, screenProps }) => ({
         //     title: "Notes".toUpperCase(),
         //     ...commonNavigationOptions(navigation, screenProps),
