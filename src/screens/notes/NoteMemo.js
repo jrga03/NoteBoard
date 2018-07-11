@@ -62,13 +62,15 @@ export default class NoteMemo extends Component {
 
     render() {
         const { container, titleText, checkedItemText } = styles;
-        const { memo } = this.props;
+        const { memo, index, onLayoutEvent, layout } = this.props;
         const { title, contents, type } = memo;
 
         const checkedItemsCount = contents.reduce((acc, item) => (item.checked ? acc + 1 : acc), 0);
 
         return (
-            <View style={container} onLayout={(event) => console.log(event.nativeEvent.layout)}>
+            <View
+                style={container}
+                onLayout={layout === "tile" ? (e) => onLayoutEvent(e.nativeEvent.layout, index) : null}>
                 <Text style={titleText}>{title}</Text>
                 <FlatList
                     data={contents}
@@ -91,6 +93,14 @@ const styles = StyleSheet.create({
         backgroundColor: SWATCH.WHITE,
         width: "100%",
         padding: 7,
+        elevation: 2,
+        shadowRadius: 3,
+        shadowOffset: {
+            width: 0,
+            height: 1,
+        },
+        shadowColor: "#000000",
+        shadowOpacity: 0.08,
     },
     titleText: {
         fontWeight: "bold",

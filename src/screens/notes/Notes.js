@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
-// import { Icon } from "react-native-elements";
+import { Icon } from "react-native-elements";
 import { connect } from "react-redux";
 
 import { SWATCH, LAYOUT_MARGIN } from "../../constants";
@@ -12,7 +12,7 @@ let rightColumnHeight = 0;
 class Notes extends Component {
     constructor(props) {
         super(props);
-        
+
         this.state = {
             data: [],
             leftList: [],
@@ -42,17 +42,34 @@ class Notes extends Component {
 
     handleMemoPress = (memo) => this.props.navigation.navigate("NoteItem", { memo });
 
-    renderNoteItem = ({ item }) => {
+    handleOnLayoutEvent = ({ height }, index) => {
+        // const layout = this.props.navigation.getParam("noteLayout", "tile");
+        // console.log("onLayoutEvent", index);
+        // if (layout === "tile") {
+        //     const leftList = [];
+        //     const rightList = [];
+        //     if (leftColumnHeight > rightColumnHeight) {
+        //         rightList.push(this.state.data[index]);
+        //         rightColumnHeight += height;
+        //     } else {
+        //         leftList.push(this.state.data[index]);
+        //         leftColumnHeight += height;
+        //     }
+        //     index === this.state.data.length -1 ? this.setState({ leftList, rightList }, () => console.log("end")) : console.log("not end");
+        // }
+    };
+
+    renderNoteItem = ({ item, index }) => {
         const layout = this.props.navigation.getParam("noteLayout", "tile");
 
         return (
             <TouchableOpacity onPress={() => this.handleMemoPress(item)}>
-                <NoteMemo memo={item} layout={layout} />
+                <NoteMemo index={index} memo={item} layout={layout} onLayoutEvent={this.handleOnLayoutEvent} />
             </TouchableOpacity>
         );
     };
 
-    render() {
+    renderTileLayout = () => {
         const {
             container,
             rowContainer,
@@ -62,45 +79,68 @@ class Notes extends Component {
             rowItemContainerRight,
         } = styles;
 
+        const { leftList, rightList } = this.state;
+        return (
+            <ScrollView style={{ flex: 1 }} contentContainerStyle={container}>
+                <View style={rowContainer}>
+                    <View style={[rowItemContainer, rowItemContainerLeft]}>
+                        <FlatList
+                            style={listContainer}
+                            data={leftList}
+                            extraData={this.state}
+                            renderItem={this.renderNoteItem}
+                            keyExtractor={(item) => `${item.id}`}
+                        />
+                    </View>
+                    <View style={[rowItemContainer, rowItemContainerRight]}>
+                        <FlatList
+                            style={listContainer}
+                            data={rightList}
+                            extraData={this.state}
+                            renderItem={this.renderNoteItem}
+                            keyExtractor={(item) => `${item.id}`}
+                        />
+                    </View>
+                </View>
+            </ScrollView>
+        );
+    };
+
+    renderListLayout = () => {
+        const { container, listContainer } = styles;
+
+        const { data } = this.state;
+        return (
+            <View style={container}>
+                <FlatList
+                    style={listContainer}
+                    data={data}
+                    renderItem={this.renderNoteItem}
+                    keyExtractor={(item) => `${item.id}`}
+                />
+            </View>
+        );
+    };
+
+    render() {
+        const { footerText, mainContainer, footerContainer, footerItemContainer, footerTakeNoteContainer } = styles;
+
         const layout = this.props.navigation.getParam("noteLayout", "tile");
 
-        const { data, leftList, rightList } = this.state;
+        return (
+            <View style={mainContainer}>
+                {layout === "tile" ? this.renderTileLayout() : this.renderListLayout()}
 
-        if (layout === "tile") {
-            return (
-                <ScrollView contentContainerStyle={container}>
-                    <View style={rowContainer}>
-                        <View style={[rowItemContainer, rowItemContainerLeft]}>
-                            <FlatList
-                                style={listContainer}
-                                data={leftList}
-                                renderItem={this.renderNoteItem}
-                                keyExtractor={(item) => `${item.id}`}
-                            />
-                        </View>
-                        <View style={[rowItemContainer, rowItemContainerRight]}>
-                            <FlatList
-                                style={listContainer}
-                                data={rightList}
-                                renderItem={this.renderNoteItem}
-                                keyExtractor={(item) => `${item.id}`}
-                            />
-                        </View>
-                    </View>
-                </ScrollView>
-            );
-        } else {
-            return (
-                <View style={container}>
-                    <FlatList
-                        style={listContainer}
-                        data={data}
-                        renderItem={this.renderNoteItem}
-                        keyExtractor={(item) => `${item.id}`}
-                    />
+                <View style={footerContainer}>
+                    <TouchableOpacity style={[footerItemContainer, footerTakeNoteContainer]}>
+                        <Text style={footerText}>Take a note...</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={footerItemContainer}>
+                        <Icon type="material-icons" name="format-list-bulleted" size={22} color={SWATCH.GRAY} />
+                    </TouchableOpacity>
                 </View>
-            );
-        }
+            </View>
+        );
     }
 }
 
@@ -113,8 +153,11 @@ export default connect(
 )(Notes);
 
 const styles = StyleSheet.create({
-    container: {
+    mainContainer: {
         flex: 1,
+    },
+    container: {
+        // flex: 1,
         justifyContent: "center",
         alignItems: "stretch",
         margin: LAYOUT_MARGIN,
@@ -132,8 +175,34 @@ const styles = StyleSheet.create({
     rowItemContainerRight: {
         marginLeft: LAYOUT_MARGIN / 2,
     },
-
-    listContainer: {},
+    listContainer: { flex: 1 },
+    footerContainer: {
+        flexDirection: "row",
+        flexBasis: 40,
+        justifyContent: "flex-start",
+        alignItems: "center",
+        // paddingHorizontal: 5,
+        backgroundColor: SWATCH.WHITE,
+        shadowRadius: 5,
+        shadowOffset: {
+            width: 0,
+            height: -3,
+        },
+        shadowColor: "#000000",
+        shadowOpacity: 0.05,
+        elevation: 4,
+    },
+    footerItemContainer: {
+        paddingHorizontal: 10,
+    },
+    footerTakeNoteContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignSelf: "stretch",
+    },
+    footerText: {
+        color: SWATCH.GRAY
+    },
 });
 
 const fakeData = [
@@ -165,6 +234,11 @@ const fakeData = [
             },
             {
                 checked: false,
+                content:
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum efficitur ullamcorper quam id sollicitudin. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque a elit in nulla elementum facilisis. Nunc semper tempus erat et imperdiet. Sed vitae mollis arcu. Cras scelerisque nec erat eget rhoncus. Aenean sit amet mollis nibh, a egestas risus.",
+            },
+            {
+                checked: true,
                 content:
                     "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum efficitur ullamcorper quam id sollicitudin. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque a elit in nulla elementum facilisis. Nunc semper tempus erat et imperdiet. Sed vitae mollis arcu. Cras scelerisque nec erat eget rhoncus. Aenean sit amet mollis nibh, a egestas risus.",
             },

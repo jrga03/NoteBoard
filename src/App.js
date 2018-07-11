@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, StatusBar, Platform, YellowBox } from "react-native";
+import { View, StatusBar, YellowBox } from "react-native";
 import { Provider } from "react-redux";
 import { createStore, applyMiddleware, compose } from "redux";
 import createSagaMiddleware from "redux-saga";
@@ -13,10 +13,7 @@ import { NavigationService } from "./services";
 // const storeWithMiddleware = applyMiddleware()(createStore);
 
 const sagaMiddleware = createSagaMiddleware();
-const storeWithMiddleware = createStore(
-    reducers,
-    compose(applyMiddleware(sagaMiddleware))
-);
+const storeWithMiddleware = createStore(reducers, compose(applyMiddleware(sagaMiddleware)));
 sagaMiddleware.run(rootSaga);
 
 export default class App extends Component {
@@ -40,14 +37,12 @@ export default class App extends Component {
         return (
             <Provider store={storeWithMiddleware}>
                 <View style={{ flex: 1 }}>
+                    <StatusBar barStyle="default" />
                     <Root
                         ref={(navigatorRef) => {
-                            NavigationService.setTopLevelNavigator(
-                                navigatorRef
-                            );
+                            NavigationService.setTopLevelNavigator(navigatorRef);
                         }}
                     />
-                    <StatusBar barStyle="light-content" />
                 </View>
             </Provider>
         );
