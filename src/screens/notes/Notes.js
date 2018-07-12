@@ -40,7 +40,9 @@ class Notes extends Component {
         // console.log("home props update", this.props);
     }
 
-    handleMemoPress = (memo) => this.props.navigation.navigate("NoteItem", { memo });
+    handleMemoPress = (memo, index) => this.props.navigation.navigate("NoteItem", { memo, index });
+
+    handleNoteChanges = () => {};
 
     handleOnLayoutEvent = ({ height }, index) => {
         // const layout = this.props.navigation.getParam("noteLayout", "tile");
@@ -63,8 +65,14 @@ class Notes extends Component {
         const layout = this.props.navigation.getParam("noteLayout", "tile");
 
         return (
-            <TouchableOpacity onPress={() => this.handleMemoPress(item)}>
-                <NoteMemo index={index} memo={item} layout={layout} onLayoutEvent={this.handleOnLayoutEvent} />
+            <TouchableOpacity onPress={() => this.handleMemoPress(item, index)}>
+                <NoteMemo
+                    index={index}
+                    memo={item}
+                    layout={layout}
+                    onLayoutEvent={this.handleOnLayoutEvent}
+                    handleNoteChanges={this.handleNoteChanges}
+                />
             </TouchableOpacity>
         );
     };
@@ -201,7 +209,7 @@ const styles = StyleSheet.create({
         alignSelf: "stretch",
     },
     footerText: {
-        color: SWATCH.GRAY
+        color: SWATCH.GRAY,
     },
 });
 

@@ -3,6 +3,8 @@ const SWATCH = {
 
     BLACK: "black",
 
+    BLUE: "blue",
+
     GRAY: "gray",
 
     RED: "red",

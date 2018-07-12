@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import { View, Text, TextInput, StyleSheet, FlatList, TouchableOpacity } from "react-native";
-
 import { Icon } from "react-native-elements";
+import Moment from "moment";
+
 import { SWATCH, LAYOUT_MARGIN } from "../../constants";
 
 export default class NoteItem extends Component {
@@ -19,7 +20,10 @@ export default class NoteItem extends Component {
     componentDidMount() {
         // console.log(this);
 
-        const { title, type, contents, lastEditedAt, pinned } = this.props.navigation.state.params.memo;
+        const { memo, index } = this.props.navigation.state.params;
+        const { title, type, contents, lastEditedAt, pinned } = memo;
+
+        this.props.navigation.setParams({ isPinned: pinned });
 
         this.setState({
             title,
@@ -27,18 +31,34 @@ export default class NoteItem extends Component {
             contents,
             lastEditedAt,
             pinned,
+            index,
         });
     }
 
-    renderNoteContent = ({ item }) => {
-        const { noteContentText } = styles;
+    handleChangeText = (type, index, text) => {
+        console.log("handleChangeText", type, index, text);
+    };
+
+    renderNoteContent = ({ item, index }) => {
+        const { noteContentText, noteContentCheckBox, noteContentCheckedText, checklistRowContainer } = styles;
+
+        onChangeText = (text) => this.handleChangeText("content", index, text);
 
         if (this.state.type === "memo") {
-            return <TextInput style={noteContentText} value={item.content} underlineColorAndroid="transparent" />;
+            return (
+                <TextInput
+                    style={noteContentText}
+                    value={item.content}
+                    underlineColorAndroid="transparent"
+                    multiline={true}
+                    onChangeText={onChangeText}
+                    autoCorrect={false}
+                />
+            );
         } else if (this.state.type === "checklist") {
             return (
-                <View style={{ flexDirection: "row" }}>
-                    <View>
+                <View style={checklistRowContainer}>
+                    <View style={noteContentCheckBox}>
                         <Icon
                             type="material-icons"
                             name={item.checked ? "check-box" : "check-box-outline-blank"}
@@ -46,10 +66,12 @@ export default class NoteItem extends Component {
                         />
                     </View>
                     <TextInput
-                        style={item.checked ? { textDecorationLine: "line-through" } : null}
+                        style={[noteContentText, item.checked ? noteContentCheckedText : null]}
                         value={item.content}
                         underlineColorAndroid="transparent"
                         multiline={true}
+                        onChangeText={onChangeText}
+                        autoCorrect={false}
                     />
                 </View>
             );
@@ -66,19 +88,32 @@ export default class NoteItem extends Component {
             footerItemContainer,
             footerMainContentContainer,
         } = styles;
-        const { title, type, lastEditedAt, contents, pinned } = this.state;
+        const { title, lastEditedAt, contents, index } = this.state;
+
+        lastEditedAtFormatted = () => {
+            const lastEdit = Moment(lastEditedAt);
+
+            return lastEdit.isSame(Moment(), "day")
+                ? lastEdit.format("HH:mm")
+                : lastEdit.isSame(Moment(), "year")
+                    ? lastEdit.format("MMM D")
+                    : lastEdit.format("MMM D, YYYY");
+        };
+
+        onChangeText = (text) => this.handleChangeText("title", index, text);
 
         return (
             <View style={mainContainer}>
                 <View style={container}>
                     <TextInput
-                        style={[noteTitleText, { backgroundColor: "red" }]}
+                        style={noteTitleText}
                         value={title}
                         placeholder="Title"
                         underlineColorAndroid="transparent"
+                        onChangeText={onChangeText}
                     />
                     <FlatList
-                        // contentContainerStyle={container}
+                        // contentContainerStyle={{marginVertical: 3}}
                         data={contents}
                         renderItem={this.renderNoteContent}
                         keyExtractor={(item, index) => `${index}`}
@@ -89,12 +124,12 @@ export default class NoteItem extends Component {
                         <Icon type="material-icons" name="add-box" size={22} color={SWATCH.GRAY} />
                     </TouchableOpacity>
                     <TouchableOpacity style={[footerItemContainer, footerMainContentContainer]}>
-                        <Text style={footerText}>Edited</Text>
+                        <Text style={footerText}>Edited {lastEditedAtFormatted()}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={footerItemContainer}>
                         <Icon type="material-icons" name="more" size={22} color={SWATCH.GRAY} />
                     </TouchableOpacity>
-                </View>{" "}
+                </View>
             </View>
         );
     }
@@ -108,15 +143,38 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "stretch",
-        padding: LAYOUT_MARGIN,
+        padding: LAYOUT_MARGIN * 2,
     },
     noteTitleText: {
         fontWeight: "bold",
-        fontSize: 16,
+        fontSize: 18,
         padding: 0,
         margin: 0,
+        paddingBottom: 15,
     },
-    noteContentText: {},
+    checklistRowContainer: {
+        flexDirection: "row",
+        marginBottom: 3,
+    },
+    noteContentText: {
+        flex: 1,
+        padding: 0,
+        margin: 0,
+        paddingHorizontal: 5,
+        // justifyContent: "flex-start",
+        // alignItems: "flex-start",
+        // alignSelf: "stretch",
+        // backgroundColor: "green",
+    },
+    noteContentCheckBox: {
+        justifyContent: "flex-start",
+        alignItems: "flex-start",
+        // backgroundColor: "red",
+    },
+    noteContentCheckedText: {
+        textDecorationLine: "line-through",
+        color: SWATCH.GRAY,
+    },
     footerContainer: {
         flexDirection: "row",
         flexBasis: 40,
@@ -143,6 +201,7 @@ const styles = StyleSheet.create({
         alignSelf: "stretch",
     },
     footerText: {
-        color: SWATCH.GRAY
+        color: SWATCH.GRAY,
+        fontSize: 11,
     },
 });

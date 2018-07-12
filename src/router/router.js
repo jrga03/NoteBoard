@@ -95,27 +95,32 @@ const noteHomeNavigationOptions = (navigation, screenProps, ...props) => {
     };
 };
 
-const noteItemNavigationOptions = (navigation, screenProps, ...props) => ({
-    headerRight: (
-        <View style={{ flexDirection: "row" }}>
-            <TouchableOpacity style={{ paddingHorizontal: 10 }} onPress={() => null}>
-                {generateIcon("material-community", "pin")}
-            </TouchableOpacity>
-            <TouchableOpacity style={{ paddingHorizontal: 10 }} onPress={() => null}>
-                {generateIcon("material-icons", "event-note")}
-            </TouchableOpacity>
-            <TouchableOpacity style={{ paddingLeft: 10 }} onPress={() => null}>
-                {generateIcon("material-icons", "archive")}
-            </TouchableOpacity>
-        </View>
-    ),
-    headerStyle: {
-        backgroundColor: SWATCH.GRAY,
-        height: 50,
-        paddingHorizontal: 10,
-    },
-    headerTintColor: SWATCH.BLACK,
-});
+const noteItemNavigationOptions = (navigation, screenProps, ...props) => {
+    const isPinned = navigation.getParam("isPinned", false);
+    const pinColor = isPinned ? SWATCH.BLUE : SWATCH.BLACK;
+
+    return {
+        headerRight: (
+            <View style={{ flexDirection: "row" }}>
+                <TouchableOpacity style={{ paddingHorizontal: 10 }} onPress={() => null}>
+                    {generateIcon("material-community", "pin", pinColor)}
+                </TouchableOpacity>
+                <TouchableOpacity style={{ paddingHorizontal: 10 }} onPress={() => null}>
+                    {generateIcon("material-icons", "event-note")}
+                </TouchableOpacity>
+                <TouchableOpacity style={{ paddingLeft: 10 }} onPress={() => null}>
+                    {generateIcon("material-icons", "archive")}
+                </TouchableOpacity>
+            </View>
+        ),
+        headerStyle: {
+            backgroundColor: SWATCH.GRAY,
+            height: 50,
+            paddingHorizontal: 10,
+        },
+        headerTintColor: SWATCH.BLACK,
+    };
+};
 
 const NotesStack = createStackNavigator(
     {
@@ -139,6 +144,7 @@ const NotesStack = createStackNavigator(
         initialRouteName: "Notes",
         initialRouteParams: {
             noteLayout: "tile",
+            isPinned: false,
         },
         // navigationOptions: ({ navigation, screenProps }) => ({
         //     title: "Notes".toUpperCase(),
