@@ -2,10 +2,11 @@ import React, { Component } from "react";
 import { View, Text, TextInput, StyleSheet, FlatList, TouchableOpacity } from "react-native";
 import { Icon } from "react-native-elements";
 import Moment from "moment";
+import { connect } from "react-redux";
 
 import { SWATCH, LAYOUT_MARGIN } from "../../constants";
 
-export default class NoteItem extends Component {
+class NoteItem extends Component {
     constructor(props) {
         super(props);
 
@@ -20,31 +21,33 @@ export default class NoteItem extends Component {
     componentDidMount() {
         // console.log(this);
 
-        const { memo, index } = this.props.navigation.state.params;
-        const { title, type, contents, lastEditedAt, pinned } = memo;
+        // const { memo, index } = this.props.navigation.state.params;
+        const { pinned } = this.props.selectedNote;
 
         this.props.navigation.setParams({ isPinned: pinned });
 
-        this.setState({
-            title,
-            type,
-            contents,
-            lastEditedAt,
-            pinned,
-            index,
-        });
+        // this.setState({
+        //     title,
+        //     type,
+        //     contents,
+        //     lastEditedAt,
+        //     pinned,
+        //     index,
+        // });
     }
 
     handleChangeText = (type, index, text) => {
         console.log("handleChangeText", type, index, text);
+        console.log(this.props.selectedNote[type]);
     };
 
     renderNoteContent = ({ item, index }) => {
         const { noteContentText, noteContentCheckBox, noteContentCheckedText, checklistRowContainer } = styles;
+        const { type } = this.props.selectedNote;
 
         onChangeText = (text) => this.handleChangeText("content", index, text);
 
-        if (this.state.type === "memo") {
+        if (type === "memo") {
             return (
                 <TextInput
                     style={noteContentText}
@@ -55,7 +58,7 @@ export default class NoteItem extends Component {
                     autoCorrect={false}
                 />
             );
-        } else if (this.state.type === "checklist") {
+        } else if (type === "checklist") {
             return (
                 <View style={checklistRowContainer}>
                     <View style={noteContentCheckBox}>
@@ -88,7 +91,7 @@ export default class NoteItem extends Component {
             footerItemContainer,
             footerMainContentContainer,
         } = styles;
-        const { title, lastEditedAt, contents, index } = this.state;
+        const { title, lastEditedAt, contents, index } = this.props.selectedNote;
 
         lastEditedAtFormatted = () => {
             const lastEdit = Moment(lastEditedAt);
@@ -108,6 +111,7 @@ export default class NoteItem extends Component {
                     <TextInput
                         style={noteTitleText}
                         value={title}
+                        // controlled={true}
                         placeholder="Title"
                         underlineColorAndroid="transparent"
                         onChangeText={onChangeText}
@@ -115,6 +119,7 @@ export default class NoteItem extends Component {
                     <FlatList
                         // contentContainerStyle={{marginVertical: 3}}
                         data={contents}
+                        extraData={this.props}
                         renderItem={this.renderNoteContent}
                         keyExtractor={(item, index) => `${index}`}
                     />
@@ -134,6 +139,14 @@ export default class NoteItem extends Component {
         );
     }
 }
+
+const mapStateToProps = ({ selectedNote }) => ({ selectedNote });
+const mapDispatchToProps = (dispatch) => ({});
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(NoteItem);
 
 const styles = StyleSheet.create({
     mainContainer: {

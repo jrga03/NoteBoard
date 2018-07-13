@@ -8,7 +8,7 @@
     "launch-android-23": "emulator -avd Nexus_5X_API_23 -no-snapshot-load",
     "launch-android-27": "emulator -avd Nexus_5X_API_27 -no-snapshot-load",
     "launch-ios-8-plus": "react-native run-ios --simulator='iPhone 8 Plus'",
-    "launch-devices": "npm run launch-ios-8-plus && npm run launch-android-23"
+    "launch-devices": "npm run launch-ios-8-plus && npm run launch-android-27"
   },
   "dependencies": {
     "@redux-offline/redux-offline": "^2.3.3",

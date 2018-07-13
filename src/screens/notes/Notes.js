@@ -3,8 +3,9 @@ import { View, Text, FlatList, StyleSheet, TouchableOpacity, ScrollView } from "
 import { Icon } from "react-native-elements";
 import { connect } from "react-redux";
 
-import { SWATCH, LAYOUT_MARGIN } from "../../constants";
 import NoteMemo from "./NoteMemo";
+import { SWATCH, LAYOUT_MARGIN } from "../../constants";
+import { selectNote } from "../../actions";
 
 let leftColumnHeight = 0;
 let rightColumnHeight = 0;
@@ -21,7 +22,7 @@ class Notes extends Component {
     }
 
     componentDidMount() {
-        // console.log("home props", this.props);
+        console.log("home props", this.props);
         const leftList = [];
         const rightList = [];
         const data = fakeData.sort((a, b) => a.lastEditedAt - b.lastEditedAt);
@@ -37,10 +38,13 @@ class Notes extends Component {
     componentDidUpdate() {
         // const test = this.props.navigation.getParam("noteLayout", null);
         // console.log("getparam", test);
-        // console.log("home props update", this.props);
+        console.log("home props update", this.props);
     }
 
-    handleMemoPress = (memo, index) => this.props.navigation.navigate("NoteItem", { memo, index });
+    handleMemoPress = (memo, index) => {
+        this.props.selectNote(memo, index);
+        this.props.navigation.navigate("NoteItem");
+    };
 
     handleNoteChanges = () => {};
 
@@ -64,8 +68,10 @@ class Notes extends Component {
     renderNoteItem = ({ item, index }) => {
         const layout = this.props.navigation.getParam("noteLayout", "tile");
 
+        const onPress = () => this.handleMemoPress(item, index);
+
         return (
-            <TouchableOpacity onPress={() => this.handleMemoPress(item, index)}>
+            <TouchableOpacity onPress={onPress}>
                 <NoteMemo
                     index={index}
                     memo={item}
@@ -153,7 +159,9 @@ class Notes extends Component {
 }
 
 const mapStateToProps = (state) => ({ ...state });
-const mapDispatchToProps = (dispatch) => ({});
+const mapDispatchToProps = (dispatch) => ({
+    selectNote: (note, index) => dispatch(selectNote(note, index)),
+});
 
 export default connect(
     mapStateToProps,

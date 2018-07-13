@@ -7,6 +7,7 @@ import {
     LOGIN_REQUEST,
     LOGIN,
     REGISTER_USER,
+    SELECT_NOTE,
 } from "./constants";
 
 export function loginFlowStart() {
@@ -44,5 +45,12 @@ export function registerEmailUser(user) {
 export function logoutUser() {
     return {
         type: LOGOUT_USER,
+    };
+}
+
+export function selectNote(note, index) {
+    return {
+        type: SELECT_NOTE,
+        payload: { index, ...note },
     };
 }
