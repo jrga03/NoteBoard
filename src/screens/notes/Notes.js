@@ -25,11 +25,12 @@ class Notes extends Component {
         console.log("home props", this.props);
         const leftList = [];
         const rightList = [];
-        const data = fakeData.sort((a, b) => a.lastEditedAt - b.lastEditedAt);
+        const { data } = this.props;
+        data.sort((a, b) => a.lastEditedAt - b.lastEditedAt);
         data.map((item, index) => (index % 2 === 0 ? leftList.push(item) : rightList.push(item)));
 
         this.setState({
-            data,
+            // data,
             leftList,
             rightList,
         });
@@ -38,15 +39,15 @@ class Notes extends Component {
     componentDidUpdate() {
         // const test = this.props.navigation.getParam("noteLayout", null);
         // console.log("getparam", test);
-        console.log("home props update", this.props);
+        console.log("home props update", this.props, this.state);
     }
 
-    handleMemoPress = (memo, index) => {
-        this.props.selectNote(memo, index);
+    handleMemoPress = (index, memo) => {
+        this.props.selectNote(index, memo);
         this.props.navigation.navigate("NoteItem");
     };
 
-    handleNoteChanges = () => {};
+    // handleNoteChanges = () => {};
 
     handleOnLayoutEvent = ({ height }, index) => {
         // const layout = this.props.navigation.getParam("noteLayout", "tile");
@@ -68,7 +69,7 @@ class Notes extends Component {
     renderNoteItem = ({ item, index }) => {
         const layout = this.props.navigation.getParam("noteLayout", "tile");
 
-        const onPress = () => this.handleMemoPress(item, index);
+        const onPress = () => this.handleMemoPress(index, item);
 
         return (
             <TouchableOpacity onPress={onPress}>
@@ -77,7 +78,7 @@ class Notes extends Component {
                     memo={item}
                     layout={layout}
                     onLayoutEvent={this.handleOnLayoutEvent}
-                    handleNoteChanges={this.handleNoteChanges}
+                    // handleNoteChanges={this.handleNoteChanges}
                 />
             </TouchableOpacity>
         );
@@ -88,6 +89,7 @@ class Notes extends Component {
             container,
             rowContainer,
             listContainer,
+            scrollContainer,
             rowItemContainer,
             rowItemContainerLeft,
             rowItemContainerRight,
@@ -95,7 +97,7 @@ class Notes extends Component {
 
         const { leftList, rightList } = this.state;
         return (
-            <ScrollView style={{ flex: 1 }} contentContainerStyle={container}>
+            <ScrollView style={container} contentContainerStyle={scrollContainer}>
                 <View style={rowContainer}>
                     <View style={[rowItemContainer, rowItemContainerLeft]}>
                         <FlatList
@@ -121,14 +123,15 @@ class Notes extends Component {
     };
 
     renderListLayout = () => {
-        const { container, listContainer } = styles;
+        const { container, scrollContainer, listContainer } = styles;
 
-        const { data } = this.state;
+        const { data } = this.props;
         return (
-            <View style={container}>
+            <View style={[container, scrollContainer]}>
                 <FlatList
                     style={listContainer}
                     data={data}
+                    extraData={this.state}
                     renderItem={this.renderNoteItem}
                     keyExtractor={(item) => `${item.id}`}
                 />
@@ -137,12 +140,12 @@ class Notes extends Component {
     };
 
     render() {
-        const { footerText, mainContainer, footerContainer, footerItemContainer, footerTakeNoteContainer } = styles;
+        const { footerText, container, footerContainer, footerItemContainer, footerTakeNoteContainer } = styles;
 
         const layout = this.props.navigation.getParam("noteLayout", "tile");
 
         return (
-            <View style={mainContainer}>
+            <View style={container}>
                 {layout === "tile" ? this.renderTileLayout() : this.renderListLayout()}
 
                 <View style={footerContainer}>
@@ -158,9 +161,11 @@ class Notes extends Component {
     }
 }
 
-const mapStateToProps = (state) => ({ ...state });
+const mapStateToProps = (state) => ({
+    data: state.noteList,
+});
 const mapDispatchToProps = (dispatch) => ({
-    selectNote: (note, index) => dispatch(selectNote(note, index)),
+    selectNote: (index, note) => dispatch(selectNote(index, note)),
 });
 
 export default connect(
@@ -169,10 +174,10 @@ export default connect(
 )(Notes);
 
 const styles = StyleSheet.create({
-    mainContainer: {
+    container: {
         flex: 1,
     },
-    container: {
+    scrollContainer: {
         // flex: 1,
         justifyContent: "center",
         alignItems: "stretch",
@@ -220,112 +225,3 @@ const styles = StyleSheet.create({
         color: SWATCH.GRAY,
     },
 });
-
-const fakeData = [
-    {
-        id: 0,
-        title: "HELLO",
-        type: "memo",
-        contents: [
-            {
-                checked: true,
-                content: "AZXCBSA",
-            },
-            {
-                checked: false,
-                content: "XXXXX",
-            },
-        ],
-        lastEditedAt: new Date(2018, 5, 9),
-        pinned: false,
-    },
-    {
-        id: 1,
-        title: "CHECKLIST",
-        type: "checklist",
-        contents: [
-            {
-                checked: true,
-                content: "ASDF",
-            },
-            {
-                checked: false,
-                content:
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum efficitur ullamcorper quam id sollicitudin. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque a elit in nulla elementum facilisis. Nunc semper tempus erat et imperdiet. Sed vitae mollis arcu. Cras scelerisque nec erat eget rhoncus. Aenean sit amet mollis nibh, a egestas risus.",
-            },
-            {
-                checked: true,
-                content:
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum efficitur ullamcorper quam id sollicitudin. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque a elit in nulla elementum facilisis. Nunc semper tempus erat et imperdiet. Sed vitae mollis arcu. Cras scelerisque nec erat eget rhoncus. Aenean sit amet mollis nibh, a egestas risus.",
-            },
-            {
-                checked: true,
-                content: "A",
-            },
-            {
-                checked: false,
-                content: "B",
-            },
-            {
-                checked: true,
-                content: "C",
-            },
-            {
-                checked: false,
-                content: "D",
-            },
-            {
-                checked: true,
-                content: "E",
-            },
-            {
-                checked: false,
-                content: "F",
-            },
-        ],
-        lastEditedAt: new Date(2018, 4, 10),
-        pinned: true,
-    },
-    {
-        id: 2,
-        title: "Test for List",
-        type: "checklist",
-        contents: [
-            {
-                checked: true,
-                content: "Hello world",
-            },
-            {
-                checked: false,
-                content: "Lorem ipsum",
-            },
-        ],
-        lastEditedAt: new Date(2018, 2, 28),
-        pinned: false,
-    },
-    {
-        id: 3,
-        title: "Hi hello",
-        type: "checklist",
-        contents: [
-            {
-                checked: true,
-                content: "Woooo",
-            },
-            {
-                checked: false,
-                content: "Need to test longer message lorem ipsum",
-            },
-            {
-                checked: true,
-                content: "Woooo",
-            },
-            {
-                checked: false,
-                content: "Need to test long message",
-            },
-        ],
-        lastEditedAt: new Date(2018, 11, 27),
-        pinned: false,
-    },
-];

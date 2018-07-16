@@ -8,6 +8,10 @@ import {
     LOGIN,
     REGISTER_USER,
     SELECT_NOTE,
+    NOTE_LIST_REQUEST,
+    EDIT_NOTE_CONTENT,
+    EDIT_NOTE_TITLE,
+    EDIT_NOTE_ITEM,
 } from "./constants";
 
 export function loginFlowStart() {
@@ -48,9 +52,40 @@ export function logoutUser() {
     };
 }
 
-export function selectNote(note, index) {
+export function getNoteList() {
+    return {
+        type: NOTE_LIST_REQUEST,
+        // payload
+    };
+}
+
+export function editNoteTitle(text) {
+    return {
+        type: EDIT_NOTE_TITLE,
+        payload: text,
+    };
+}
+
+export function editNoteContent(index, text) {
+    return {
+        type: EDIT_NOTE_CONTENT,
+        payload: text,
+        index,
+    };
+}
+
+export function selectNote(index, note) {
     return {
         type: SELECT_NOTE,
-        payload: { index, ...note },
+        payload: note,
+        index,
+    };
+}
+
+export function editNoteItem(index, item) {
+    return {
+        type: EDIT_NOTE_ITEM,
+        index,
+        payload: item,
     };
 }

@@ -5,6 +5,7 @@ import Moment from "moment";
 import { connect } from "react-redux";
 
 import { SWATCH, LAYOUT_MARGIN } from "../../constants";
+import { editNoteTitle, editNoteContent, editNoteItem } from "../../actions";
 
 class NoteItem extends Component {
     constructor(props) {
@@ -19,7 +20,7 @@ class NoteItem extends Component {
         };
     }
     componentDidMount() {
-        // console.log(this);
+        // console.log(this.props);
 
         // const { memo, index } = this.props.navigation.state.params;
         const { pinned } = this.props.selectedNote;
@@ -36,14 +37,28 @@ class NoteItem extends Component {
         // });
     }
 
+    componentDidUpdate() {
+        console.log("update selected note", this.props.selectedNote.note);
+    }
+
+    componentWillUnmount() {
+        this.props.updateNoteList(this.props.selectedNote.index, this.props.selectedNote.note);
+    }
+
     handleChangeText = (type, index, text) => {
-        console.log("handleChangeText", type, index, text);
-        console.log(this.props.selectedNote[type]);
+        // console.log("handleChangeText", type, index, text);
+        if (type === "title") {
+            // console.log(this.props.selectedNote[type]);
+            this.props.editTitle(text);
+        } else {
+            this.props.editContent(index, text);
+            // console.log(this.props.selectedNote.contents[index]);
+        }
     };
 
     renderNoteContent = ({ item, index }) => {
         const { noteContentText, noteContentCheckBox, noteContentCheckedText, checklistRowContainer } = styles;
-        const { type } = this.props.selectedNote;
+        const { type } = this.props.selectedNote.note;
 
         onChangeText = (text) => this.handleChangeText("content", index, text);
 
@@ -91,7 +106,8 @@ class NoteItem extends Component {
             footerItemContainer,
             footerMainContentContainer,
         } = styles;
-        const { title, lastEditedAt, contents, index } = this.props.selectedNote;
+        const { note, index } = this.props.selectedNote;
+        const { title, lastEditedAt, contents } = note;
 
         lastEditedAtFormatted = () => {
             const lastEdit = Moment(lastEditedAt);
@@ -141,7 +157,11 @@ class NoteItem extends Component {
 }
 
 const mapStateToProps = ({ selectedNote }) => ({ selectedNote });
-const mapDispatchToProps = (dispatch) => ({});
+const mapDispatchToProps = (dispatch) => ({
+    editTitle: (text) => dispatch(editNoteTitle(text)),
+    editContent: (index, text) => dispatch(editNoteContent(index, text)),
+    updateNoteList: (index, item) => dispatch(editNoteItem(index, item)),
+});
 
 export default connect(
     mapStateToProps,

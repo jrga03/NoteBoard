@@ -1,10 +1,12 @@
 import { combineReducers } from "redux";
-import User from "./reducer_user";
-import SelectedNote from "./reducer_selected_note";
+import User from "./user_reducer";
+import SelectedNote from "./selected_note_reducer";
+import NoteList from "./note_list_reducer";
 
 const rootReducer = combineReducers({
     user: User,
     selectedNote: SelectedNote,
+    noteList: NoteList,
 });
 
 export default rootReducer;

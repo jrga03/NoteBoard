@@ -17,16 +17,14 @@ const auth = {
         });
     },
     logout() {
-        FirebaseService.signOut((err, res) => {
+        return FirebaseService.signOut((err, res) => {
             if (err) {
                 console.log(err);
             }
         });
     },
     loggedIn(callback) {
-        return FirebaseService.isUserLoggedIn((err, user) =>
-            callback(err, user)
-        );
+        return FirebaseService.isUserLoggedIn((err, user) => callback(err, user));
     },
     register(credentials, callback) {
         FirebaseService.registerUser(credentials, (err, res) => {

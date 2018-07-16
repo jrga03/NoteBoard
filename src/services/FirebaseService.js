@@ -1,35 +1,8 @@
 // import { Platform } from "react-native";
 import firebase from "react-native-firebase";
 
-// const iosConfig = {
-//     clientId:
-//         "604168385941-564sugmijrebh8dg3vpt5i2tr5df4bee.apps.googleusercontent.com",
-//     appId: "1:604168385941:ios:ac070bda8a2575b8",
-//     apiKey: "AIzaSyBK8pCjM1ANlH8oBDgFuUXCJDIPXzFCS10",
-//     databaseURL: "https://note-board-1527334009294.firebaseio.com/",
-//     storageBucket: "note-board-1527334009294.appspot.com",
-//     messagingSenderId: "604168385941",
-//     projectId: "note-board-1527334009294",
-//     persistence: true,
-// };
-
-// const androidConfig = {
-//     clientId:
-//         "604168385941-s3ir3m3puo5um9hpsig7trvfjfbafreq.apps.googleusercontent.com",
-//     appId: "1:604168385941:android:ac070bda8a2575b8",
-//     apiKey: "AIzaSyCNFx__Cp3WdKYlK--LeH4KdrgqkxBf3j0",
-//     databaseURL: "https://note-board-1527334009294.firebaseio.com/",
-//     storageBucket: "note-board-1527334009294.appspot.com",
-//     messagingSenderId: "604168385941",
-//     projectId: "note-board-1527334009294",
-//     persistence: true,
-// };
-
 class _FirebaseService {
     isUserLoggedIn(callback) {
-        /**
-         * REFACTOR SAGA ASAP TO ACCOMMODATE LOGIN FLOW
-         */
         firebase.auth().onAuthStateChanged((data) => {
             const user = data ? data.toJSON() : null;
             console.log("authstatechange", user);
