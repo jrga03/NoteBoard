@@ -20,7 +20,7 @@ class NoteItem extends Component {
         };
     }
     componentDidMount() {
-        // console.log(this.props);
+        // console.log("NoteItem mounted", this.props);
 
         // const { memo, index } = this.props.navigation.state.params;
         const { pinned } = this.props.selectedNote;
@@ -42,16 +42,20 @@ class NoteItem extends Component {
     }
 
     componentWillUnmount() {
-        this.props.updateNoteList(this.props.selectedNote.index, this.props.selectedNote.note);
+        const { note, index } = this.props.selectedNote;
+        if (!index || !!note.title || note.contents.reduce((acc, item) => (acc = !!item.content), false)) {
+            console.log("update triggered");
+            this.props.updateNoteList(index, note);
+        }
     }
 
-    handleChangeText = (type, index, text) => {
+    handleChangeText = (data) => {
         // console.log("handleChangeText", type, index, text);
-        if (type === "title") {
+        if (data.type === "title") {
             // console.log(this.props.selectedNote[type]);
-            this.props.editTitle(text);
+            this.props.editTitle(data.text);
         } else {
-            this.props.editContent(index, text);
+            this.props.editContent(data.index, data.text);
             // console.log(this.props.selectedNote.contents[index]);
         }
     };
@@ -60,7 +64,7 @@ class NoteItem extends Component {
         const { noteContentText, noteContentCheckBox, noteContentCheckedText, checklistRowContainer } = styles;
         const { type } = this.props.selectedNote.note;
 
-        onChangeText = (text) => this.handleChangeText("content", index, text);
+        onChangeText = (text) => this.handleChangeText({ type: "content", index, text });
 
         if (type === "memo") {
             return (
@@ -71,6 +75,7 @@ class NoteItem extends Component {
                     multiline={true}
                     onChangeText={onChangeText}
                     autoCorrect={false}
+                    autoFocus={this.props.selectedNote.index === null ? true : false}
                 />
             );
         } else if (type === "checklist") {
@@ -90,6 +95,7 @@ class NoteItem extends Component {
                         multiline={true}
                         onChangeText={onChangeText}
                         autoCorrect={false}
+                        autoFocus={this.props.selectedNote.index === null ? true : false}
                     />
                 </View>
             );
@@ -106,8 +112,7 @@ class NoteItem extends Component {
             footerItemContainer,
             footerMainContentContainer,
         } = styles;
-        const { note, index } = this.props.selectedNote;
-        const { title, lastEditedAt, contents } = note;
+        const { title, lastEditedAt, contents } = this.props.selectedNote.note;
 
         lastEditedAtFormatted = () => {
             const lastEdit = Moment(lastEditedAt);
@@ -119,7 +124,7 @@ class NoteItem extends Component {
                     : lastEdit.format("MMM D, YYYY");
         };
 
-        onChangeText = (text) => this.handleChangeText("title", index, text);
+        onChangeText = (text) => this.handleChangeText({ type: "title", text });
 
         return (
             <View style={mainContainer}>

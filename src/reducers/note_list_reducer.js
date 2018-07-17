@@ -8,13 +8,14 @@ export default function(state = initialState, action) {
         case EDIT_NOTE_ITEM:
             // console.log("oldState", state, action);
             const newState = state;
-            newState.splice(action.index, 1);
+            if (action.index !== null) {
+                newState.splice(action.index, 1);
+            }
             // console.log("spliced", newState, newState.length);
             newState.unshift(action.payload);
             // console.log("unshifted", newState, newState.length);
             return newState;
         default:
-            console.log("test", state)
             return state;
     }
 }
@@ -34,7 +35,7 @@ const initialState = [
                 content: "XXXXX",
             },
         ],
-        lastEditedAt: Moment(new Date(Date.UTC(2018, 5, 9, 0, 0, 0))).format("x"),
+        lastEditedAt: Moment(new Date(2018, 5, 9)).toISOString(),
         pinned: false,
     },
     {
@@ -81,7 +82,7 @@ const initialState = [
                 content: "F",
             },
         ],
-        lastEditedAt: Moment(new Date(Date.UTC(2018, 4, 10, 0, 0, 0))).format("x"),
+        lastEditedAt: Moment(new Date(2018, 4, 10)).toISOString(),
         pinned: true,
     },
     {
@@ -98,7 +99,7 @@ const initialState = [
                 content: "Lorem ipsum",
             },
         ],
-        lastEditedAt: Moment(new Date(Date.UTC(2018, 2, 28, 0, 0, 0))).format("x"),
+        lastEditedAt: Moment(new Date(2018, 2, 28)).toISOString(),
         pinned: false,
     },
     {
@@ -123,7 +124,7 @@ const initialState = [
                 content: "Need to test long message",
             },
         ],
-        lastEditedAt: Moment(new Date(Date.UTC(2018, 11, 27, 0, 0, 0))).format("x"),
+        lastEditedAt: Moment(new Date(2018, 11, 27)).toISOString(),
         pinned: false,
     },
 ];

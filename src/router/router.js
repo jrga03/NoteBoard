@@ -143,7 +143,7 @@ const NotesStack = createStackNavigator(
     {
         initialRouteName: "Notes",
         initialRouteParams: {
-            noteLayout: "tile",
+            noteLayout: "list",
             isPinned: false,
         },
         // navigationOptions: ({ navigation, screenProps }) => ({

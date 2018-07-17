@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 
 import NoteMemo from "./NoteMemo";
 import { SWATCH, LAYOUT_MARGIN } from "../../constants";
-import { selectNote } from "../../actions";
+import { openNote, createNote } from "../../actions";
 
 let leftColumnHeight = 0;
 let rightColumnHeight = 0;
@@ -43,7 +43,12 @@ class Notes extends Component {
     }
 
     handleMemoPress = (index, memo) => {
-        this.props.selectNote(index, memo);
+        this.props.openNote(index, memo);
+        this.props.navigation.navigate("NoteItem");
+    };
+
+    handleCreateNote = (type) => {
+        this.props.createNote(type);
         this.props.navigation.navigate("NoteItem");
     };
 
@@ -149,10 +154,12 @@ class Notes extends Component {
                 {layout === "tile" ? this.renderTileLayout() : this.renderListLayout()}
 
                 <View style={footerContainer}>
-                    <TouchableOpacity style={[footerItemContainer, footerTakeNoteContainer]}>
+                    <TouchableOpacity
+                        style={[footerItemContainer, footerTakeNoteContainer]}
+                        onPress={() => this.handleCreateNote("memo")}>
                         <Text style={footerText}>Take a note...</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={footerItemContainer}>
+                    <TouchableOpacity style={footerItemContainer} onPress={() => this.handleCreateNote("checklist")}>
                         <Icon type="material-icons" name="format-list-bulleted" size={22} color={SWATCH.GRAY} />
                     </TouchableOpacity>
                 </View>
@@ -165,7 +172,8 @@ const mapStateToProps = (state) => ({
     data: state.noteList,
 });
 const mapDispatchToProps = (dispatch) => ({
-    selectNote: (index, note) => dispatch(selectNote(index, note)),
+    openNote: (index, note) => dispatch(openNote(index, note)),
+    createNote: (type) => dispatch(createNote(type)),
 });
 
 export default connect(

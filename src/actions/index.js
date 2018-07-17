@@ -7,11 +7,12 @@ import {
     LOGIN_REQUEST,
     LOGIN,
     REGISTER_USER,
-    SELECT_NOTE,
+    OPEN_NOTE,
     NOTE_LIST_REQUEST,
     EDIT_NOTE_CONTENT,
     EDIT_NOTE_TITLE,
     EDIT_NOTE_ITEM,
+    CREATE_NEW_NOTE,
 } from "./constants";
 
 export function loginFlowStart() {
@@ -74,9 +75,9 @@ export function editNoteContent(index, text) {
     };
 }
 
-export function selectNote(index, note) {
+export function openNote(index, note) {
     return {
-        type: SELECT_NOTE,
+        type: OPEN_NOTE,
         payload: note,
         index,
     };
@@ -87,5 +88,12 @@ export function editNoteItem(index, item) {
         type: EDIT_NOTE_ITEM,
         index,
         payload: item,
+    };
+}
+
+export function createNote(type) {
+    return {
+        type: CREATE_NEW_NOTE,
+        payload: type,
     };
 }
