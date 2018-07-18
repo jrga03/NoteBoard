@@ -12,52 +12,66 @@ class NoteItem extends Component {
         super(props);
 
         this.state = {
-            title: null,
-            type: null,
-            contents: null,
-            lastEditedAt: null,
-            pinned: null,
+            wasChanged: false,
+            note: null,
         };
     }
     componentDidMount() {
         // console.log("NoteItem mounted", this.props);
 
-        // const { memo, index } = this.props.navigation.state.params;
-        const { pinned } = this.props.selectedNote;
+        const { note } = this.props.selectedNote;
+        const { pinned } = note;
 
         this.props.navigation.setParams({ isPinned: pinned });
-
-        // this.setState({
-        //     title,
-        //     type,
-        //     contents,
-        //     lastEditedAt,
-        //     pinned,
-        //     index,
-        // });
+        this.setState({ note });
     }
 
     componentDidUpdate() {
-        console.log("update selected note", this.props.selectedNote.note);
+        // console.log("update selected note", this.props.selectedNote.note);
     }
 
     componentWillUnmount() {
-        const { note, index } = this.props.selectedNote;
-        if (!index || !!note.title || note.contents.reduce((acc, item) => (acc = !!item.content), false)) {
-            console.log("update triggered");
-            this.props.updateNoteList(index, note);
+        if (this.state.wasChanged) {
+            const { note, index } = this.props.selectedNote;
+
+            const checkboxChanged = note.contents.some(
+                (content, i) => content.checked === this.state.note.contents[i].checked
+            );
+
+            if (
+                !!index ||
+                !!note.title ||
+                note.contents.reduce((acc, item) => (acc = !!item.content), false) ||
+                checkboxChanged
+            ) {
+                // console.log("update triggered");
+                this.props.updateNoteList(index, note);
+            }
         }
     }
 
     handleChangeText = (data) => {
+        this.setState({ wasChanged: true });
         // console.log("handleChangeText", type, index, text);
         if (data.type === "title") {
             // console.log(this.props.selectedNote[type]);
             this.props.editTitle(data.text);
         } else {
-            this.props.editContent(data.index, data.text);
+            this.props.editContent(data.index, {
+                ...this.props.selectedNote.note.contents[data.index],
+                content: data.text,
+            });
             // console.log(this.props.selectedNote.contents[index]);
         }
+    };
+
+    handlePressCheckbox = (index) => {
+        this.setState({ wasChanged: true });
+
+        this.props.editContent(index, {
+            ...this.props.selectedNote.note.contents[index],
+            checked: !this.props.selectedNote.note.contents[index].checked,
+        });
     };
 
     renderNoteContent = ({ item, index }) => {
@@ -79,15 +93,19 @@ class NoteItem extends Component {
                 />
             );
         } else if (type === "checklist") {
+            onPressCheckbox = () => this.handlePressCheckbox(index);
+
             return (
                 <View style={checklistRowContainer}>
-                    <View style={noteContentCheckBox}>
-                        <Icon
-                            type="material-icons"
-                            name={item.checked ? "check-box" : "check-box-outline-blank"}
-                            color={item.checked ? SWATCH.GRAY : SWATCH.BLACK}
-                        />
-                    </View>
+                    <TouchableOpacity onPress={onPressCheckbox}>
+                        <View style={noteContentCheckBox}>
+                            <Icon
+                                type="material-icons"
+                                name={item.checked ? "check-box" : "check-box-outline-blank"}
+                                color={item.checked ? SWATCH.GRAY : SWATCH.BLACK}
+                            />
+                        </View>
+                    </TouchableOpacity>
                     <TextInput
                         style={[noteContentText, item.checked ? noteContentCheckedText : null]}
                         value={item.content}
@@ -161,10 +179,13 @@ class NoteItem extends Component {
     }
 }
 
-const mapStateToProps = ({ selectedNote }) => ({ selectedNote });
+const mapStateToProps = (state) => ({
+    selectedNote: state.selectedNote,
+    noteList: state.noteList,
+});
 const mapDispatchToProps = (dispatch) => ({
     editTitle: (text) => dispatch(editNoteTitle(text)),
-    editContent: (index, text) => dispatch(editNoteContent(index, text)),
+    editContent: (index, content) => dispatch(editNoteContent(index, content)),
     updateNoteList: (index, item) => dispatch(editNoteItem(index, item)),
 });
 

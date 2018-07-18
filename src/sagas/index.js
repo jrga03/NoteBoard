@@ -1,4 +1,4 @@
-import { put, take, takeLatest, call, all, fork, cps, race } from "redux-saga/effects";
+import { put, take, takeLatest, call, all, fork, cps, race, takeEvery } from "redux-saga/effects";
 import {
     // CURRENT_USER,
     GET_GOOGLE,
@@ -16,8 +16,10 @@ import {
     LOGIN_FAIL,
     REGISTER_USER,
     LOGIN,
+    EDIT_NOTE_ITEM,
+    CLEAR_SELECTED_NOTE,
 } from "../actions/constants";
-import { NavigationService } from "../services";
+import { NavigationService, FirebaseService } from "../services";
 import authentication from "../auth";
 
 function navigateTo(route = "Home") {
@@ -144,8 +146,16 @@ function* registerFlow() {
     }
 }
 
+/**
+ * Edit note item
+ */
+function* editNote({ payload }) {
+    yield cps(FirebaseService.editNote, payload);
+    yield put({ type: CLEAR_SELECTED_NOTE });
+}
+
 export default function* rootSaga() {
-    yield all([fork(loginFlow), fork(registerFlow), fork(logoutFlow)]);
+    yield all([fork(loginFlow), fork(registerFlow), fork(logoutFlow), takeEvery(EDIT_NOTE_ITEM, editNote)]);
 }
 
 /**

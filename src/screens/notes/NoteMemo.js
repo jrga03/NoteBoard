@@ -70,8 +70,9 @@ export default class NoteMemo extends Component {
         return (
             <View
                 style={container}
-                onLayout={layout === "tile" ? (e) => onLayoutEvent(e.nativeEvent.layout, index) : null}>
-                <Text style={titleText}>{title}</Text>
+                // onLayout={layout === "tile" ? (e) => onLayoutEvent(e.nativeEvent.layout, index) : null}
+            >
+                {!!title && <Text style={titleText}>{title}</Text>}
                 <FlatList
                     data={contents}
                     renderItem={this.renderNoteContent}

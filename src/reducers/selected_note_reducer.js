@@ -1,5 +1,11 @@
 import Moment from "moment";
-import { OPEN_NOTE, EDIT_NOTE_TITLE, EDIT_NOTE_CONTENT, EDIT_NOTE_ITEM, CREATE_NEW_NOTE } from "../actions/constants";
+import {
+    OPEN_NOTE,
+    EDIT_NOTE_TITLE,
+    EDIT_NOTE_CONTENT,
+    CREATE_NEW_NOTE,
+    CLEAR_SELECTED_NOTE,
+} from "../actions/constants";
 
 export default function(state = initialState, action) {
     switch (action.type) {
@@ -8,7 +14,18 @@ export default function(state = initialState, action) {
                 index: null,
                 note: {
                     ...initialState,
+                    id: `${Date.now()}`,
+                    title: "",
                     type: action.payload,
+                    contents: [
+                        {
+                            content: "",
+                            checked: false,
+                        },
+                    ],
+                    lastEditedAt: Moment().toISOString(),
+                    lastEditedAtMsec: -Date.now(),
+                    pinned: false,
                 },
             };
         case OPEN_NOTE:
@@ -16,8 +33,8 @@ export default function(state = initialState, action) {
                 note: action.payload,
                 index: action.index,
             };
-        case EDIT_NOTE_ITEM:
-            return initialState;
+        case CLEAR_SELECTED_NOTE:
+            return {};
         case EDIT_NOTE_TITLE:
             return {
                 ...state,
@@ -25,12 +42,14 @@ export default function(state = initialState, action) {
                     ...state.note,
                     title: action.payload,
                     lastEditedAt: Moment().toISOString(),
+                    lastEditedAtMsec: -Date.now(),
                 },
             };
         case EDIT_NOTE_CONTENT:
             const { contents } = state.note;
             const item = contents[action.index];
-            item.content = action.payload;
+            item.content = action.payload.content;
+            item.checked = action.payload.checked;
             contents.splice(action.index, 1, item);
 
             return {
@@ -39,6 +58,7 @@ export default function(state = initialState, action) {
                     ...state.note,
                     contents,
                     lastEditedAt: Moment().toISOString(),
+                    lastEditedAtMsec: -Date.now(),
                 },
             };
         default:
@@ -47,15 +67,16 @@ export default function(state = initialState, action) {
 }
 
 const initialState = {
-    id: Date.now(),
-    title: "",
+    id: null,
+    title: null,
     type: null,
     contents: [
         {
             checked: false,
-            content: "",
+            content: null,
         },
     ],
-    lastEditedAt: Moment().toISOString(),
+    lastEditedAt: null,
+    lastEditedAtMsec: null,
     pinned: false,
 };

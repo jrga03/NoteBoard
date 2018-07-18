@@ -8,7 +8,7 @@ import {
     LOGIN,
     REGISTER_USER,
     OPEN_NOTE,
-    NOTE_LIST_REQUEST,
+    UPDATE_NOTE_LIST,
     EDIT_NOTE_CONTENT,
     EDIT_NOTE_TITLE,
     EDIT_NOTE_ITEM,
@@ -53,10 +53,10 @@ export function logoutUser() {
     };
 }
 
-export function getNoteList() {
+export function updateNoteList(newList) {
     return {
-        type: NOTE_LIST_REQUEST,
-        // payload
+        type: UPDATE_NOTE_LIST,
+        payload: newList,
     };
 }
 
@@ -67,10 +67,10 @@ export function editNoteTitle(text) {
     };
 }
 
-export function editNoteContent(index, text) {
+export function editNoteContent(index, payload) {
     return {
         type: EDIT_NOTE_CONTENT,
-        payload: text,
+        payload,
         index,
     };
 }

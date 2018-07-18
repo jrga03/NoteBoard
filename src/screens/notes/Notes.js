@@ -5,7 +5,8 @@ import { connect } from "react-redux";
 
 import NoteMemo from "./NoteMemo";
 import { SWATCH, LAYOUT_MARGIN } from "../../constants";
-import { openNote, createNote } from "../../actions";
+import { openNote, createNote, updateNoteList } from "../../actions";
+import { FirebaseService } from "../../services";
 
 let leftColumnHeight = 0;
 let rightColumnHeight = 0;
@@ -22,24 +23,30 @@ class Notes extends Component {
     }
 
     componentDidMount() {
-        console.log("home props", this.props);
-        const leftList = [];
-        const rightList = [];
-        const { data } = this.props;
-        data.sort((a, b) => a.lastEditedAt - b.lastEditedAt);
-        data.map((item, index) => (index % 2 === 0 ? leftList.push(item) : rightList.push(item)));
+        // console.log("home props", this.props);
 
-        this.setState({
-            // data,
-            leftList,
-            rightList,
+        FirebaseService.fetchNotes((err, data) => {
+            if (err) {
+                console.log("error fetchNotes", err);
+            } else {
+                const leftList = [];
+                const rightList = [];
+                data.map((item, index) => (index % 2 === 0 ? leftList.push(item) : rightList.push(item)));
+
+                this.setState({
+                    data,
+                    leftList,
+                    rightList,
+                });
+                this.props.updateNoteList(data);
+            }
         });
     }
 
     componentDidUpdate() {
         // const test = this.props.navigation.getParam("noteLayout", null);
         // console.log("getparam", test);
-        console.log("home props update", this.props, this.state);
+        // console.log("home props update", this.props, this.state);
     }
 
     handleMemoPress = (index, memo) => {
@@ -130,7 +137,7 @@ class Notes extends Component {
     renderListLayout = () => {
         const { container, scrollContainer, listContainer } = styles;
 
-        const { data } = this.props;
+        const { data } = this.state;
         return (
             <View style={[container, scrollContainer]}>
                 <FlatList
@@ -174,6 +181,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
     openNote: (index, note) => dispatch(openNote(index, note)),
     createNote: (type) => dispatch(createNote(type)),
+    updateNoteList: (notes) => dispatch(updateNoteList(notes)),
 });
 
 export default connect(
