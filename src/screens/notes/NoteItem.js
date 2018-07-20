@@ -5,9 +5,7 @@ import Moment from "moment";
 import { connect } from "react-redux";
 
 import { SWATCH, LAYOUT_MARGIN } from "../../constants";
-import { editNoteTitle, editNoteContent, editNoteItem } from "../../actions";
-
-let addMenuItems, moreMenuItems;
+import { editNoteTitle, editNoteContent, editNoteItem, deleteNote } from "../../actions";
 
 class NoteItem extends Component {
     constructor(props) {
@@ -15,37 +13,30 @@ class NoteItem extends Component {
 
         this.state = {
             wasChanged: false,
-            note: null,
+            note: this.props.selectedNote.note,
+            index: this.props.selectedNote.index,
+            footerMenuSelected: null,
             footerMenu: [],
+            forDeletion: false,
         };
     }
+
     componentDidMount() {
         // console.log("NoteItem mounted", this.props);
 
-        const { note } = this.props.selectedNote;
-        const { pinned } = note;
+        // const { note, index } = this.props.selectedNote;
+        const { pinned } = this.state.note;
 
+        // this.setState({ note, index });
         this.props.navigation.setParams({ isPinned: pinned });
-        this.setState({ note });
-
-        addMenuItems = [
-            {
-                text,
-                icon: {
-                    name,
-                    type,
-                },
-                onPress,
-            },
-        ];
     }
 
     componentDidUpdate() {
-        // console.log("update selected note", this.props.selectedNote.note);
+        console.log("update selected note", this.state);
     }
 
     componentWillUnmount() {
-        if (this.state.wasChanged) {
+        if (!this.state.forDeletion && this.state.wasChanged) {
             const { note, index } = this.props.selectedNote;
 
             const checkboxChanged = note.contents.some(
@@ -70,10 +61,29 @@ class NoteItem extends Component {
         if (data.type === "title") {
             // console.log(this.props.selectedNote[type]);
             this.props.editTitle(data.text);
+            this.setState({
+                note: {
+                    ...this.state.note,
+                    title: data.text,
+                    lastEditedAt: Moment().toISOString(),
+                },
+            });
         } else {
             this.props.editContent(data.index, {
                 ...this.props.selectedNote.note.contents[data.index],
                 content: data.text,
+            });
+
+            const { contents } = this.state.note;
+            const item = contents[data.index];
+            item.content = data.text;
+            contents.splice(data.index, 1, item);
+            this.setState({
+                note: {
+                    ...this.state.note,
+                    contents,
+                    lastEditedAt: Moment().toISOString(),
+                },
             });
             // console.log(this.props.selectedNote.contents[index]);
         }
@@ -86,11 +96,45 @@ class NoteItem extends Component {
             ...this.props.selectedNote.note.contents[index],
             checked: !this.props.selectedNote.note.contents[index].checked,
         });
+
+        const { contents } = this.state.note;
+        const item = contents[index];
+        item.checked = this.state.note.contents[index].checked;
+        contents.splice(index, 1, item);
+        this.setState({
+            note: {
+                ...this.state.note,
+                contents,
+                lastEditedAt: Moment().toISOString(),
+            },
+        });
+    };
+
+    handleFooterMenuItemPress = (type, payload) => {
+        switch (type) {
+            case "delete":
+                if (this.state.index !== null) {
+                    this.setState({ forDeletion: true }, () => {
+                        this.props.deleteNote(payload);
+                        this.props.navigation.goBack();
+                    });
+                } else {
+                    this.props.navigation.goBack();
+                }
+                break;
+            case "photo":
+                break;
+            case "gallery":
+                break;
+            case "checkbox":
+                break;
+            case "collaborator":
+        }
     };
 
     renderNoteContent = ({ item, index }) => {
         const { noteContentText, noteContentCheckBox, noteContentCheckedText, checklistRowContainer } = styles;
-        const { type } = this.props.selectedNote.note;
+        const { type } = this.state.note;
 
         onChangeText = (text) => this.handleChangeText({ type: "content", index, text });
 
@@ -103,7 +147,7 @@ class NoteItem extends Component {
                     multiline={true}
                     onChangeText={onChangeText}
                     autoCorrect={false}
-                    autoFocus={this.props.selectedNote.index === null ? true : false}
+                    autoFocus={this.state.index === null ? true : false}
                 />
             );
         } else if (type === "checklist") {
@@ -127,14 +171,12 @@ class NoteItem extends Component {
                         multiline={true}
                         onChangeText={onChangeText}
                         autoCorrect={false}
-                        autoFocus={this.props.selectedNote.index === null ? true : false}
+                        autoFocus={this.state.index === null ? true : false}
                     />
                 </View>
             );
         }
     };
-
-    renderFooterItem = ({ item }) => {};
 
     render() {
         const {
@@ -144,13 +186,18 @@ class NoteItem extends Component {
             footerItemText,
             footerContainer,
             staticFooterText,
+            footerMenuActive,
+            contentContainer,
+            listItemContainer,
             footerRowContainer,
             footerItemContainer,
             staticFooterContainer,
             footerItemTextContainer,
             staticFooterMainContentContainer,
         } = styles;
-        const { title, lastEditedAt, contents } = this.props.selectedNote.note;
+        const { footerMenu, footerMenuSelected, note } = this.state;
+        const { id, title, lastEditedAt, contents, type } = note;
+        const { memoAdd, checklistAdd, more } = noteItemMenuItems;
 
         lastEditedAtFormatted = () => {
             const lastEdit = Moment(lastEditedAt);
@@ -163,6 +210,7 @@ class NoteItem extends Component {
         };
 
         onChangeText = (text) => this.handleChangeText({ type: "title", text });
+        onPressFooterItem = (type) => null; //do not use this
 
         return (
             <View style={mainContainer}>
@@ -176,30 +224,57 @@ class NoteItem extends Component {
                         onChangeText={onChangeText}
                     />
                     <FlatList
-                        // contentContainerStyle={{marginVertical: 3}}
+                        contentContainerStyle={contentContainer}
                         data={contents}
-                        extraData={this.props}
+                        extraData={this.state}
                         renderItem={this.renderNoteContent}
                         keyExtractor={(item, index) => `${index}`}
                     />
                 </View>
                 <View style={footerContainer}>
+                    <View>
+                        {!!footerMenuSelected &&
+                            footerMenu.map((item) => (
+                                <TouchableOpacity
+                                    key={item.onPress}
+                                    onPress={() => this.handleFooterMenuItemPress(item.onPress, id)}>
+                                    <View style={[footerRowContainer, listItemContainer]}>
+                                        <View style={footerItemContainer}>
+                                            <Icon
+                                                type={item.icon.type}
+                                                name={item.icon.name}
+                                                size={22}
+                                                color={SWATCH.GRAY}
+                                            />
+                                        </View>
+                                        <View style={[footerItemContainer, footerItemTextContainer]}>
+                                            <Text style={footerItemText}>{item.text}</Text>
+                                        </View>
+                                    </View>
+                                </TouchableOpacity>
+                            ))}
+                    </View>
                     {/* <FlatList
-                        data={this.state.footerMenu}
+                        data={footerMenu}
                         extraData={this.state}
                         renderItem={({ item }) => (
-                            <TouchableOpacity onPress={() => null}>
-                                <View style={footerRowContainer}>
+                            <TouchableOpacity onPress={() => onPressFooterItem(item.onPress)}>
+                                <View style={[footerRowContainer, listItemContainer]}>
                                     <View style={footerItemContainer}>
-                                        <Icon type="material-icons" name="delete" size={22} color={SWATCH.GRAY} />
+                                        <Icon
+                                            type={item.icon.type}
+                                            name={item.icon.name}
+                                            size={22}
+                                            color={SWATCH.GRAY}
+                                        />
                                     </View>
                                     <View style={[footerItemContainer, footerItemTextContainer]}>
-                                        <Text style={footerItemText}>Delete</Text>
+                                        <Text style={footerItemText}>{item.text}</Text>
                                     </View>
                                 </View>
                             </TouchableOpacity>
                         )}
-                        keyExtractor={(item, index) => `${index}`}
+                        keyExtractor={(item) => item.onPress}
                     /> */}
                     {/* <View>
                         <TouchableOpacity>
@@ -214,13 +289,41 @@ class NoteItem extends Component {
                         </TouchableOpacity>
                     </View> */}
                     <View style={[footerRowContainer, staticFooterContainer]}>
-                        <TouchableOpacity style={footerItemContainer} onPress={() => null}>
+                        <TouchableOpacity
+                            style={[footerItemContainer, footerMenuSelected === "ADD" ? footerMenuActive : null]}
+                            onPress={() => {
+                                if (footerMenuSelected === "ADD") {
+                                    this.setState({
+                                        footerMenu: [],
+                                        footerMenuSelected: null,
+                                    });
+                                } else {
+                                    this.setState({
+                                        footerMenu: type === "memo" ? memoAdd : checklistAdd,
+                                        footerMenuSelected: "ADD",
+                                    });
+                                }
+                            }}>
                             <Icon type="material-icons" name="add-box" size={22} color={SWATCH.GRAY} />
                         </TouchableOpacity>
                         <View style={[footerItemContainer, staticFooterMainContentContainer]}>
                             <Text style={staticFooterText}>Edited {lastEditedAtFormatted()}</Text>
                         </View>
-                        <TouchableOpacity style={footerItemContainer} onPress={() => null}>
+                        <TouchableOpacity
+                            style={[footerItemContainer, footerMenuSelected === "MORE" ? footerMenuActive : null]}
+                            onPress={() => {
+                                if (footerMenuSelected === "MORE") {
+                                    this.setState({
+                                        footerMenu: [],
+                                        footerMenuSelected: null,
+                                    });
+                                } else {
+                                    this.setState({
+                                        footerMenu: more,
+                                        footerMenuSelected: "MORE",
+                                    });
+                                }
+                            }}>
                             <Icon type="material-icons" name="more" size={22} color={SWATCH.GRAY} />
                         </TouchableOpacity>
                     </View>
@@ -238,6 +341,7 @@ const mapDispatchToProps = (dispatch) => ({
     editTitle: (text) => dispatch(editNoteTitle(text)),
     editContent: (index, content) => dispatch(editNoteContent(index, content)),
     updateNoteList: (index, item) => dispatch(editNoteItem(index, item)),
+    deleteNote: (id) => dispatch(deleteNote(id)),
 });
 
 export default connect(
@@ -253,7 +357,10 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "stretch",
-        padding: LAYOUT_MARGIN * 2,
+        paddingTop: LAYOUT_MARGIN * 2,
+    },
+    contentContainer: {
+        paddingHorizontal: LAYOUT_MARGIN * 2,
     },
     noteTitleText: {
         fontWeight: "bold",
@@ -261,6 +368,7 @@ const styles = StyleSheet.create({
         padding: 0,
         margin: 0,
         paddingBottom: 15,
+        paddingHorizontal: LAYOUT_MARGIN * 2,
     },
     checklistRowContainer: {
         flexDirection: "row",
@@ -298,15 +406,20 @@ const styles = StyleSheet.create({
     },
     footerRowContainer: {
         flexDirection: "row",
-        flexBasis: 40,
         alignItems: "center",
         justifyContent: "flex-start",
     },
+    listItemContainer: {
+        height: 40,
+    },
     staticFooterContainer: {
+        flexBasis: 40,
         borderTopColor: SWATCH.GRAY,
         borderTopWidth: StyleSheet.hairlineWidth,
     },
     footerItemContainer: {
+        justifyContent: "center",
+        height: "100%",
         paddingHorizontal: 10,
     },
     footerItemTextContainer: {
@@ -328,4 +441,72 @@ const styles = StyleSheet.create({
         color: SWATCH.GRAY,
         fontSize: 11,
     },
+    footerMenuActive: {
+        backgroundColor: SWATCH.LIGHT_GRAY,
+    },
 });
+
+const noteItemMenuItems = {
+    memoAdd: [
+        {
+            text: "Take Photo",
+            icon: {
+                type: "material-icons",
+                name: "photo-camera",
+            },
+            onPress: "photo",
+        },
+        {
+            text: "Choose Image",
+            icon: {
+                type: "material-icons",
+                name: "insert-photo",
+            },
+            onPress: "gallery",
+        },
+        {
+            text: "Checkboxes",
+            icon: {
+                type: "material-icons",
+                name: "check",
+            },
+            onPress: "checkbox",
+        },
+    ],
+    checklistAdd: [
+        {
+            text: "Take Photo",
+            icon: {
+                type: "material-icons",
+                name: "photo-camera",
+            },
+            onPress: "photo",
+        },
+        {
+            text: "Choose Image",
+            icon: {
+                type: "material-icons",
+                name: "insert-photo",
+            },
+            onPress: "gallery",
+        },
+    ],
+    more: [
+        {
+            text: "Delete",
+            icon: {
+                type: "material-icons",
+                name: "delete",
+            },
+            onPress: "delete",
+        },
+        {
+            text: "Collaborator",
+            icon: {
+                type: "material-icons",
+                name: "person-add",
+            },
+            onPress: "collaborator",
+        },
+    ],
+};

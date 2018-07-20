@@ -133,6 +133,17 @@ const FirebaseService = {
             return callback(error, null);
         }
     },
+
+    async deleteNote(id, callback) {
+        try {
+            await firebase
+                .database()
+                .ref(`/${firebase.auth().currentUser.uid}/notes/note${id}`)
+                .remove(() => callback(null, true));
+        } catch (error) {
+            return callback(error, null);
+        }
+    },
 };
 
 // const FirebaseService = new _FirebaseService();

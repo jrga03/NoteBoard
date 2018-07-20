@@ -13,6 +13,7 @@ import {
     EDIT_NOTE_TITLE,
     EDIT_NOTE_ITEM,
     CREATE_NEW_NOTE,
+    DELETE_NOTE,
 } from "./constants";
 
 export function loginFlowStart() {
@@ -95,5 +96,12 @@ export function createNote(type) {
     return {
         type: CREATE_NEW_NOTE,
         payload: type,
+    };
+}
+
+export function deleteNote(id) {
+    return {
+        type: DELETE_NOTE,
+        payload: id,
     };
 }

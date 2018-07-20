@@ -20,6 +20,7 @@ export const GET_FACEBOOK_FAIL = "GET_FACEBOOK_FAIL";
 
 export const OPEN_NOTE = "OPEN_NOTE";
 export const CREATE_NEW_NOTE = "CREATE_NEW_NOTE";
+export const DELETE_NOTE = "DELETE_NOTE";
 export const UPDATE_NOTE_LIST = "UPDATE_NOTE_LIST";
 export const CLEAR_SELECTED_NOTE = "CLEAR_SELECTED_NOTE";
 export const EDIT_NOTE_ITEM = "EDIT_NOTE_ITEM";

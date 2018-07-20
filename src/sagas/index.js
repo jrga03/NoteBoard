@@ -18,6 +18,7 @@ import {
     LOGIN,
     EDIT_NOTE_ITEM,
     CLEAR_SELECTED_NOTE,
+    DELETE_NOTE,
 } from "../actions/constants";
 import { NavigationService, FirebaseService } from "../services";
 import authentication from "../auth";
@@ -154,8 +155,22 @@ function* editNote({ payload }) {
     yield put({ type: CLEAR_SELECTED_NOTE });
 }
 
+/**
+ * Delete note
+ */
+function* deleteNote({ payload }) {
+    yield put({ type: CLEAR_SELECTED_NOTE });
+    yield cps(FirebaseService.deleteNote, payload);
+}
+
 export default function* rootSaga() {
-    yield all([fork(loginFlow), fork(registerFlow), fork(logoutFlow), takeEvery(EDIT_NOTE_ITEM, editNote)]);
+    yield all([
+        fork(loginFlow),
+        fork(registerFlow),
+        fork(logoutFlow),
+        takeEvery(EDIT_NOTE_ITEM, editNote),
+        takeEvery(DELETE_NOTE, deleteNote),
+    ]);
 }
 
 /**

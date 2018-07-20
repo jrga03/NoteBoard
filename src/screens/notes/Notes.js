@@ -116,24 +116,24 @@ class Notes extends Component {
             <ScrollView style={container} contentContainerStyle={scrollContainer}>
                 {isLoading && <ActivityIndicator size="large" animating={isLoading} />}
                 <View style={rowContainer}>
-                    <View style={[rowItemContainer, rowItemContainerLeft]}>
-                        <FlatList
-                            style={listContainer}
-                            data={leftList}
-                            extraData={this.state}
-                            renderItem={this.renderNoteItem}
-                            keyExtractor={(item) => `${item.id}`}
-                        />
-                    </View>
-                    <View style={[rowItemContainer, rowItemContainerRight]}>
-                        <FlatList
-                            style={listContainer}
-                            data={rightList}
-                            extraData={this.state}
-                            renderItem={this.renderNoteItem}
-                            keyExtractor={(item) => `${item.id}`}
-                        />
-                    </View>
+                    {/* <View style={[rowItemContainer, rowItemContainerLeft]}> */}
+                    <FlatList
+                        contentContainerStyle={[rowItemContainer, rowItemContainerLeft]}
+                        data={leftList}
+                        extraData={this.state}
+                        renderItem={this.renderNoteItem}
+                        keyExtractor={(item) => `${item.id}`}
+                    />
+                    {/* </View>
+                    <View style={[rowItemContainer, rowItemContainerRight]}> */}
+                    <FlatList
+                        contentContainerStyle={[rowItemContainer, rowItemContainerRight]}
+                        data={rightList}
+                        extraData={this.state}
+                        renderItem={this.renderNoteItem}
+                        keyExtractor={(item) => `${item.id}`}
+                    />
+                    {/* </View> */}
                 </View>
             </ScrollView>
         );
@@ -147,7 +147,7 @@ class Notes extends Component {
             <View style={[container, scrollContainer]}>
                 {isLoading && <ActivityIndicator size="large" animating={isLoading} />}
                 <FlatList
-                    style={listContainer}
+                    contentContainerStyle={listContainer}
                     data={data}
                     extraData={this.state}
                     renderItem={this.renderNoteItem}
@@ -204,22 +204,29 @@ const styles = StyleSheet.create({
         // flex: 1,
         justifyContent: "center",
         alignItems: "stretch",
-        margin: LAYOUT_MARGIN,
+        // margin: LAYOUT_MARGIN,
     },
     rowContainer: {
         flex: 1,
         flexDirection: "row",
+        marginTop: LAYOUT_MARGIN,
     },
     rowItemContainer: {
         flex: 1,
     },
     rowItemContainerLeft: {
+        marginLeft: LAYOUT_MARGIN,
         marginRight: LAYOUT_MARGIN / 2,
     },
     rowItemContainerRight: {
+        marginRight: LAYOUT_MARGIN,
         marginLeft: LAYOUT_MARGIN / 2,
     },
-    listContainer: { flex: 1 },
+    listContainer: {
+        flex: 1,
+        marginHorizontal: LAYOUT_MARGIN,
+        marginTop: LAYOUT_MARGIN,
+    },
     footerContainer: {
         flexDirection: "row",
         flexBasis: 40,
