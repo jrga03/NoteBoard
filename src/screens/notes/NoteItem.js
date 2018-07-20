@@ -7,6 +7,8 @@ import { connect } from "react-redux";
 import { SWATCH, LAYOUT_MARGIN } from "../../constants";
 import { editNoteTitle, editNoteContent, editNoteItem } from "../../actions";
 
+let addMenuItems, moreMenuItems;
+
 class NoteItem extends Component {
     constructor(props) {
         super(props);
@@ -14,6 +16,7 @@ class NoteItem extends Component {
         this.state = {
             wasChanged: false,
             note: null,
+            footerMenu: [],
         };
     }
     componentDidMount() {
@@ -24,6 +27,17 @@ class NoteItem extends Component {
 
         this.props.navigation.setParams({ isPinned: pinned });
         this.setState({ note });
+
+        addMenuItems = [
+            {
+                text,
+                icon: {
+                    name,
+                    type,
+                },
+                onPress,
+            },
+        ];
     }
 
     componentDidUpdate() {
@@ -120,15 +134,21 @@ class NoteItem extends Component {
         }
     };
 
+    renderFooterItem = ({ item }) => {};
+
     render() {
         const {
-            mainContainer,
             container,
-            footerText,
             noteTitleText,
+            mainContainer,
+            footerItemText,
             footerContainer,
+            staticFooterText,
+            footerRowContainer,
             footerItemContainer,
-            footerMainContentContainer,
+            staticFooterContainer,
+            footerItemTextContainer,
+            staticFooterMainContentContainer,
         } = styles;
         const { title, lastEditedAt, contents } = this.props.selectedNote.note;
 
@@ -164,15 +184,46 @@ class NoteItem extends Component {
                     />
                 </View>
                 <View style={footerContainer}>
-                    <TouchableOpacity style={footerItemContainer}>
-                        <Icon type="material-icons" name="add-box" size={22} color={SWATCH.GRAY} />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[footerItemContainer, footerMainContentContainer]}>
-                        <Text style={footerText}>Edited {lastEditedAtFormatted()}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={footerItemContainer}>
-                        <Icon type="material-icons" name="more" size={22} color={SWATCH.GRAY} />
-                    </TouchableOpacity>
+                    {/* <FlatList
+                        data={this.state.footerMenu}
+                        extraData={this.state}
+                        renderItem={({ item }) => (
+                            <TouchableOpacity onPress={() => null}>
+                                <View style={footerRowContainer}>
+                                    <View style={footerItemContainer}>
+                                        <Icon type="material-icons" name="delete" size={22} color={SWATCH.GRAY} />
+                                    </View>
+                                    <View style={[footerItemContainer, footerItemTextContainer]}>
+                                        <Text style={footerItemText}>Delete</Text>
+                                    </View>
+                                </View>
+                            </TouchableOpacity>
+                        )}
+                        keyExtractor={(item, index) => `${index}`}
+                    /> */}
+                    {/* <View>
+                        <TouchableOpacity>
+                            <View style={footerRowContainer}>
+                                <View style={footerItemContainer}>
+                                    <Icon type="material-icons" name="delete" size={22} color={SWATCH.GRAY} />
+                                </View>
+                                <View style={[footerItemContainer, footerItemTextContainer]}>
+                                    <Text style={footerItemText}>Delete</Text>
+                                </View>
+                            </View>
+                        </TouchableOpacity>
+                    </View> */}
+                    <View style={[footerRowContainer, staticFooterContainer]}>
+                        <TouchableOpacity style={footerItemContainer} onPress={() => null}>
+                            <Icon type="material-icons" name="add-box" size={22} color={SWATCH.GRAY} />
+                        </TouchableOpacity>
+                        <View style={[footerItemContainer, staticFooterMainContentContainer]}>
+                            <Text style={staticFooterText}>Edited {lastEditedAtFormatted()}</Text>
+                        </View>
+                        <TouchableOpacity style={footerItemContainer} onPress={() => null}>
+                            <Icon type="material-icons" name="more" size={22} color={SWATCH.GRAY} />
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </View>
         );
@@ -235,31 +286,45 @@ const styles = StyleSheet.create({
         color: SWATCH.GRAY,
     },
     footerContainer: {
-        flexDirection: "row",
-        flexBasis: 40,
-        justifyContent: "flex-start",
-        alignItems: "center",
-        // paddingHorizontal: 5,
         backgroundColor: SWATCH.WHITE,
         shadowRadius: 5,
         shadowOffset: {
             width: 0,
             height: -3,
         },
-        shadowColor: "#000000",
+        shadowColor: SWATCH.BLACK,
         shadowOpacity: 0.05,
         elevation: 4,
+    },
+    footerRowContainer: {
+        flexDirection: "row",
+        flexBasis: 40,
+        alignItems: "center",
+        justifyContent: "flex-start",
+    },
+    staticFooterContainer: {
+        borderTopColor: SWATCH.GRAY,
+        borderTopWidth: StyleSheet.hairlineWidth,
     },
     footerItemContainer: {
         paddingHorizontal: 10,
     },
-    footerMainContentContainer: {
+    footerItemTextContainer: {
+        flex: 1,
+        justifyContent: "center",
+        // alignItems: "center",
+        alignSelf: "stretch",
+    },
+    footerItemText: {
+        color: SWATCH.GRAY,
+    },
+    staticFooterMainContentContainer: {
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
         alignSelf: "stretch",
     },
-    footerText: {
+    staticFooterText: {
         color: SWATCH.GRAY,
         fontSize: 11,
     },

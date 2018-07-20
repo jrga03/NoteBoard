@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
 import { Icon } from "react-native-elements";
 import { connect } from "react-redux";
 
@@ -16,9 +16,12 @@ class Notes extends Component {
         super(props);
 
         this.state = {
+            isLoading: true,
             data: [],
             leftList: [],
             rightList: [],
+            multiSelectMode: false,
+            selected: [],
         };
     }
 
@@ -37,6 +40,7 @@ class Notes extends Component {
                     data,
                     leftList,
                     rightList,
+                    isLoading: false,
                 });
                 this.props.updateNoteList(data);
             }
@@ -107,9 +111,10 @@ class Notes extends Component {
             rowItemContainerRight,
         } = styles;
 
-        const { leftList, rightList } = this.state;
+        const { leftList, rightList, isLoading } = this.state;
         return (
             <ScrollView style={container} contentContainerStyle={scrollContainer}>
+                {isLoading && <ActivityIndicator size="large" animating={isLoading} />}
                 <View style={rowContainer}>
                     <View style={[rowItemContainer, rowItemContainerLeft]}>
                         <FlatList
@@ -137,15 +142,17 @@ class Notes extends Component {
     renderListLayout = () => {
         const { container, scrollContainer, listContainer } = styles;
 
-        const { data } = this.state;
+        const { data, isLoading } = this.state;
         return (
             <View style={[container, scrollContainer]}>
+                {isLoading && <ActivityIndicator size="large" animating={isLoading} />}
                 <FlatList
                     style={listContainer}
                     data={data}
                     extraData={this.state}
                     renderItem={this.renderNoteItem}
                     keyExtractor={(item) => `${item.id}`}
+                    ListEmptyComponent={!isLoading && <Text>You have no notes to show.</Text>}
                 />
             </View>
         );
