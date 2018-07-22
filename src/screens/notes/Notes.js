@@ -145,7 +145,11 @@ class Notes extends Component {
         const { data, isLoading } = this.state;
         return (
             <View style={[container, scrollContainer]}>
-                {isLoading && <ActivityIndicator size="large" animating={isLoading} />}
+                {isLoading && (
+                    <View style={{ padding: 50 }}>
+                        <ActivityIndicator size="large" animating={isLoading} />
+                    </View>
+                )}
                 <FlatList
                     contentContainerStyle={listContainer}
                     data={data}

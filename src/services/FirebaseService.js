@@ -22,15 +22,11 @@ const FirebaseService = {
 
     async logInUsingEmail({ email, password }, callback) {
         try {
-            // const result = await firebase.auth().signInAndRetrieveDataWithEmailAndPassword(email, password);
-            return callback(
-                null,
-                await firebase
-                    .auth()
-                    .signInAndRetrieveDataWithEmailAndPassword(email, password)
-                    .user.toJSON()
-            );
+            const result = await firebase.auth().signInAndRetrieveDataWithEmailAndPassword(email, password);
+            // console.log("result", result)
+            return callback(null, result.user.toJSON());
         } catch (error) {
+            // console.log("loginUsingEmail error", error)
             return callback(error, null);
         }
         // firebase

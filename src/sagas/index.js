@@ -110,6 +110,8 @@ function* loginFlow() {
         if (winner.auth) {
             // ...we send Redux appropiate actions
             yield put({ type: LOGIN_SUCCESS, user: winner.auth }); // User is logged in (authorized)
+
+            // console.log("navigate");
             navigateTo("Home"); // Go to dashboard page
         }
     }

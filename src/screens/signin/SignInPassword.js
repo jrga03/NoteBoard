@@ -18,7 +18,7 @@ import { connect } from "react-redux";
 
 import { SWATCH } from "../../constants";
 import { FirebaseService } from "../../services";
-import { getEmailUser } from "../../actions";
+import { getEmailUser, loginFlowStart } from "../../actions";
 
 // const resetToHome = StackActions.reset({
 //     index: 0,
@@ -35,6 +35,19 @@ class SignInPassword extends Component {
             error: false,
             errorText: null,
         };
+        this.inputs = {};
+    }
+
+    componentDidUpdate() {
+        if (this.props.user.error && this.props.user.error.code === "auth/wrong-password" && !this.state.error) {
+            this.setState(
+                {
+                    error: true,
+                    errorText: "Wrong password. Try again or click Forgot Password to reset it.",
+                },
+                () => this.inputs.passwordInput.focus()
+            );
+        }
     }
 
     handleForgotPassword = () => {
@@ -69,6 +82,7 @@ class SignInPassword extends Component {
     handleSubmit = () => {
         Keyboard.dismiss;
         if (this.validateInput()) {
+            this.props.startLoginFlow();
             // this.setState({ isLoading: true });
             // console.log("submit")
             const userCredentials = {
@@ -134,25 +148,19 @@ class SignInPassword extends Component {
         return (
             <KeyboardAwareScrollView
                 keyboardShouldPersistTaps="handled"
-                keyboardDismissMode={
-                    Platform.OS === "ios" ? "interactive" : "none"
-                }
+                keyboardDismissMode={Platform.OS === "ios" ? "interactive" : "none"}
                 extraHeight={10}
                 contentContainerStyle={container}>
                 <View style={formContainer}>
                     <View style={spacerThin} />
-                    <Text style={formHeader}>
-                        {this.props.navigation.state.params.email}
-                    </Text>
+                    <Text style={formHeader}>{this.props.navigation.state.params.email}</Text>
                     <View style={spacerThin} />
                     <TextInput
                         autoFocus={true}
+                        selectTextOnFocus={true}
                         placeholder="Enter your password"
                         placeholderTextColor="gray"
-                        style={[
-                            formTextField,
-                            error ? { borderBottomColor: SWATCH.RED } : null,
-                        ]}
+                        style={[formTextField, error ? { borderBottomColor: SWATCH.RED } : null]}
                         numberOfLines={1}
                         maxLength={64}
                         autoCorrect={false}
@@ -165,38 +173,24 @@ class SignInPassword extends Component {
                         underlineColorAndroid="transparent"
                         secureTextEntry={true}
                         returnKeyType="done"
-                        onChangeText={(password) =>
-                            this.setState({ password, error: false })
-                        }
+                        onChangeText={(password) => this.setState({ password, error: false })}
+                        ref={(ref) => (this.inputs.passwordInput = ref)}
                     />
-                    <View style={errorContainer}>
-                        {error && (
-                            <Text style={errorTextStyle}>{errorText}</Text>
-                        )}
-                    </View>
+                    <View style={errorContainer}>{error && <Text style={errorTextStyle}>{errorText}</Text>}</View>
 
                     <View style={formTextForgotContainer}>
-                        <TouchableOpacity
-                            onPress={this.handleForgotPassword}
-                            disabled={isLoading || isFetching}>
+                        <TouchableOpacity onPress={this.handleForgotPassword} disabled={isLoading || isFetching}>
                             <Text style={formTextButton}>Forgot password?</Text>
                         </TouchableOpacity>
                     </View>
 
                     <View style={[containedButton, submitButtonContainer]}>
-                        <TouchableOpacity
-                            onPress={this.handleSubmit}
-                            disabled={isLoading || isFetching}>
+                        <TouchableOpacity onPress={this.handleSubmit} disabled={isLoading || isFetching}>
                             <View style={submitButton}>
                                 {isLoading || isFetching ? (
-                                    <ActivityIndicator
-                                        size="small"
-                                        color={SWATCH.WHITE}
-                                    />
+                                    <ActivityIndicator size="small" color={SWATCH.WHITE} />
                                 ) : (
-                                    <Text style={submitButtonText}>
-                                        SIGN IN
-                                    </Text>
+                                    <Text style={submitButtonText}>SIGN IN</Text>
                                 )}
                             </View>
                         </TouchableOpacity>
@@ -208,9 +202,7 @@ class SignInPassword extends Component {
                 <View style={spacerThin} />
 
                 <View style={backButtonContainer}>
-                    <TouchableOpacity
-                        onPress={() => this.props.navigation.goBack()}
-                        disabled={isLoading || isFetching}>
+                    <TouchableOpacity onPress={() => this.props.navigation.goBack()} disabled={isLoading || isFetching}>
                         <Text style={formTextButton}>Back</Text>
                     </TouchableOpacity>
                 </View>
@@ -225,6 +217,7 @@ const mapStateToProps = ({ user }) => ({
 
 const mapDispatchToProps = (dispatch) => ({
     logInEmailUser: (credentials) => dispatch(getEmailUser(credentials)),
+    startLoginFlow: () => dispatch(loginFlowStart()),
 });
 
 export default connect(
