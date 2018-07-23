@@ -97,12 +97,18 @@ const noteHomeNavigationOptions = (navigation, screenProps, ...props) => {
 
 const noteItemNavigationOptions = (navigation, screenProps, ...props) => {
     const isPinned = navigation.getParam("isPinned", false);
-    const pinColor = isPinned ? SWATCH.BLUE : SWATCH.BLACK;
+    const pinColor = isPinned ? SWATCH.DARK_TURQUOISE : SWATCH.BLACK;
+
+    handlePinOnPress = () => {
+        if (navigation.state.params && navigation.state.params.togglePin) {
+            navigation.state.params.togglePin();
+        }
+    };
 
     return {
         headerRight: (
             <View style={{ flexDirection: "row" }}>
-                <TouchableOpacity style={{ paddingHorizontal: 10 }} onPress={() => null}>
+                <TouchableOpacity style={{ paddingHorizontal: 10 }} onPress={handlePinOnPress}>
                     {generateIcon("material-community", "pin", pinColor)}
                 </TouchableOpacity>
                 <TouchableOpacity style={{ paddingHorizontal: 10 }} onPress={() => null}>

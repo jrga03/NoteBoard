@@ -61,9 +61,9 @@ export default class NoteMemo extends Component {
     };
 
     render() {
-        const { container, titleText, checkedItemText } = styles;
+        const { container, titleText, checkedItemText, pinContainer } = styles;
         const { memo, index, onLayoutEvent, layout } = this.props;
-        const { title, contents, type } = memo;
+        const { title, contents, type, pinned } = memo;
 
         const checkedItemsCount = contents.reduce((acc, item) => (item.checked ? acc + 1 : acc), 0);
 
@@ -72,6 +72,11 @@ export default class NoteMemo extends Component {
                 style={container}
                 // onLayout={layout === "tile" ? (e) => onLayoutEvent(e.nativeEvent.layout, index) : null}
             >
+                {pinned && (
+                    <View style={pinContainer}>
+                        <Icon type="material-community" name="pin" size={16} color={SWATCH.DARK_TURQUOISE} />
+                    </View>
+                )}
                 {!!title && <Text style={titleText}>{title}</Text>}
                 <FlatList
                     data={contents}
@@ -143,5 +148,10 @@ const styles = StyleSheet.create({
     },
     checkboxIconContainerListStyle: {
         flex: 0.05,
+    },
+    pinContainer: {
+        position: "absolute",
+        top: 8,
+        right: 5,
     },
 });

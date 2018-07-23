@@ -107,11 +107,17 @@ const FirebaseService = {
         try {
             await firebase
                 .database()
-                .ref(`/${firebase.auth().currentUser.uid}/notes`)
+                .ref(`/users_notes/${firebase.auth().currentUser.uid}/notes`)
                 .orderByChild("lastEditedAtMsec")
                 .on("value", (data) => {
                     const notes = [];
-                    data.forEach((note) => notes.push(note.val()));
+                    let index = 0;
+                    data.forEach((note) => {
+                        const noteObj = note.val();
+                        noteObj.overallIndex = index;
+                        notes.push(noteObj);
+                        index++;
+                    });
                     callback(null, notes);
                 });
         } catch (error) {
@@ -123,7 +129,7 @@ const FirebaseService = {
         try {
             await firebase
                 .database()
-                .ref(`/${firebase.auth().currentUser.uid}/notes/note${note.id}`)
+                .ref(`/users_notes/${firebase.auth().currentUser.uid}/notes/note${note.id}`)
                 .update(note, () => callback(null, true));
         } catch (error) {
             return callback(error, null);
@@ -134,7 +140,7 @@ const FirebaseService = {
         try {
             await firebase
                 .database()
-                .ref(`/${firebase.auth().currentUser.uid}/notes/note${id}`)
+                .ref(`/users_notes/${firebase.auth().currentUser.uid}/notes/note${id}`)
                 .remove(() => callback(null, true));
         } catch (error) {
             return callback(error, null);

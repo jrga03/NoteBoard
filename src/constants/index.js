@@ -5,6 +5,8 @@ const SWATCH = {
 
     BLUE: "blue",
 
+    DARK_TURQUOISE: "darkturquoise",
+
     GRAY: "gray",
 
     RED: "red",

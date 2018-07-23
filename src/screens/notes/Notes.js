@@ -1,5 +1,14 @@
 import React, { Component } from "react";
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
+import {
+    View,
+    Text,
+    FlatList,
+    StyleSheet,
+    ScrollView,
+    SectionList,
+    TouchableOpacity,
+    ActivityIndicator,
+} from "react-native";
 import { Icon } from "react-native-elements";
 import { connect } from "react-redux";
 
@@ -18,8 +27,11 @@ class Notes extends Component {
         this.state = {
             isLoading: true,
             data: [],
+            dataPinned: [],
             leftList: [],
+            leftPinned: [],
             rightList: [],
+            rightPinned: [],
             multiSelectMode: false,
             selected: [],
         };
@@ -27,24 +39,7 @@ class Notes extends Component {
 
     componentDidMount() {
         // console.log("home props", this.props);
-
-        FirebaseService.fetchNotes((err, data) => {
-            if (err) {
-                console.log("error fetchNotes", err);
-            } else {
-                const leftList = [];
-                const rightList = [];
-                data.map((item, index) => (index % 2 === 0 ? leftList.push(item) : rightList.push(item)));
-
-                this.setState({
-                    data,
-                    leftList,
-                    rightList,
-                    isLoading: false,
-                });
-                this.props.updateNoteList(data);
-            }
-        });
+        this.fetchNotes();
     }
 
     componentDidUpdate() {
@@ -52,6 +47,42 @@ class Notes extends Component {
         // console.log("getparam", test);
         // console.log("home props update", this.props, this.state);
     }
+
+    fetchNotes = () => {
+        FirebaseService.fetchNotes((err, data) => {
+            if (err) {
+                console.log("error fetchNotes", err);
+            } else {
+                const list = [];
+                const listPinned = [];
+                const leftList = [];
+                const rightList = [];
+                const leftPinned = [];
+                const rightPinned = [];
+                data.map((item, index) => {
+                    item.pinned ? listPinned.push(item) : list.push(item);
+                    item.pinned
+                        ? leftPinned.length > rightPinned.length
+                            ? rightPinned.push(item)
+                            : leftPinned.push(item)
+                        : leftList.length > rightList.length
+                            ? rightList.push(item)
+                            : leftList.push(item);
+                });
+
+                this.setState({
+                    data: list,
+                    dataPinned: listPinned,
+                    leftList,
+                    leftPinned,
+                    rightList,
+                    rightPinned,
+                    isLoading: false,
+                });
+                this.props.updateNoteList(data);
+            }
+        });
+    };
 
     handleMemoPress = (index, memo) => {
         this.props.openNote(index, memo);
@@ -85,7 +116,7 @@ class Notes extends Component {
     renderNoteItem = ({ item, index }) => {
         const layout = this.props.navigation.getParam("noteLayout", "tile");
 
-        const onPress = () => this.handleMemoPress(index, item);
+        const onPress = () => this.handleMemoPress(item.overallIndex, item);
 
         return (
             <TouchableOpacity onPress={onPress}>
@@ -140,24 +171,63 @@ class Notes extends Component {
     };
 
     renderListLayout = () => {
-        const { container, scrollContainer, listContainer } = styles;
+        const {
+            container,
+            scrollContainer,
+            listContainer,
+            emptyListContainer,
+            addNoteText,
+            sectionTitleText,
+            sectionFooter,
+        } = styles;
 
-        const { data, isLoading } = this.state;
+        const { data, dataPinned, isLoading } = this.state;
         return (
             <View style={[container, scrollContainer]}>
-                {isLoading && (
-                    <View style={{ padding: 50 }}>
-                        <ActivityIndicator size="large" animating={isLoading} />
-                    </View>
-                )}
-                <FlatList
+                <SectionList
+                    contentContainerStyle={listContainer}
+                    renderItem={this.renderNoteItem}
+                    extraData={this.state}
+                    renderSectionHeader={({ section: { title } }) =>
+                        dataPinned.length > 0 && <Text style={sectionTitleText}>{title}</Text>
+                    }
+                    sections={[{ title: "Pinned", data: dataPinned }, { title: "Others", data }]}
+                    renderSectionFooter={() => dataPinned.length > 0 && <View style={sectionFooter} />}
+                    keyExtractor={(item) => `${item.id}`}
+                    refreshing={isLoading}
+                    onRefresh={this.fetchNotes}
+                    ListEmptyComponent={
+                        !isLoading && (
+                            <View style={emptyListContainer}>
+                                <Text>You have no notes to show</Text>
+                                <Text />
+                                <TouchableOpacity onPress={() => this.handleCreateNote("memo")}>
+                                    <Text style={addNoteText}>Add Note</Text>
+                                </TouchableOpacity>
+                            </View>
+                        )
+                    }
+                />
+                {/* <FlatList
                     contentContainerStyle={listContainer}
                     data={data}
                     extraData={this.state}
                     renderItem={this.renderNoteItem}
                     keyExtractor={(item) => `${item.id}`}
-                    ListEmptyComponent={!isLoading && <Text>You have no notes to show.</Text>}
-                />
+                    refreshing={isLoading}
+                    onRefresh={this.fetchNotes}
+                    ListEmptyComponent={
+                        !isLoading && (
+                            <View style={emptyListContainer}>
+                                <Text>You have no notes to show</Text>
+                                <Text />
+                                <TouchableOpacity onPress={this.handleCreateNote}>
+                                    <Text style={addNoteText}>Add Note</Text>
+                                </TouchableOpacity>
+                            </View>
+                        )
+                    }
+                /> */}
             </View>
         );
     };
@@ -209,6 +279,21 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "stretch",
         // margin: LAYOUT_MARGIN,
+    },
+    emptyListContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    sectionTitleText: {
+        fontWeight: "bold",
+        paddingVertical: 8,
+    },
+    sectionFooter: {
+        height: 20,
+    },
+    addNoteText: {
+        color: SWATCH.BLUE,
     },
     rowContainer: {
         flex: 1,

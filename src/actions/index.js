@@ -14,6 +14,7 @@ import {
     EDIT_NOTE_ITEM,
     CREATE_NEW_NOTE,
     DELETE_NOTE,
+    TOGGLE_PIN,
 } from "./constants";
 
 export function loginFlowStart() {
@@ -73,6 +74,12 @@ export function editNoteContent(index, payload) {
         type: EDIT_NOTE_CONTENT,
         payload,
         index,
+    };
+}
+
+export function togglePin(index) {
+    return {
+        type: TOGGLE_PIN,
     };
 }
 
