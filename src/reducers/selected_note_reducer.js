@@ -5,15 +5,17 @@ import {
     EDIT_NOTE_CONTENT,
     CREATE_NEW_NOTE,
     CLEAR_SELECTED_NOTE,
+    TOGGLE_PIN,
 } from "../actions/constants";
 
 export default function(state = initialState, action) {
     switch (action.type) {
         case CREATE_NEW_NOTE:
             return {
+                ...initialState,
                 index: null,
                 note: {
-                    ...initialState,
+                    ...initialState.note,
                     id: `${Date.now()}`,
                     title: "",
                     type: action.payload,
@@ -61,22 +63,33 @@ export default function(state = initialState, action) {
                     lastEditedAtMsec: -Date.now(),
                 },
             };
+        case TOGGLE_PIN:
+            return {
+                ...state,
+                note: {
+                    ...state.note,
+                    pinned: !state.note.pinned,
+                },
+            };
         default:
             return state;
     }
 }
 
 const initialState = {
-    id: null,
-    title: null,
-    type: null,
-    contents: [
-        {
-            checked: false,
-            content: null,
-        },
-    ],
-    lastEditedAt: null,
-    lastEditedAtMsec: null,
-    pinned: false,
+    index: null,
+    note: {
+        id: null,
+        title: null,
+        type: null,
+        contents: [
+            {
+                checked: false,
+                content: null,
+            },
+        ],
+        lastEditedAt: null,
+        lastEditedAtMsec: null,
+        pinned: false,
+    },
 };

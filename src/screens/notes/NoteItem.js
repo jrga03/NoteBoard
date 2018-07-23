@@ -5,7 +5,9 @@ import Moment from "moment";
 import { connect } from "react-redux";
 
 import { SWATCH, LAYOUT_MARGIN } from "../../constants";
-import { editNoteTitle, editNoteContent, editNoteItem, deleteNote } from "../../actions";
+import { editNoteTitle, editNoteContent, editNoteItem, deleteNote, togglePin } from "../../actions";
+
+const selection = { start: null, end: null };
 
 class NoteItem extends Component {
     constructor(props) {
@@ -28,7 +30,10 @@ class NoteItem extends Component {
         const { pinned } = this.state.note;
 
         // this.setState({ note, index });
-        this.props.navigation.setParams({ isPinned: pinned });
+        this.props.navigation.setParams({
+            isPinned: pinned,
+            togglePin: this.togglePinNote.bind(this),
+        });
     }
 
     componentDidUpdate() {
@@ -49,19 +54,29 @@ class NoteItem extends Component {
                 note.contents.reduce((acc, item) => (acc = !!item.content), false) ||
                 checkboxChanged
             ) {
-                // console.log("update triggered");
+                console.log("update triggered");
                 this.props.updateNoteList(index, note);
             }
         }
     }
 
+    togglePinNote() {
+        this.props.navigation.setParams({ isPinned: !this.state.note.pinned });
+        this.props.togglePinNote();
+        this.setState({
+            wasChanged: true,
+            note: {
+                ...this.state.note,
+                pinned: !this.state.note.pinned,
+            },
+        });
+    }
+
     handleChangeText = (data) => {
-        this.setState({ wasChanged: true });
-        // console.log("handleChangeText", type, index, text);
         if (data.type === "title") {
-            // console.log(this.props.selectedNote[type]);
             this.props.editTitle(data.text);
             this.setState({
+                wasChanged: true,
                 note: {
                     ...this.state.note,
                     title: data.text,
@@ -79,19 +94,17 @@ class NoteItem extends Component {
             item.content = data.text;
             contents.splice(data.index, 1, item);
             this.setState({
+                wasChanged: true,
                 note: {
                     ...this.state.note,
                     contents,
                     lastEditedAt: Moment().toISOString(),
                 },
             });
-            // console.log(this.props.selectedNote.contents[index]);
         }
     };
 
     handlePressCheckbox = (index) => {
-        this.setState({ wasChanged: true });
-
         this.props.editContent(index, {
             ...this.props.selectedNote.note.contents[index],
             checked: !this.props.selectedNote.note.contents[index].checked,
@@ -102,12 +115,25 @@ class NoteItem extends Component {
         item.checked = this.state.note.contents[index].checked;
         contents.splice(index, 1, item);
         this.setState({
+            wasChanged: true,
             note: {
                 ...this.state.note,
                 contents,
                 lastEditedAt: Moment().toISOString(),
             },
         });
+    };
+
+    handleAddOrDeleteLine = (key, index) => {
+        console.log(key,index);
+        const { contents } = this.state.note;
+        switch (key) {
+            case "Enter":
+                break;
+            case "Backspace":
+                break;
+        }
+        // this.setState({ wasChanged: true });
     };
 
     handleFooterMenuItemPress = (type, payload) => {
@@ -132,58 +158,78 @@ class NoteItem extends Component {
         }
     };
 
-    renderNoteContent = ({ item, index }) => {
-        const { noteContentText, noteContentCheckBox, noteContentCheckedText, checklistRowContainer } = styles;
-        const { type } = this.state.note;
+    renderNoteContentMemo = ({ item, index }) => {
+        const { noteContentText } = styles;
 
         onChangeText = (text) => this.handleChangeText({ type: "content", index, text });
+        onAddOrDeleteLine = ({ nativeEvent: { key } }) =>
+            this.handleAddOrDeleteLine(key, { index, start: selection.start, end: selection.end });
+        onSelectionChange = ({
+            nativeEvent: {
+                selection: { start, end },
+            },
+        }) => ([selection.start, selection.end] = [start, end]);
 
-        if (type === "memo") {
-            return (
+        return (
+            <TextInput
+                style={noteContentText}
+                value={item.content}
+                underlineColorAndroid="transparent"
+                multiline={true}
+                onChangeText={onChangeText}
+                autoCorrect={false}
+                autoFocus={this.state.index === null ? true : false}
+                onKeyPress={this.handleAddOrDeleteLine}
+                onSelectionChange={onSelectionChange}
+            />
+        );
+    };
+
+    renderNoteContentChecklist = ({ item, index }) => {
+        const { noteContentText, noteContentCheckBox, noteContentCheckedText, checklistRowContainer } = styles;
+
+        onChangeText = (text) => this.handleChangeText({ type: "content", index, text });
+        onPressCheckbox = () => this.handlePressCheckbox(index);
+        onAddOrDeleteLine = ({ nativeEvent: { key } }) =>
+            this.handleAddOrDeleteLine(key, { index, start: selection.start, end: selection.end });
+        onSelectionChange = ({
+            nativeEvent: {
+                selection: { start, end },
+            },
+        }) => ([selection.start, selection.end] = [start, end]);
+
+        return (
+            <View style={checklistRowContainer}>
+                <TouchableOpacity onPress={onPressCheckbox}>
+                    <View style={noteContentCheckBox}>
+                        <Icon
+                            type="material-icons"
+                            name={item.checked ? "check-box" : "check-box-outline-blank"}
+                            color={item.checked ? SWATCH.GRAY : SWATCH.BLACK}
+                        />
+                    </View>
+                </TouchableOpacity>
                 <TextInput
-                    style={noteContentText}
+                    style={[noteContentText, item.checked ? noteContentCheckedText : null]}
                     value={item.content}
                     underlineColorAndroid="transparent"
                     multiline={true}
                     onChangeText={onChangeText}
                     autoCorrect={false}
                     autoFocus={this.state.index === null ? true : false}
+                    onKeyPress={onAddOrDeleteLine}
+                    onSelectionChange={onSelectionChange}
                 />
-            );
-        } else if (type === "checklist") {
-            onPressCheckbox = () => this.handlePressCheckbox(index);
-
-            return (
-                <View style={checklistRowContainer}>
-                    <TouchableOpacity onPress={onPressCheckbox}>
-                        <View style={noteContentCheckBox}>
-                            <Icon
-                                type="material-icons"
-                                name={item.checked ? "check-box" : "check-box-outline-blank"}
-                                color={item.checked ? SWATCH.GRAY : SWATCH.BLACK}
-                            />
-                        </View>
-                    </TouchableOpacity>
-                    <TextInput
-                        style={[noteContentText, item.checked ? noteContentCheckedText : null]}
-                        value={item.content}
-                        underlineColorAndroid="transparent"
-                        multiline={true}
-                        onChangeText={onChangeText}
-                        autoCorrect={false}
-                        autoFocus={this.state.index === null ? true : false}
-                    />
-                </View>
-            );
-        }
+            </View>
+        );
     };
 
     render() {
         const {
             container,
             noteTitleText,
-            mainContainer,
             footerItemText,
+            mainContainer,
             footerContainer,
             staticFooterText,
             footerMenuActive,
@@ -210,7 +256,7 @@ class NoteItem extends Component {
         };
 
         onChangeText = (text) => this.handleChangeText({ type: "title", text });
-        onPressFooterItem = (type) => null; //do not use this
+        // onPressFooterItem = (type) => null; //do not use this
 
         return (
             <View style={mainContainer}>
@@ -227,7 +273,7 @@ class NoteItem extends Component {
                         contentContainerStyle={contentContainer}
                         data={contents}
                         extraData={this.state}
-                        renderItem={this.renderNoteContent}
+                        renderItem={type === "memo" ? this.renderNoteContentMemo : this.renderNoteContentChecklist}
                         keyExtractor={(item, index) => `${index}`}
                     />
                 </View>
@@ -342,6 +388,7 @@ const mapDispatchToProps = (dispatch) => ({
     editContent: (index, content) => dispatch(editNoteContent(index, content)),
     updateNoteList: (index, item) => dispatch(editNoteItem(index, item)),
     deleteNote: (id) => dispatch(deleteNote(id)),
+    togglePinNote: () => dispatch(togglePin()),
 });
 
 export default connect(
