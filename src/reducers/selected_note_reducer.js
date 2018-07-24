@@ -6,6 +6,7 @@ import {
     CREATE_NEW_NOTE,
     CLEAR_SELECTED_NOTE,
     TOGGLE_PIN,
+    UPDATE_SELECTED_NOTE,
 } from "../actions/constants";
 
 export default function(state = initialState, action) {
@@ -69,6 +70,15 @@ export default function(state = initialState, action) {
                 note: {
                     ...state.note,
                     pinned: !state.note.pinned,
+                },
+            };
+        case UPDATE_SELECTED_NOTE:
+            return {
+                ...state,
+                note: {
+                    ...action.payload,
+                    lastEditedAt: Moment().toISOString(),
+                    lastEditedAtMsec: -Date.now(),
                 },
             };
         default:

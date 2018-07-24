@@ -15,6 +15,7 @@ import {
     CREATE_NEW_NOTE,
     DELETE_NOTE,
     TOGGLE_PIN,
+    UPDATE_SELECTED_NOTE,
 } from "./constants";
 
 export function loginFlowStart() {
@@ -110,5 +111,12 @@ export function deleteNote(id) {
     return {
         type: DELETE_NOTE,
         payload: id,
+    };
+}
+
+export function updateSelectedNote(note) {
+    return {
+        type: UPDATE_SELECTED_NOTE,
+        payload: note,
     };
 }
