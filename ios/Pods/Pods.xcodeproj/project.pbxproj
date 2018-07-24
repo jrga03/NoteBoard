@@ -414,7 +414,6 @@
 		7C6000F2621735B5FE081DC22BBD6B34 /* GMUPolygon.h in Headers */ = {isa = PBXBuildFile; fileRef = CA68BB3D7AB632211AAEAA2337946700 /* GMUPolygon.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		7C6411FCC651D94ABC0021A24CBB77AE /* AIRGoogleMapUrlTileManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 83AB61D91561503C21A1E0AC53B2AC6C /* AIRGoogleMapUrlTileManager.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		7D40A0F900A05EC9D070B573F49D0836 /* Pods-NoteBoardTests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DB9C5059138157F0EA559A541F1BDB2 /* Pods-NoteBoardTests-dummy.m */; };
-		7DDD80F4673A1F4BCED9CF5713D22174 /* YGLayout.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8E26C99F9DA4878747D9683E5A95276 /* YGLayout.cpp */; settings = {COMPILER_FLAGS = "-fno-omit-frame-pointer -fexceptions -Wall -Werror -std=c++1y -fPIC -fno-objc-arc"; }; };
 		7DF1FE75A60CDCA843CE668C0E2805B6 /* GTMOAuth2ViewControllerTouch.m in Sources */ = {isa = PBXBuildFile; fileRef = 72AC06A8166EBD26DE554A9FED07584E /* GTMOAuth2ViewControllerTouch.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		7E6E515119DD9065019DE8348F1A59CC /* FIRAuthCredential.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF1CB60DD15E7B71343FBF2D9AAD87B /* FIRAuthCredential.m */; };
 		7E77E0D6ABE6A45E7652C8A1EC1A47CF /* RCTConvert+AirMap.h in Headers */ = {isa = PBXBuildFile; fileRef = 4FDD2B9DC9BBD223FF96CCF1F5F0B521 /* RCTConvert+AirMap.h */; settings = {ATTRIBUTES = (Project, ); }; };
@@ -705,7 +704,6 @@
 		D842292642CBE226B4759BA50F6E1272 /* FIRDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = 54EC28B9C1A636AA09E3CB241B3469F3 /* FIRDatabase.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		D873F43E3FD0B200DCCE6BAB84AB9AA9 /* FIROptions.h in Headers */ = {isa = PBXBuildFile; fileRef = 42B08EDD6E931F99AEC23F488FF64F75 /* FIROptions.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		D8936C1020C836B5727637CF166CC25D /* FIRAuthAPNSTokenManager.h in Headers */ = {isa = PBXBuildFile; fileRef = E4C92C0822F6E4AFC2A2FC7CEEFFC44A /* FIRAuthAPNSTokenManager.h */; settings = {ATTRIBUTES = (Project, ); }; };
-		D8B2C40652EB0AE53FD862DB864FCBE6 /* YGStyle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC71B1EA8C205124B4BFEEFDAD7F16CC /* YGStyle.cpp */; settings = {COMPILER_FLAGS = "-fno-omit-frame-pointer -fexceptions -Wall -Werror -std=c++1y -fPIC -fno-objc-arc"; }; };
 		D8EFD829D256D56C6165EEBE65C953F5 /* FIRServerValue.h in Headers */ = {isa = PBXBuildFile; fileRef = E2E4185051697D11A167E6AF9670F923 /* FIRServerValue.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		D94C4D633DE3EC149535E0E8E7FB54D4 /* GMUGroundOverlay.h in Headers */ = {isa = PBXBuildFile; fileRef = A88CD389B5426BD6997310CF97CA93D2 /* GMUGroundOverlay.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		D9B381BF1DE72A9FEC0FEEE1138FFE09 /* fast-dtoa.cc in Sources */ = {isa = PBXBuildFile; fileRef = A7D42503CA2BE59E9BD0175CACB3D7B6 /* fast-dtoa.cc */; };
@@ -827,7 +825,6 @@
 		FE6C68A4C5B34581A739C78F69764C2B /* FIRIdentityToolkitRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = C6C278234501A1D6C2462D93AA80BA56 /* FIRIdentityToolkitRequest.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		FE76F1A3B7F120BC6574227C56B278B5 /* FCacheNode.m in Sources */ = {isa = PBXBuildFile; fileRef = F839D1D8EAF709163EA64D7AF03160E9 /* FCacheNode.m */; };
 		FEAD299ED104A9DA4F9D6B2E17737C7A /* GTMMIMEDocument.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A9350DC2484C60A82667C805284A5CB /* GTMMIMEDocument.h */; settings = {ATTRIBUTES = (Project, ); }; };
-		FEE0447D0BFE9C8757F630DD45F9D48F /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AB739D6C4D446C289412261A94D64F89 /* Utils.cpp */; settings = {COMPILER_FLAGS = "-fno-omit-frame-pointer -fexceptions -Wall -Werror -std=c++1y -fPIC -fno-objc-arc"; }; };
 		FF19BB176F557A43A525E4B14AE49E7D /* AIRGoogleMapPolylineManager.h in Headers */ = {isa = PBXBuildFile; fileRef = EE58A0A9B8FBBEC44CB2CDD668BFF83B /* AIRGoogleMapPolylineManager.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		FF2DCC294DA198D678045CC0F55BB343 /* FChildrenNode.h in Headers */ = {isa = PBXBuildFile; fileRef = F71E717BBB35C5482BB6781AA18C6E17 /* FChildrenNode.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		FFD6A523DBEDA9B4B46A4AFB272248B4 /* FViewCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 46A12EDDA250763B5E6003613F5E8B23 /* FViewCache.h */; settings = {ATTRIBUTES = (Project, ); }; };
@@ -1961,7 +1958,6 @@
 		AB2C479A67B798F5A4EB9E7F818892C4 /* FEventEmitter.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FEventEmitter.m; path = Firebase/Database/Utilities/FEventEmitter.m; sourceTree = "<group>"; };
 		AB52EF5763C21676BA24BDC75B01C029 /* db_iter.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = db_iter.cc; path = db/db_iter.cc; sourceTree = "<group>"; };
 		AB658BD397CF9CB72AFA4565576190D6 /* FIRAuth.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FIRAuth.m; path = Firebase/Auth/Source/FIRAuth.m; sourceTree = "<group>"; };
-		AB739D6C4D446C289412261A94D64F89 /* Utils.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = Utils.cpp; path = yoga/Utils.cpp; sourceTree = "<group>"; };
 		AB814230417B9D192BA49ECE17D07BC0 /* FTupleObjects.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FTupleObjects.h; path = Firebase/Database/Utilities/Tuples/FTupleObjects.h; sourceTree = "<group>"; };
 		AB9E8AD53091E7DDAF99B2049D6EC514 /* FIRPhoneAuthCredential.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FIRPhoneAuthCredential.m; path = Firebase/Auth/Source/AuthProviders/Phone/FIRPhoneAuthCredential.m; sourceTree = "<group>"; };
 		ABDA9B99FE5E25F17288187B9FCAFE34 /* RCTInputAccessoryViewContent.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = RCTInputAccessoryViewContent.m; sourceTree = "<group>"; };
@@ -2043,7 +2039,6 @@
 		B833DA317F3D2AE016DB25E5E1D82C31 /* RCTCxxUtils.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = RCTCxxUtils.h; sourceTree = "<group>"; };
 		B8B4FCD4AC22C3B062A125DF8075579A /* RCTRefreshControl.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = RCTRefreshControl.h; sourceTree = "<group>"; };
 		B8C51B44DC75A77EADA99917C2687AB8 /* FIRResetPasswordRequest.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FIRResetPasswordRequest.m; path = Firebase/Auth/Source/RPCs/FIRResetPasswordRequest.m; sourceTree = "<group>"; };
-		B8E26C99F9DA4878747D9683E5A95276 /* YGLayout.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = YGLayout.cpp; path = yoga/YGLayout.cpp; sourceTree = "<group>"; };
 		B90F8F4B32364009C2FC4857AA974AE2 /* FIRAppInternal.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FIRAppInternal.h; path = Firebase/Core/Private/FIRAppInternal.h; sourceTree = "<group>"; };
 		B923C3C4AA5C1B5A0BD5562DFCF3DF3D /* FChildChangeAccumulator.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FChildChangeAccumulator.m; path = Firebase/Database/Core/View/Filter/FChildChangeAccumulator.m; sourceTree = "<group>"; };
 		B92CF12AB95F3EE3BF07C5AD4458EA56 /* FIRErrors.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FIRErrors.m; path = Firebase/Core/FIRErrors.m; sourceTree = "<group>"; };
@@ -2163,7 +2158,6 @@
 		CBFD47B3F55826EA3C540478BDDCC42F /* FIRLogger.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FIRLogger.h; path = Firebase/Core/Private/FIRLogger.h; sourceTree = "<group>"; };
 		CC0D67CC8BD65EBE263A0D1BC634EC9E /* RCTSwitch.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = RCTSwitch.m; sourceTree = "<group>"; };
 		CC6DDCE4BFA9F82CA96428EBB73D39D1 /* RCTUIUtils.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = RCTUIUtils.m; sourceTree = "<group>"; };
-		CC71B1EA8C205124B4BFEEFDAD7F16CC /* YGStyle.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = YGStyle.cpp; path = yoga/YGStyle.cpp; sourceTree = "<group>"; };
 		CC78888EA47199AF31E9CC4BC11BA459 /* FIRAuthCredential.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FIRAuthCredential.h; path = Firebase/Auth/Source/Public/FIRAuthCredential.h; sourceTree = "<group>"; };
 		CC7BC1333EB9F5BAC64AFF3696D99A24 /* RCTRawTextViewManager.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = RCTRawTextViewManager.m; sourceTree = "<group>"; };
 		CC96C124FE787F80A77E314AB9E76657 /* GMUClusterManager.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = GMUClusterManager.m; path = src/Clustering/GMUClusterManager.m; sourceTree = "<group>"; };
@@ -4624,18 +4618,15 @@
 		E01595BCA7E0FC1231443603D8751BEC /* yoga */ = {
 			isa = PBXGroup;
 			children = (
-				AB739D6C4D446C289412261A94D64F89 /* Utils.cpp */,
 				59F4CC1FA6A2054BBF515FE87CCB8B17 /* Utils.h */,
 				1994948F02D80DA51302FA3E0ABE60E7 /* YGEnums.cpp */,
 				2B2B0EA2F6D47A5A1A175495E23686B6 /* YGEnums.h */,
-				B8E26C99F9DA4878747D9683E5A95276 /* YGLayout.cpp */,
 				D3D5595296B8F2C78718C77833CC714B /* YGLayout.h */,
 				FC2230BB9A86E7791CF6D934035FF135 /* YGMacros.h */,
 				94616533DE6F413B0F9A6DF891449804 /* YGNode.cpp */,
 				07D5CBA56BBC8A0F5D10CB0BE7783E21 /* YGNode.h */,
 				EA686E077D0327434C6BB4222A8B81C0 /* YGNodePrint.cpp */,
 				0F04505767CDF3C8CB55BE82306FCAC7 /* YGNodePrint.h */,
-				CC71B1EA8C205124B4BFEEFDAD7F16CC /* YGStyle.cpp */,
 				CD4C2A9B1B65861E017EB955F1F27DCC /* YGStyle.h */,
 				F16B16E491A96ACE03AEB9DA0199E5C4 /* Yoga.cpp */,
 				AF29942CA0929431FF546CE301CF73A9 /* Yoga.h */,
@@ -6013,12 +6004,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FEE0447D0BFE9C8757F630DD45F9D48F /* Utils.cpp in Sources */,
 				67FFB4950AE310BF6A78799B40C53621 /* YGEnums.cpp in Sources */,
-				7DDD80F4673A1F4BCED9CF5713D22174 /* YGLayout.cpp in Sources */,
 				54999A95373FB33B3E4EC27C3B27007E /* YGNode.cpp in Sources */,
 				E72E59840D48233A332F154455295ACC /* YGNodePrint.cpp in Sources */,
-				D8B2C40652EB0AE53FD862DB864FCBE6 /* YGStyle.cpp in Sources */,
 				B7F5E8EC402CF83D975037B2B877E86B /* yoga-dummy.m in Sources */,
 				5C2C3C1333034B122F9A4122E854F9B2 /* Yoga.cpp in Sources */,
 			);

@@ -13,8 +13,8 @@
   "dependencies": {
     "@redux-offline/redux-offline": "^2.3.3",
     "moment": "^2.22.1",
-    "react": "16.4.1",
-    "react-native": "0.56.0",
+    "react": "^16.2.0",
+    "react-native": "0.53.0",
     "react-native-elements": "^0.19.1",
     "react-native-fbsdk": "^0.7.0",
     "react-native-firebase": "^4.2.0",
@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "babel-jest": "23.0.1",
-    "babel-preset-react-native": "^5.0.1",
+    "babel-preset-react-native": "4.0.0",
     "jest": "23.0.1",
     "react-test-renderer": "16.3.1",
     "redux-logger": "^3.0.6"
