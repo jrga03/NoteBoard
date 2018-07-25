@@ -66,15 +66,9 @@ class SignUp extends Component {
         const { displayName, email, password } = this.state;
 
         const isNameEmpty = validator.isEmpty(displayName.value.trim());
-        const isNameAlphaNum = validator.isAlphanumeric(
-            displayName.value.trim()
-        );
+        const isNameAlphaNum = validator.isAlphanumeric(displayName.value.trim().replace(/\s+/g, ""));
         const nameValid = !isNameEmpty && isNameAlphaNum;
-        const nameErrorText = isNameEmpty
-            ? "Enter a name"
-            : isNameAlphaNum
-                ? null
-                : "Use alphanumeric characters";
+        const nameErrorText = isNameEmpty ? "Enter a name" : isNameAlphaNum ? null : "Use alphanumeric characters";
 
         const isEmailEmpty = validator.isEmpty(email.value.trim());
         const isEmail = validator.isEmail(email.value.trim());
@@ -117,11 +111,7 @@ class SignUp extends Component {
                     onPressIn={() => this.setState({ showPassword: true })}
                     onPressOut={() => this.setState({ showPassword: false })}
                     disabled={this.props.user.isFetching}>
-                    <Icon
-                        type="material-icon"
-                        name="visibility"
-                        color={SWATCH.BLACK}
-                    />
+                    <Icon type="material-icon" name="visibility" color={SWATCH.BLACK} />
                 </TouchableOpacity>
             </View>
         );
@@ -153,9 +143,7 @@ class SignUp extends Component {
         return (
             <KeyboardAwareScrollView
                 keyboardShouldPersistTaps="handled"
-                keyboardDismissMode={
-                    Platform.OS === "ios" ? "interactive" : "none"
-                }
+                keyboardDismissMode={Platform.OS === "ios" ? "interactive" : "none"}
                 extraHeight={10}
                 contentContainerStyle={container}>
                 <View style={formContainer}>
@@ -166,18 +154,13 @@ class SignUp extends Component {
                         autoFocus={true}
                         placeholder="Display Name"
                         placeholderTextColor="gray"
-                        style={[
-                            formTextField,
-                            displayName.error
-                                ? { borderBottomColor: SWATCH.RED }
-                                : null,
-                        ]}
+                        style={[formTextField, displayName.error ? { borderBottomColor: SWATCH.RED } : null]}
                         numberOfLines={1}
                         maxLength={64}
                         autoCorrect={false}
                         autoCapitalize="none"
                         editable={!isFetching}
-                        blurOnSubmit={true}
+                        blurOnSubmit={false}
                         onSubmitEditing={() => this.focusToNext("email")}
                         value={displayName.value}
                         keyboardType="default"
@@ -196,28 +179,19 @@ class SignUp extends Component {
                         ref={(ref) => (this.inputs["displayName"] = ref)}
                     />
                     <View style={errorContainer}>
-                        {displayName.error && (
-                            <Text style={errorTextStyle}>
-                                {displayName.errorText}
-                            </Text>
-                        )}
+                        {displayName.error && <Text style={errorTextStyle}>{displayName.errorText}</Text>}
                     </View>
 
                     <TextInput
                         placeholder="Email Address"
                         placeholderTextColor="gray"
-                        style={[
-                            formTextField,
-                            email.error
-                                ? { borderBottomColor: SWATCH.RED }
-                                : null,
-                        ]}
+                        style={[formTextField, email.error ? { borderBottomColor: SWATCH.RED } : null]}
                         numberOfLines={1}
                         maxLength={64}
                         autoCorrect={false}
                         autoCapitalize="none"
                         editable={!isFetching}
-                        blurOnSubmit={true}
+                        blurOnSubmit={false}
                         onSubmitEditing={() => this.focusToNext("password")}
                         value={email.value}
                         keyboardType="email-address"
@@ -236,23 +210,14 @@ class SignUp extends Component {
                         ref={(ref) => (this.inputs["email"] = ref)}
                     />
                     <View style={errorContainer}>
-                        {email.error && (
-                            <Text style={errorTextStyle}>
-                                {email.errorText}
-                            </Text>
-                        )}
+                        {email.error && <Text style={errorTextStyle}>{email.errorText}</Text>}
                     </View>
 
                     <View style={passwordInputContainer}>
                         <TextInput
                             placeholder="Password"
                             placeholderTextColor="gray"
-                            style={[
-                                formTextField,
-                                password.error
-                                    ? { borderBottomColor: SWATCH.RED }
-                                    : null,
-                            ]}
+                            style={[formTextField, password.error ? { borderBottomColor: SWATCH.RED } : null]}
                             numberOfLines={1}
                             maxLength={64}
                             autoCorrect={false}
@@ -279,29 +244,18 @@ class SignUp extends Component {
                         {this.renderVisibilityIcon()}
                     </View>
                     <View style={errorContainer}>
-                        {password.error && (
-                            <Text style={errorTextStyle}>
-                                {password.errorText}
-                            </Text>
-                        )}
+                        {password.error && <Text style={errorTextStyle}>{password.errorText}</Text>}
                     </View>
 
                     <View style={spacerThin} />
 
                     <View style={[containedButton, submitButtonContainer]}>
-                        <TouchableOpacity
-                            onPress={this.handleSubmit}
-                            disabled={isFetching}>
+                        <TouchableOpacity onPress={this.handleSubmit} disabled={isFetching}>
                             <View style={submitButton}>
                                 {isFetching ? (
-                                    <ActivityIndicator
-                                        size="small"
-                                        color={SWATCH.WHITE}
-                                    />
+                                    <ActivityIndicator size="small" color={SWATCH.WHITE} />
                                 ) : (
-                                    <Text style={submitButtonText}>
-                                        SIGN UP
-                                    </Text>
+                                    <Text style={submitButtonText}>SIGN UP</Text>
                                 )}
                             </View>
                         </TouchableOpacity>
@@ -313,9 +267,7 @@ class SignUp extends Component {
                 <View style={spacerThin} />
 
                 <View style={backButtonContainer}>
-                    <TouchableOpacity
-                        onPress={() => this.props.navigation.goBack()}
-                        disabled={isFetching}>
+                    <TouchableOpacity onPress={() => this.props.navigation.goBack()} disabled={isFetching}>
                         <Text style={formTextButton}>Back</Text>
                     </TouchableOpacity>
                 </View>

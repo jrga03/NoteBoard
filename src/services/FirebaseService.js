@@ -22,9 +22,22 @@ const FirebaseService = {
 
     async logInUsingEmail({ email, password }, callback) {
         try {
-            const result = await firebase.auth().signInAndRetrieveDataWithEmailAndPassword(email, password);
-            // console.log("result", result)
-            return callback(null, result.user.toJSON());
+            const { user } = await firebase.auth().signInAndRetrieveDataWithEmailAndPassword(email, password);
+            const userObj = user.toJSON();
+
+            const userToDB = {
+                displayName: userObj.displayName,
+                email: userObj.email,
+                photoURL: !!userObj.photoURL ? userObj.photoURL : "",
+                providerId: userObj.providerData[0].providerId,
+            };
+
+            await firebase
+                .database()
+                .ref(`/users/${userObj.uid}`)
+                .update(userToDB, () => callback(null, userObj));
+
+            // return callback(null, result.user.toJSON());
         } catch (error) {
             // console.log("loginUsingEmail error", error)
             return callback(error, null);
@@ -63,10 +76,24 @@ const FirebaseService = {
             await user.updateProfile({ displayName });
 
             const credential = firebase.auth.EmailAuthProvider.credential(email, password);
-            const reAuth = await user.reauthenticateAndRetrieveDataWithCredential(credential);
-            const reAuthUser = reAuth.user;
+            const { user: reAuth } = await user.reauthenticateAndRetrieveDataWithCredential(credential);
 
-            return callback(null, reAuthUser.toJSON());
+            await reAuth.sendEmailVerification();
+            const reAuthUser = reAuth.toJSON();
+
+            const userToDB = {
+                displayName: reAuthUser.displayName,
+                email: reAuthUser.email,
+                photoURL: !!reAuthUser.photoURL ? reAuthUser.photoURL : "",
+                providerId: reAuthUser.providerData[0].providerId,
+            };
+
+            await firebase
+                .database()
+                .ref(`/users/${reAuthUser.uid}`)
+                .update(userToDB, () => callback(null, reAuthUser));
+
+            // return callback(null, reAuthUser.toJSON());
         } catch (error) {
             return callback(error, null);
         }
@@ -87,8 +114,26 @@ const FirebaseService = {
         }
 
         try {
-            const result = await firebase.auth().signInAndRetrieveDataWithCredential(credential);
-            return callback(null, result.user.toJSON());
+            const { user } = await firebase.auth().signInAndRetrieveDataWithCredential(credential);
+            const userObj = user.toJSON();
+
+            if (userObj.metadata.creationTime === userObj.metadata.lastSignInTime) {
+                await user.sendEmailVerification();
+            }
+
+            const userToDB = {
+                displayName: userObj.displayName,
+                email: userObj.email,
+                photoURL: !!userObj.photoURL ? userObj.photoURL : "",
+                providerId: userObj.providerData[0].providerId,
+            };
+
+            await firebase
+                .database()
+                .ref(`/users/${userObj.uid}`)
+                .update(userToDB, () => callback(null, userObj));
+
+            // return callback(null, user.toJSON());
         } catch (error) {
             return callback(error, null);
         }
