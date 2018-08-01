@@ -3,7 +3,7 @@ import { View, TouchableOpacity, Platform } from "react-native";
 import {
     createStackNavigator,
     createDrawerNavigator,
-    createMaterialBottomNavigator,
+    // createMaterialBottomNavigator,
     createMaterialTopTabNavigator,
     createSwitchNavigator,
     // DrawerActions,
@@ -22,6 +22,7 @@ import SettingsScreen from "../screens/settings/Settings";
 import NoteItemScreen from "../screens/notes/NoteItem";
 import SignUpScreen from "../screens/signup/SignUp";
 import ContactsScreen from "../screens/contacts/Contacts";
+import AddContactScreen from "../screens/contacts/AddContact";
 
 const generateIcon = (type, name, color = SWATCH.BLACK, size = 27) => {
     return <Icon name={name} type={type} color={color} size={size} />;
@@ -169,7 +170,7 @@ const NotesStack = createStackNavigator(
 
 const ContactsTab = createMaterialTopTabNavigator({
     Contacts: ContactsScreen,
-    Add: ContactsScreen,
+    Add: AddContactScreen,
 });
 
 const ContactsStack = createStackNavigator(
