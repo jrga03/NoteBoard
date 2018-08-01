@@ -148,33 +148,49 @@ const FirebaseService = {
         }
     },
 
-    async fetchNotes(callback) {
-        try {
-            await firebase
-                .database()
-                .ref(`/users_notes/${firebase.auth().currentUser.uid}/notes`)
-                .orderByChild("lastEditedAtMsec")
-                .on("value", (data) => {
-                    const notes = [];
-                    let index = 0;
-                    data.forEach((note) => {
-                        const noteObj = note.val();
-                        noteObj.overallIndex = index;
-                        notes.push(noteObj);
-                        index++;
-                    });
-                    callback(null, notes);
-                });
-        } catch (error) {
-            return callback(error, null);
-        }
+    // async fetchNotes(callback) {
+    //     try {
+    //         await firebase
+    //             .database()
+    //             .ref(`/users_notes/${firebase.auth().currentUser.uid}/notes`)
+    //             .orderByChild("lastEditedAtMsec")
+    //             .on("value", (data) => {
+    //                 const notes = [];
+    //                 let index = 0;
+    //                 data.forEach((note) => {
+    //                     const noteObj = note.val();
+    //                     noteObj.overallIndex = index;
+    //                     notes.push(noteObj);
+    //                     index++;
+    //                 });
+    //                 callback(null, notes);
+    //             });
+    //     } catch (error) {
+    //         return callback(error, null);
+    //     }
+    // },
+
+    addNotesListener(callback) {
+        firebase
+            .database()
+            .ref(`/users_notes/${firebase.auth().currentUser.uid}`)
+            .orderByChild("lastEditedAtMsec")
+            .on("value", callback);
+    },
+
+    removeNotesListener(callback) {
+        firebase
+            .database()
+            .ref(`/users_notes/${firebase.auth().currentUser.uid}`)
+            .orderByChild("lastEditedAtMsec")
+            .off("value", callback);
     },
 
     async editNote(note, callback) {
         try {
             await firebase
                 .database()
-                .ref(`/users_notes/${firebase.auth().currentUser.uid}/notes/note${note.id}`)
+                .ref(`/users_notes/${firebase.auth().currentUser.uid}/note${note.id}`)
                 .update(note, () => callback(null, true));
         } catch (error) {
             return callback(error, null);
@@ -185,11 +201,27 @@ const FirebaseService = {
         try {
             await firebase
                 .database()
-                .ref(`/users_notes/${firebase.auth().currentUser.uid}/notes/note${id}`)
+                .ref(`/users_notes/${firebase.auth().currentUser.uid}/note${id}`)
                 .remove(() => callback(null, true));
         } catch (error) {
             return callback(error, null);
         }
+    },
+
+    addContactsListener(callback) {
+        firebase
+            .database()
+            .ref(`/users_notes/${firebase.auth().currentUser.uid}`)
+            .orderByChild("lastEditedAtMsec")
+            .on("value", callback);
+    },
+
+    removeContactsListener(callback) {
+        firebase
+            .database()
+            .ref(`/users_notes/${firebase.auth().currentUser.uid}`)
+            .orderByChild("lastEditedAtMsec")
+            .off("value", callback);
     },
 };
 

@@ -39,7 +39,12 @@ class Notes extends Component {
 
     componentDidMount() {
         // console.log("home props", this.props);
-        this.fetchNotes();
+        // this.fetchNotes();
+        FirebaseService.addNotesListener(this.fetchNotes);
+    }
+
+    componentWillUnmount() {
+        FirebaseService.removeNotesListener(this.fetchNotes);
     }
 
     componentDidUpdate() {
@@ -48,41 +53,80 @@ class Notes extends Component {
         // console.log("home props update", this.props, this.state);
     }
 
-    fetchNotes = () => {
-        FirebaseService.fetchNotes((err, data) => {
-            if (err) {
-                console.log("error fetchNotes", err);
-            } else {
-                const list = [];
-                const listPinned = [];
-                const leftList = [];
-                const rightList = [];
-                const leftPinned = [];
-                const rightPinned = [];
-                data.map((item, index) => {
-                    item.pinned ? listPinned.push(item) : list.push(item);
-                    item.pinned
-                        ? leftPinned.length > rightPinned.length
-                            ? rightPinned.push(item)
-                            : leftPinned.push(item)
-                        : leftList.length > rightList.length
-                            ? rightList.push(item)
-                            : leftList.push(item);
-                });
-
-                this.setState({
-                    data: list,
-                    dataPinned: listPinned,
-                    leftList,
-                    leftPinned,
-                    rightList,
-                    rightPinned,
-                    isLoading: false,
-                });
-                this.props.updateNoteList(data);
-            }
+    fetchNotes = (data) => {
+        const notes = [];
+        let index = 0;
+        data.forEach((note) => {
+            const noteObj = note.val();
+            noteObj.overallIndex = index;
+            notes.push(noteObj);
+            index++;
         });
+
+        const list = [];
+        const listPinned = [];
+        const leftList = [];
+        const rightList = [];
+        const leftPinned = [];
+        const rightPinned = [];
+        notes.map((item) => {
+            item.pinned ? listPinned.push(item) : list.push(item);
+            item.pinned
+                ? leftPinned.length > rightPinned.length
+                    ? rightPinned.push(item)
+                    : leftPinned.push(item)
+                : leftList.length > rightList.length
+                    ? rightList.push(item)
+                    : leftList.push(item);
+        });
+
+        this.setState({
+            data: list,
+            dataPinned: listPinned,
+            leftList,
+            leftPinned,
+            rightList,
+            rightPinned,
+            isLoading: false,
+        });
+        this.props.updateNoteList(data);
     };
+
+    // fetchNotes = () => {
+    //     return FirebaseService.fetchNotes((err, data) => {
+    //         if (err) {
+    //             console.log("error fetchNotes", err);
+    //         } else {
+    //             const list = [];
+    //             const listPinned = [];
+    //             const leftList = [];
+    //             const rightList = [];
+    //             const leftPinned = [];
+    //             const rightPinned = [];
+    //             data.map((item, index) => {
+    //                 item.pinned ? listPinned.push(item) : list.push(item);
+    //                 item.pinned
+    //                     ? leftPinned.length > rightPinned.length
+    //                         ? rightPinned.push(item)
+    //                         : leftPinned.push(item)
+    //                     : leftList.length > rightList.length
+    //                         ? rightList.push(item)
+    //                         : leftList.push(item);
+    //             });
+
+    //             this.setState({
+    //                 data: list,
+    //                 dataPinned: listPinned,
+    //                 leftList,
+    //                 leftPinned,
+    //                 rightList,
+    //                 rightPinned,
+    //                 isLoading: false,
+    //             });
+    //             this.props.updateNoteList(data);
+    //         }
+    //     });
+    // };
 
     handleMemoPress = (index, memo) => {
         this.props.openNote(index, memo);

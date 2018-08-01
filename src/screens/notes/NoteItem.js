@@ -78,14 +78,14 @@ class NoteItem extends Component {
                 note.contents.reduce((acc, item) => (acc = !!item.content), false) ||
                 checkboxChanged
             ) {
-                console.log("update triggered");
+                // console.log("update triggered");
                 this.props.updateNoteList(index, note);
             }
         }
     }
 
     updateNote = () => {
-        console.log("update", this.state)
+        // console.log("update", this.state, "\n\n");
         const contentsWithoutIndex = this.state.note.contents.map(({ checked, content }) => ({ checked, content }));
 
         const noteWithoutContentIndex = {
@@ -189,32 +189,61 @@ class NoteItem extends Component {
             },
             this.updateNote
         );
+        this.inputs[`content_${contentId}`].focus();
         contentId++;
     };
 
     handleAddOrDeleteLine = (key, { index, cId, start, end }) => {
         // console.log("handleAddOrDeleteLine", key, index, cId, start, end);
-        const { contents } = this.state.note;
-        const test = contents;
-        console.log("handleAddOrDeleteLine before", test);
+        const contents = Array.from(this.state.note.contents);
+        // const test = contents;
+        // console.log("handleAddOrDeleteLine before", test);
 
         switch (key) {
             case "Enter":
+                let newContent;
+                if ((start === 0 && end === 0) || contents[index].content === "") {
+                    newContent = "";
+                } else {
+                    newContent = contents[index].content.substring(start);
+                    contents[index].content = contents[index].content.substring(0, start);
+                }
+                contents.splice(index + 1, 0, {
+                    content: newContent,
+                    checked: false,
+                    cId: contentId,
+                });
+
+                this.setState(
+                    {
+                        wasChanged: true,
+                        note: {
+                            ...this.state.note,
+                            contents,
+                        },
+                    },
+                    () => {
+                        this.updateNote();
+                        // this.inputs[`content_${cId}`].blur();
+
+                        const nextItemId = contents[index + 1].cId;
+                        // console.log("nextItemId", nextItemId);
+                        // this.inputs[`content_${nextItemId}`].focus();
+                        // this.inputs[`content_${nextItemId}`].setNativeProps({
+                        //     start: 0,
+                        //     end: 0,
+                        // });
+                    }
+                );
                 break;
             case "Backspace":
                 if (((start === 0 && end === 0) || contents[index].content === "") && index > 0) {
                     const prevItemId = contents[index - 1].cId;
-                    this.inputs[`content_${prevItemId}`].focus();
-                    this.inputs[`content_${prevItemId}`].setNativeProps({
-                        start: contents[index - 1].content.length,
-                        end: contents[index - 1].content.length,
-                    });
 
                     contents[index - 1].content += contents[index].content;
                     if (!!contents[index + 1]) {
                         contents[index].content = contents[index + 1].content;
                         contents.splice(index, 1);
-                        console.log("handleAddOrDeleteLine after", contents);
                     } else {
                         contents.pop();
                     }
@@ -222,17 +251,23 @@ class NoteItem extends Component {
                     //     ? (contents[index].content = contents[index + 1].content)
                     //     : (contents[index].content = "");
                     // contents.splice(index, 1);
-
+                    // this.inputs[`content_${cId}`].blur();
                     this.setState(
                         {
                             wasChanged: true,
                             note: {
                                 ...this.state.note,
                                 contents,
-                                // lastEditedAt: Moment().toISOString(),
                             },
                         },
-                        this.updateNote
+                        () => {
+                            this.updateNote();
+                            this.inputs[`content_${prevItemId}`].focus();
+                            this.inputs[`content_${prevItemId}`].setNativeProps({
+                                start: contents[index - 1].content.length,
+                                end: contents[index - 1].content.length,
+                            });
+                        }
                     );
                 }
                 break;
@@ -266,7 +301,7 @@ class NoteItem extends Component {
 
         onChangeText = (text) => this.handleChangeText({ type: "content", index, text });
         onAddOrDeleteLine = ({ nativeEvent: { key } }) => {
-            console.log("test", key, item.cId, selection);
+            // console.log("test", key, item.cId, selection);
             key === "Enter" || key === "Backspace"
                 ? this.handleAddOrDeleteLine(key, { index, cId: item.cId, start: selection.start, end: selection.end })
                 : null;
@@ -299,7 +334,7 @@ class NoteItem extends Component {
         onChangeText = (text) => this.handleChangeText({ type: "content", index, text });
         onPressCheckbox = () => this.handlePressCheckbox(index);
         onAddOrDeleteLine = ({ nativeEvent: { key } }) => {
-            console.log("onAddOrDeleteLine", key, index);
+            // console.log("onAddOrDeleteLine", key, index);
             key === "Enter" || key === "Backspace"
                 ? this.handleAddOrDeleteLine(key, { index, cId: item.cId, start: selection.start, end: selection.end })
                 : null;
@@ -327,6 +362,9 @@ class NoteItem extends Component {
                     underlineColorAndroid="transparent"
                     multiline={true}
                     onChangeText={selection.start === 0 && selection.end === 0 ? null : onChangeText}
+                    // onChange={(e) => e.nativeEvent.text.indexOf("\n") > -1 ? e.preventDefault : null}
+                    blurOnSubmit={true}
+                    // onBlur={() => console.log("this", this)}
                     autoCorrect={false}
                     autoFocus={this.state.index === null ? true : false}
                     onKeyPress={onAddOrDeleteLine}
