@@ -83,11 +83,12 @@ export default class NoteMemo extends Component {
                     renderItem={this.renderNoteContent}
                     keyExtractor={(item, index) => item + index}
                 />
-                {type === "checklist" && (
-                    <Text style={checkedItemText}>
-                        {`+${checkedItemsCount} checked ${checkedItemsCount > 1 ? "items" : "item"}`}
-                    </Text>
-                )}
+                {type === "checklist" &&
+                    checkedItemsCount > 0 && (
+                        <Text style={checkedItemText}>
+                            {`+${checkedItemsCount} checked ${checkedItemsCount > 1 ? "items" : "item"}`}
+                        </Text>
+                    )}
             </View>
         );
     }
