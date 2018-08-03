@@ -29,6 +29,7 @@ export default ContactItem;
 
 const styles = StyleSheet.create({
     container: {
+        marginVertical: 10,
         flexBasis: 80,
         flexDirection: "row",
         alignItems: "center",

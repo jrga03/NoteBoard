@@ -170,6 +170,14 @@ const FirebaseService = {
     //     }
     // },
 
+    fetchNotes(callback) {
+        firebase
+            .database()
+            .ref(`/users_notes/${firebase.auth().currentUser.uid}`)
+            .orderByChild("lastEditedAtMsec")
+            .once("value", callback);
+    },
+
     addNotesListener(callback) {
         firebase
             .database()
@@ -208,20 +216,65 @@ const FirebaseService = {
         }
     },
 
+    fetchContacts(callback) {
+        firebase
+            .database()
+            .ref(`/contacts/${firebase.auth().currentUser.uid}`)
+            .orderByValue()
+            .equalTo(true)
+            .once("value", callback);
+    },
+
     addContactsListener(callback) {
         firebase
             .database()
-            .ref(`/users_notes/${firebase.auth().currentUser.uid}`)
-            .orderByChild("lastEditedAtMsec")
+            .ref(`/contacts/${firebase.auth().currentUser.uid}`)
+            .orderByValue()
+            .equalTo(true)
             .on("value", callback);
     },
 
     removeContactsListener(callback) {
         firebase
             .database()
-            .ref(`/users_notes/${firebase.auth().currentUser.uid}`)
-            .orderByChild("lastEditedAtMsec")
+            .ref(`/contacts/${firebase.auth().currentUser.uid}`)
+            .orderByValue()
+            .equalTo(true)
+            .on("value", callback);
+    },
+
+    fetchPendingContacts(callback) {
+        firebase
+            .database()
+            .ref(`/pending_contacts/${firebase.auth().currentUser.uid}`)
+            .orderByValue()
+            .equalTo(true)
+            .once("value", callback);
+    },
+
+    addPendingContactListener(callback) {
+        firebase
+            .database()
+            .ref(`/pending_contacts/${firebase.auth().currentUser.uid}`)
+            .orderByValue()
+            .equalTo(true)
+            .on("value", callback);
+    },
+
+    removePendingContactListener(callback) {
+        firebase
+            .database()
+            .ref(`/pending_contacts/${firebase.auth().currentUser.uid}`)
+            .orderByValue()
+            .equalTo(true)
             .off("value", callback);
+    },
+
+    fetchContactInfo(contact_id) {
+        return firebase
+            .database()
+            .ref(`/users/${contact_id}`)
+            .once("value");
     },
 };
 

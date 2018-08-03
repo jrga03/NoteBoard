@@ -54,6 +54,8 @@ class Notes extends Component {
     }
 
     fetchNotes = (data) => {
+        this.setState({ isLoading: true });
+
         const notes = [];
         let index = 0;
         data.forEach((note) => {
@@ -90,6 +92,10 @@ class Notes extends Component {
             isLoading: false,
         });
         this.props.updateNoteList(data);
+    };
+
+    handleRefresh = () => {
+        FirebaseService.fetchNotes(this.fetchNotes);
     };
 
     // fetchNotes = () => {
@@ -179,7 +185,7 @@ class Notes extends Component {
         const {
             container,
             rowContainer,
-            listContainer,
+            // listContainer,
             scrollContainer,
             rowItemContainer,
             rowItemContainerLeft,
@@ -227,52 +233,54 @@ class Notes extends Component {
 
         const { data, dataPinned, isLoading } = this.state;
         return (
-            <View style={[container, scrollContainer]}>
-                <SectionList
-                    contentContainerStyle={listContainer}
-                    renderItem={this.renderNoteItem}
-                    extraData={this.state}
-                    renderSectionHeader={({ section: { title } }) =>
-                        dataPinned.length > 0 && <Text style={sectionTitleText}>{title}</Text>
-                    }
-                    sections={[{ title: "Pinned", data: dataPinned }, { title: "Others", data }]}
-                    renderSectionFooter={() => dataPinned.length > 0 && <View style={sectionFooter} />}
-                    keyExtractor={(item) => `${item.id}`}
-                    refreshing={isLoading}
-                    onRefresh={this.fetchNotes}
-                    ListEmptyComponent={
-                        !isLoading && (
-                            <View style={emptyListContainer}>
-                                <Text>You have no notes to show</Text>
-                                <Text />
-                                <TouchableOpacity onPress={() => this.handleCreateNote("memo")}>
-                                    <Text style={addNoteText}>Add Note</Text>
-                                </TouchableOpacity>
-                            </View>
-                        )
-                    }
-                />
-                {/* <FlatList
-                    contentContainerStyle={listContainer}
-                    data={data}
-                    extraData={this.state}
-                    renderItem={this.renderNoteItem}
-                    keyExtractor={(item) => `${item.id}`}
-                    refreshing={isLoading}
-                    onRefresh={this.fetchNotes}
-                    ListEmptyComponent={
-                        !isLoading && (
-                            <View style={emptyListContainer}>
-                                <Text>You have no notes to show</Text>
-                                <Text />
-                                <TouchableOpacity onPress={this.handleCreateNote}>
-                                    <Text style={addNoteText}>Add Note</Text>
-                                </TouchableOpacity>
-                            </View>
-                        )
-                    }
-                /> */}
-            </View>
+            // <View style={[container, scrollContainer]}>
+            <SectionList
+                style={container}
+                contentContainerStyle={[scrollContainer, listContainer]}
+                renderItem={this.renderNoteItem}
+                extraData={this.state}
+                renderSectionHeader={({ section: { title } }) =>
+                    dataPinned.length > 0 && <Text style={sectionTitleText}>{title}</Text>
+                }
+                sections={[{ title: "Pinned", data: dataPinned }, { title: "Others", data }]}
+                renderSectionFooter={() => dataPinned.length > 0 && <View style={sectionFooter} />}
+                keyExtractor={(item) => `${item.id}`}
+                refreshing={isLoading}
+                onRefresh={this.handleRefresh}
+                ListEmptyComponent={
+                    !isLoading && (
+                        <View style={emptyListContainer}>
+                            <Text>You have no notes to show</Text>
+                            <Text />
+                            <TouchableOpacity onPress={() => this.handleCreateNote("memo")}>
+                                <Text style={addNoteText}>Add Note</Text>
+                            </TouchableOpacity>
+                        </View>
+                    )
+                }
+                // stickySectionHeadersEnabled={false}
+            />
+            // {/* <FlatList
+            //     contentContainerStyle={listContainer}
+            //     data={data}
+            //     extraData={this.state}
+            //     renderItem={this.renderNoteItem}
+            //     keyExtractor={(item) => `${item.id}`}
+            //     refreshing={isLoading}
+            //     onRefresh={this.fetchNotes}
+            //     ListEmptyComponent={
+            //         !isLoading && (
+            //             <View style={emptyListContainer}>
+            //                 <Text>You have no notes to show</Text>
+            //                 <Text />
+            //                 <TouchableOpacity onPress={this.handleCreateNote}>
+            //                     <Text style={addNoteText}>Add Note</Text>
+            //                 </TouchableOpacity>
+            //             </View>
+            //         )
+            //     }
+            // /> */}
+            // </View>
         );
     };
 
@@ -356,7 +364,7 @@ const styles = StyleSheet.create({
         marginLeft: LAYOUT_MARGIN / 2,
     },
     listContainer: {
-        flex: 1,
+        // flex: 1,
         marginHorizontal: LAYOUT_MARGIN,
         marginTop: LAYOUT_MARGIN,
     },

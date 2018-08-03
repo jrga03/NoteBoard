@@ -16,6 +16,8 @@ import {
     DELETE_NOTE,
     TOGGLE_PIN,
     UPDATE_SELECTED_NOTE,
+    UPDATE_CONTACT_LIST,
+    UPDATE_PENDING_CONTACT_LIST,
 } from "./constants";
 
 export function loginFlowStart() {
@@ -118,5 +120,19 @@ export function updateSelectedNote(note) {
     return {
         type: UPDATE_SELECTED_NOTE,
         payload: note,
+    };
+}
+
+export function updateContactList(contacts) {
+    return {
+        type: UPDATE_CONTACT_LIST,
+        payload: contacts,
+    };
+}
+
+export function updatePendingContactList(contacts) {
+    return {
+        type: UPDATE_PENDING_CONTACT_LIST,
+        payload: contacts,
     };
 }
