@@ -1,28 +1,91 @@
-import React, { Component } from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
+import React from "react";
+import { View, Text, Image, TouchableOpacity, TouchableWithoutFeedback, StyleSheet } from "react-native";
+import { Icon, Avatar } from "react-native-elements";
+
 import { SWATCH } from "../../constants";
 
-const ContactItem = (props) => {
-    const { container, imageContainer, imageContent, fullNameText, fullNameContainer } = styles;
-    return (
-        <TouchableOpacity>
-            <View style={container}>
-                <View style={imageContainer}>
-                    <Image
-                        style={imageContent}
-                        // resizeMode="center"
-                        source={{
-                            uri:
-                                "https://firebasestorage.googleapis.com/v0/b/note-board-1527334009294.appspot.com/o/Screen%20Shot%202018-05-31%20at%201.10.39%20PM.png?alt=media&token=f24b8a65-20c8-4947-ba2f-bd58c2b57907",
-                        }}
-                    />
-                </View>
-                <View style={fullNameContainer}>
-                <Text style={fullNameText}>Jason Ray Acido</Text>
+const ContactItem = ({ item, type }) => {
+    // const { item, type } = props;
+    // console.log(props);
+
+    if (!!item) {
+        // console.log("item", item, "type", type);
+        const { displayName, photoURL } = item;
+
+        const {
+            container,
+            iconAccept,
+            imageContent,
+            fullNameText,
+            iconContainer,
+            imageContainer,
+            fullNameContainer,
+            extraButtonsContainer,
+        } = styles;
+
+        return (
+            <TouchableOpacity>
+                <View style={container}>
+                    <View style={imageContainer}>
+                        {!!photoURL ? (
+                            <Image
+                                style={imageContent}
+                                // resizeMode="center"
+                                source={{ uri: photoURL }}
+                            />
+                        ) : (
+                            <Avatar medium rounded icon={{ name: "person" }} />
+                        )}
                     </View>
-            </View>
-        </TouchableOpacity>
-    );
+                    <View style={fullNameContainer}>
+                        <Text style={fullNameText} numberOfLines={1} ellipsizeMode="tail">
+                            {displayName}
+                        </Text>
+                    </View>
+
+                    {type === "Request" ? (
+                        <View style={extraButtonsContainer}>
+                            <TouchableWithoutFeedback>
+                                <TouchableOpacity>
+                                    <Icon
+                                        name="clear"
+                                        type="material-icons"
+                                        color={SWATCH.BLACK}
+                                        containerStyle={iconContainer}
+                                    />
+                                </TouchableOpacity>
+                            </TouchableWithoutFeedback>
+
+                            <TouchableWithoutFeedback>
+                                <TouchableOpacity>
+                                    <Icon
+                                        name="check"
+                                        type="material-icons"
+                                        color={SWATCH.BLACK}
+                                        containerStyle={[iconContainer, iconAccept]}
+                                    />
+                                </TouchableOpacity>
+                            </TouchableWithoutFeedback>
+                        </View>
+                    ) : type === "Add" ? (
+                        <View style={extraButtonsContainer}>
+                            <TouchableWithoutFeedback>
+                                <TouchableOpacity>
+                                    <Icon
+                                        name="add"
+                                        type="material-icons"
+                                        color={SWATCH.BLACK}
+                                        containerStyle={iconContainer}
+                                    />
+                                </TouchableOpacity>
+                            </TouchableWithoutFeedback>
+                        </View>
+                    ) : null}
+                </View>
+            </TouchableOpacity>
+        );
+    }
+    return null;
 };
 
 export default ContactItem;
@@ -33,7 +96,6 @@ const styles = StyleSheet.create({
         flexBasis: 80,
         flexDirection: "row",
         alignItems: "center",
-        // backgroundColor: "darkgray",
     },
     imageContainer: {
         padding: 0,
@@ -52,6 +114,22 @@ const styles = StyleSheet.create({
     },
     fullNameText: {
         fontSize: 18,
-        color: SWATCH.BLACK
+        color: SWATCH.BLACK,
+    },
+    extraButtonsContainer: {
+        // flex: 1,
+        // flexBasis: 50,
+        // width: 50,
+        flexDirection: "row",
+        paddingRight: 15,
+        paddingLeft: 5,
+    },
+    iconContainer: {
+        borderWidth: 0.5,
+        borderColor: SWATCH.GRAY,
+        marginHorizontal: 10,
+    },
+    iconAccept: {
+        backgroundColor: SWATCH.LIGHT_GRAY,
     },
 });

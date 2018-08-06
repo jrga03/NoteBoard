@@ -77,7 +77,9 @@ class Contacts extends Component {
             <SectionList
                 style={container}
                 contentContainerStyle={listContainer}
-                renderItem={({ item }) => <ContactItem />}
+                renderItem={({ item, section: { title } }) => (
+                    <ContactItem item={item} type={title === "" ? "Contact" : "Request"} />
+                )}
                 renderSectionHeader={({ section: { title, data } }) =>
                     title === "Requests" && data.length > 0 ? <Text style={sectionTitleText}>{title}</Text> : null
                 }
