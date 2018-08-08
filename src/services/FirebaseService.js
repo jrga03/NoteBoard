@@ -27,9 +27,12 @@ const FirebaseService = {
 
             const userToDB = {
                 displayName: userObj.displayName,
+                displayNameLowerCase: userObj.displayName.toLowerCase(),
                 email: userObj.email,
+                emailLowerCase: userObj.email.toLowerCase(),
                 photoURL: !!userObj.photoURL ? userObj.photoURL : "",
                 providerId: userObj.providerData[0].providerId,
+                id: userObj.uid,
             };
 
             await firebase
@@ -83,9 +86,12 @@ const FirebaseService = {
 
             const userToDB = {
                 displayName: reAuthUser.displayName,
+                displayNameLowerCase: reAuthUser.displayName.toLowerCase(),
                 email: reAuthUser.email,
+                emailLowerCase: reAuthUser.email.toLowerCase(),
                 photoURL: !!reAuthUser.photoURL ? reAuthUser.photoURL : "",
                 providerId: reAuthUser.providerData[0].providerId,
+                id: reAuthUser.uid,
             };
 
             await firebase
@@ -123,9 +129,12 @@ const FirebaseService = {
 
             const userToDB = {
                 displayName: userObj.displayName,
+                displayNameLowerCase: userObj.displayName.toLowerCase(),
                 email: userObj.email,
+                emailLowerCase: userObj.email.toLowerCase(),
                 photoURL: !!userObj.photoURL ? userObj.photoURL : "",
                 providerId: userObj.providerData[0].providerId,
+                id: userObj.uid,
             };
 
             await firebase
@@ -275,6 +284,28 @@ const FirebaseService = {
             .database()
             .ref(`/users/${contact_id}`)
             .once("value");
+    },
+
+    async searchContact(searchString) {
+        const nameSearch = await firebase
+            .database()
+            .ref(`/users`)
+            .orderByChild("displayNameLowerCase")
+            .startAt(searchString)
+            .endAt(searchString + "\uf8ff")
+            .once("value");
+        const emailSearch = await firebase
+            .database()
+            .ref(`/users`)
+            .orderByChild("emailLowerCase")
+            .startAt(searchString)
+            .endAt(searchString + "\uf8ff")
+            .once("value");
+
+        const nameSearchResult = nameSearch.exists() ? nameSearch.toJSON() : {};
+        const emailSearchResult = emailSearch.exists() ? emailSearch.toJSON() : {};
+
+        return { ...nameSearchResult, ...emailSearchResult };
     },
 };
 

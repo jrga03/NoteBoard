@@ -11,6 +11,10 @@ const SWATCH = {
 
     RED: "red",
 
+    GREEN: "green",
+
+    YELLOW: "yellow",
+
     LIGHT_GRAY: "lightgray",
 };
 

@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 
 import ContactItem from "./ContactItem";
 import { FirebaseService } from "../../services/FirebaseService";
-import { updateContactList, updatePendingContactList } from "../../actions";
+import { updateContactList, updatePendingContactList, fetchContactList, fetchPendingContactList } from "../../actions";
 import { LAYOUT_MARGIN, SWATCH } from "../../constants";
 
 class Contacts extends Component {
@@ -33,6 +33,8 @@ class Contacts extends Component {
     }
 
     fetchContacts = async (contacts) => {
+        this.props.fetchContactList();
+
         if (contacts.exists()) {
             contactList = [];
             const contactsArray = Object.keys(contacts.toJSON());
@@ -50,6 +52,8 @@ class Contacts extends Component {
     };
 
     fetchPendingContacts = async (pendingContacts) => {
+        this.props.fetchPendingContactList();
+
         if (pendingContacts.exists()) {
             pendingContactList = [];
             const pendingContactsArray = Object.keys(pendingContacts.toJSON());
@@ -88,10 +92,13 @@ class Contacts extends Component {
                     { title: "", data: this.props.contacts },
                 ]}
                 keyExtractor={(item) => `${item.id}`}
-                // refreshing={isLoading}
-                // onRefresh={this.handleRefresh}
+                refreshing={this.props.isLoading}
+                onRefresh={this.handleRefresh}
                 SectionSeparatorComponent={({ trailingSection, leadingItem }) =>
                     trailingSection && leadingItem ? <View style={sectionSeparator} /> : null
+                }
+                ItemSeparatorComponent={({ leadingItem }) =>
+                    leadingItem ? <View backgroundColor={SWATCH.LIGHT_GRAY} height={0.5} /> : null
                 }
                 renderSectionFooter={({ section: { title, data } }) =>
                     // !isLoading &&
@@ -115,9 +122,12 @@ class Contacts extends Component {
 mapStateToProps = (state) => ({
     contacts: state.contactList,
     pendingContacts: state.pendingContactList,
+    isLoading: state.loading,
 });
 
 mapDispatchToProps = (dispatch) => ({
+    fetchContactList: () => dispatch(fetchContactList()),
+    fetchPendingContactList: () => dispatch(fetchPendingContactList()),
     updateContactList: (contacts) => dispatch(updateContactList(contacts)),
     updatePendingContactList: (contacts) => dispatch(updatePendingContactList(contacts)),
 });
@@ -149,7 +159,7 @@ const styles = StyleSheet.create({
     },
     sectionSeparator: {
         marginVertical: 15,
-        height: 1,
+        height: 2,
         backgroundColor: SWATCH.LIGHT_GRAY,
     },
 });

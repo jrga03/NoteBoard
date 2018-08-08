@@ -14,7 +14,7 @@ const ContactItem = ({ item, type }) => {
 
         const {
             container,
-            iconAccept,
+            iconEmphasis,
             imageContent,
             fullNameText,
             iconContainer,
@@ -50,7 +50,7 @@ const ContactItem = ({ item, type }) => {
                                     <Icon
                                         name="clear"
                                         type="material-icons"
-                                        color={SWATCH.BLACK}
+                                        color={SWATCH.RED}
                                         containerStyle={iconContainer}
                                     />
                                 </TouchableOpacity>
@@ -61,8 +61,8 @@ const ContactItem = ({ item, type }) => {
                                     <Icon
                                         name="check"
                                         type="material-icons"
-                                        color={SWATCH.BLACK}
-                                        containerStyle={[iconContainer, iconAccept]}
+                                        color={SWATCH.GREEN}
+                                        containerStyle={[iconContainer, iconEmphasis]}
                                     />
                                 </TouchableOpacity>
                             </TouchableWithoutFeedback>
@@ -75,7 +75,20 @@ const ContactItem = ({ item, type }) => {
                                         name="add"
                                         type="material-icons"
                                         color={SWATCH.BLACK}
-                                        containerStyle={iconContainer}
+                                        containerStyle={[iconContainer, iconEmphasis]}
+                                    />
+                                </TouchableOpacity>
+                            </TouchableWithoutFeedback>
+                        </View>
+                    ) : type === "Remove" ? (
+                        <View style={extraButtonsContainer}>
+                            <TouchableWithoutFeedback>
+                                <TouchableOpacity>
+                                    <Icon
+                                        name="remove"
+                                        type="material-icons"
+                                        color={SWATCH.BLACK}
+                                        containerStyle={[iconContainer, iconEmphasis]}
                                     />
                                 </TouchableOpacity>
                             </TouchableWithoutFeedback>
@@ -125,11 +138,12 @@ const styles = StyleSheet.create({
         paddingLeft: 5,
     },
     iconContainer: {
-        borderWidth: 0.5,
-        borderColor: SWATCH.GRAY,
         marginHorizontal: 10,
     },
-    iconAccept: {
-        backgroundColor: SWATCH.LIGHT_GRAY,
+    iconEmphasis: {
+        // backgroundColor: SWATCH.LIGHT_GRAY,
+        borderWidth: 0.5,
+        borderColor: SWATCH.GRAY,
+        borderRadius: 3,
     },
 });

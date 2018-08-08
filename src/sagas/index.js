@@ -1,4 +1,5 @@
-import { put, take, takeLatest, call, all, fork, cps, race, takeEvery } from "redux-saga/effects";
+import { put, take, takeLatest, call, all, fork, cps, race, takeEvery, cancel, select } from "redux-saga/effects";
+import { delay } from "redux-saga";
 import {
     // CURRENT_USER,
     GET_GOOGLE,
@@ -19,7 +20,13 @@ import {
     EDIT_NOTE_ITEM,
     CLEAR_SELECTED_NOTE,
     DELETE_NOTE,
+    SEARCH_CONTACT_REQUEST,
+    SEARCH_CONTACT,
+    SEARCH_CONTACT_FAIL,
+    SEARCH_CONTACT_SUCCESS,
 } from "../actions/constants";
+
+import { getContacts, getPendingContacts } from "./selectors";
 import { NavigationService, FirebaseService } from "../services";
 import authentication from "../auth";
 
@@ -165,6 +172,40 @@ function* deleteNote({ payload }) {
     yield cps(FirebaseService.deleteNote, payload);
 }
 
+/**
+ * Search Contact
+ */
+function* searchContact({ payload }) {
+    if (payload !== "") {
+        try {
+            yield call(delay, 300);
+            yield put({ type: SEARCH_CONTACT_REQUEST });
+            const result = yield call(FirebaseService.searchContact, payload.toLowerCase());
+
+            const contacts = yield select(getContacts);
+            const pendingContacts = yield select(getPendingContacts);
+
+            const filteredAndEditedResult = Object.keys(result)
+                .filter((key) => !contacts.find((contact) => contact.id === key))
+                .reduce((arr, key) => {
+                    arr.push({
+                        ...result[key],
+                        requested: !!pendingContacts.find((pendingContact) => pendingContact.id === key),
+                    });
+                    return arr;
+                }, []);
+
+            yield put({ type: SEARCH_CONTACT_SUCCESS, payload: filteredAndEditedResult });
+        } catch (error) {
+            yield put({ type: SEARCH_CONTACT_FAIL });
+        }
+    }
+}
+
+function* watchSearchContact() {
+    yield takeLatest(SEARCH_CONTACT, searchContact);
+}
+
 export default function* rootSaga() {
     yield all([
         fork(loginFlow),
@@ -172,6 +213,7 @@ export default function* rootSaga() {
         fork(logoutFlow),
         takeEvery(EDIT_NOTE_ITEM, editNote),
         takeEvery(DELETE_NOTE, deleteNote),
+        watchSearchContact(),
     ]);
 }
 
