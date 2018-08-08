@@ -3,14 +3,11 @@ import { View, Text, Image, TouchableOpacity, TouchableWithoutFeedback, StyleShe
 import { Icon, Avatar } from "react-native-elements";
 
 import { SWATCH } from "../../constants";
+import { FirebaseService } from "../../services/FirebaseService";
 
 const ContactItem = ({ item, type }) => {
-    // const { item, type } = props;
-    // console.log(props);
-
     if (!!item) {
-        // console.log("item", item, "type", type);
-        const { displayName, photoURL } = item;
+        const { id, displayName, photoURL } = item;
 
         const {
             container,
@@ -24,7 +21,7 @@ const ContactItem = ({ item, type }) => {
         } = styles;
 
         return (
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => null}>
                 <View style={container}>
                     <View style={imageContainer}>
                         {!!photoURL ? (
@@ -34,8 +31,8 @@ const ContactItem = ({ item, type }) => {
                                 source={{ uri: photoURL }}
                             />
                         ) : (
-                            <Avatar medium rounded icon={{ name: "person" }} />
-                        )}
+                                <Avatar medium rounded icon={{ name: "person" }} />
+                            )}
                     </View>
                     <View style={fullNameContainer}>
                         <Text style={fullNameText} numberOfLines={1} ellipsizeMode="tail">
@@ -45,8 +42,8 @@ const ContactItem = ({ item, type }) => {
 
                     {type === "Request" ? (
                         <View style={extraButtonsContainer}>
-                            <TouchableWithoutFeedback>
-                                <TouchableOpacity>
+                            {/* <TouchableWithoutFeedback>
+                                <TouchableOpacity onPress={() => FirebaseService.rejectContactRequest(id)}>
                                     <Icon
                                         name="clear"
                                         type="material-icons"
@@ -54,10 +51,13 @@ const ContactItem = ({ item, type }) => {
                                         containerStyle={iconContainer}
                                     />
                                 </TouchableOpacity>
-                            </TouchableWithoutFeedback>
+                            </TouchableWithoutFeedback> */}
+                            <ContactItemButton
+                                onPress={() => FirebaseService.rejectContactRequest(id)}
+                                icon={{ name: "clear", color: SWATCH.RED, container: iconContainer }} />
 
-                            <TouchableWithoutFeedback>
-                                <TouchableOpacity>
+                            {/* <TouchableWithoutFeedback>
+                                <TouchableOpacity onPress={() => FirebaseService.acceptContactRequest(id)}>
                                     <Icon
                                         name="check"
                                         type="material-icons"
@@ -65,12 +65,15 @@ const ContactItem = ({ item, type }) => {
                                         containerStyle={[iconContainer, iconEmphasis]}
                                     />
                                 </TouchableOpacity>
-                            </TouchableWithoutFeedback>
+                            </TouchableWithoutFeedback> */}
+                            <ContactItemButton
+                                onPress={() => FirebaseService.acceptContactRequest(id)}
+                                icon={{ name: "check", color: SWATCH.GREEN, container: [iconContainer, iconEmphasis] }} />
                         </View>
                     ) : type === "Add" ? (
                         <View style={extraButtonsContainer}>
-                            <TouchableWithoutFeedback>
-                                <TouchableOpacity>
+                            {/* <TouchableWithoutFeedback>
+                                <TouchableOpacity onPress={() => FirebaseService.addContactRequest(id)}>
                                     <Icon
                                         name="add"
                                         type="material-icons"
@@ -78,12 +81,15 @@ const ContactItem = ({ item, type }) => {
                                         containerStyle={[iconContainer, iconEmphasis]}
                                     />
                                 </TouchableOpacity>
-                            </TouchableWithoutFeedback>
+                            </TouchableWithoutFeedback> */}
+                            <ContactItemButton
+                                onPress={() => FirebaseService.addContactRequest(id)}
+                                icon={{ name: "add", color: SWATCH.BLACK, container: [iconContainer, iconEmphasis] }} />
                         </View>
                     ) : type === "Remove" ? (
                         <View style={extraButtonsContainer}>
-                            <TouchableWithoutFeedback>
-                                <TouchableOpacity>
+                            {/* <TouchableWithoutFeedback>
+                                <TouchableOpacity onPress={() => FirebaseService.cancelContactRequest(id)}>
                                     <Icon
                                         name="remove"
                                         type="material-icons"
@@ -91,7 +97,10 @@ const ContactItem = ({ item, type }) => {
                                         containerStyle={[iconContainer, iconEmphasis]}
                                     />
                                 </TouchableOpacity>
-                            </TouchableWithoutFeedback>
+                            </TouchableWithoutFeedback> */}
+                            <ContactItemButton
+                                onPress={() => FirebaseService.cancelContactRequest(id)}
+                                icon={{ name: "remove", color: SWATCH.BLACK, container: [iconContainer, iconEmphasis] }} />
                         </View>
                     ) : null}
                 </View>
@@ -100,6 +109,20 @@ const ContactItem = ({ item, type }) => {
     }
     return null;
 };
+
+const ContactItemButton = (props) => (
+    <TouchableWithoutFeedback>
+        <TouchableOpacity onPress={props.onPress}>
+            <Icon
+                name={props.icon.name}
+                type="material-icons"
+                color={props.icon.color}
+                containerStyle={props.icon.container}
+            />
+        </TouchableOpacity>
+    </TouchableWithoutFeedback>
+)
+
 
 export default ContactItem;
 

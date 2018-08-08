@@ -307,6 +307,53 @@ const FirebaseService = {
 
         return { ...nameSearchResult, ...emailSearchResult };
     },
+
+    async acceptContactRequest(contact_id) {
+        try {
+            await firebase
+                .database()
+                .ref(`/pending_contacts/${firebase.auth().currentUser.uid}/${contact_id}`)
+                .set(false, async () => await firebase
+                    .database()
+                    .ref(`/contacts/${firebase.auth().currentUser.uid}/${contact_id}`)
+                    .set(true));
+        } catch (error) {
+            console.log("error accept request", error)
+        }
+    },
+
+    async rejectContactRequest(contact_id) {
+        try {
+            await firebase
+                .database()
+                .ref(`/pending_contacts/${firebase.auth().currentUser.uid}/${contact_id}`)
+                .set(false);
+        } catch (error) {
+            console.log("error reject request", error)
+        }
+    },
+
+    async addContactRequest(contact_id) {
+        try {
+            await firebase
+                .database()
+                .ref(`/pending_contacts/${contact_id}/${firebase.auth().currentUser.uid}`)
+                .set(true);
+        } catch (error) {
+            console.log("error reject request", error)
+        }
+    },
+
+    async cancelContactRequest(contact_id) {
+        try {
+            await firebase
+                .database()
+                .ref(`/pending_contacts/${contact_id}/${firebase.auth().currentUser.uid}`)
+                .set(false);
+        } catch (error) {
+            console.log("error reject request", error)
+        }
+    }
 };
 
 // const FirebaseService = new _FirebaseService();
