@@ -6,6 +6,7 @@ import { connect } from "react-redux";
 import ContactItem from "./ContactItem";
 import { SWATCH } from "../../constants";
 import { searchContact } from "../../actions";
+import { FirebaseService } from "../../services";
 
 class AddContact extends Component {
     constructor(props) {
@@ -15,6 +16,16 @@ class AddContact extends Component {
             searchString: "",
             // isLoading: this.props.loading,
         };
+    }
+
+    componentDidMount() {
+        FirebaseService.addContactsListener(this.handleRefresh);
+        FirebaseService.addPendingContactListener(this.handleRefresh);
+    }
+
+    componentWillUnmount() {
+        FirebaseService.removeContactsListener(this.handleRefresh);
+        FirebaseService.removePendingContactListener(this.handleRefresh);
     }
 
     componentDidUpdate() {
@@ -58,7 +69,13 @@ class AddContact extends Component {
                 </View>
                 <FlatList
                     // style={{backgroundColor:"red"}}
-                    renderItem={({ item }) => <ContactItem item={item} type={item.requested ? "Remove" : "Add"} />}
+                    renderItem={({ item }) => (
+                        <ContactItem
+                            item={item}
+                            type={item.requested ? "Cancel" : "Add"}
+                            extraButtonPress={this.handleRefresh}
+                        />
+                    )}
                     data={this.props.searchResult}
                     keyExtractor={(item) => `${item.id}`}
                     refreshing={this.props.loading}

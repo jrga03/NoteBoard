@@ -182,15 +182,16 @@ function* searchContact({ payload }) {
             yield put({ type: SEARCH_CONTACT_REQUEST });
             const result = yield call(FirebaseService.searchContact, payload.toLowerCase());
 
+            const { uid: currentUser } = FirebaseService.currentUser();
             const contacts = yield select(getContacts);
-            const pendingContacts = yield select(getPendingContacts);
+            const pendingContacts = yield call(FirebaseService.fetchContactRequests);
 
             const filteredAndEditedResult = Object.keys(result)
-                .filter((key) => !contacts.find((contact) => contact.id === key))
+                .filter((key) => !contacts.find((contact) => contact.id === key) && currentUser !== key)
                 .reduce((arr, key) => {
                     arr.push({
                         ...result[key],
-                        requested: !!pendingContacts.find((pendingContact) => pendingContact.id === key),
+                        requested: !!pendingContacts.find((pendingContact) => pendingContact === key),
                     });
                     return arr;
                 }, []);

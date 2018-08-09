@@ -2,6 +2,10 @@
 import firebase from "react-native-firebase";
 
 const FirebaseService = {
+    currentUser() {
+        return firebase.auth().currentUser;
+    },
+
     isUserLoggedIn(callback) {
         firebase.auth().onAuthStateChanged((data) => {
             const user = data ? data.toJSON() : null;
@@ -308,52 +312,76 @@ const FirebaseService = {
         return { ...nameSearchResult, ...emailSearchResult };
     },
 
+    async fetchContactRequests() {
+        try {
+            const contactRequests = await firebase
+                .database()
+                .ref("/pending_contacts")
+                .orderByChild(firebase.auth().currentUser.uid)
+                .equalTo(true)
+                .once("value");
+
+            return contactRequests.exists() ? Object.keys(contactRequests.toJSON()) : [];
+        } catch (error) {
+            console.log("error fetch contact request", error);
+        }
+    },
+
     async acceptContactRequest(contact_id) {
+        // console.log("ACCEPT");
         try {
             await firebase
                 .database()
                 .ref(`/pending_contacts/${firebase.auth().currentUser.uid}/${contact_id}`)
-                .set(false, async () => await firebase
-                    .database()
-                    .ref(`/contacts/${firebase.auth().currentUser.uid}/${contact_id}`)
-                    .set(true));
+                .set(false);
+            await firebase
+                .database()
+                .ref(`/contacts/${firebase.auth().currentUser.uid}/${contact_id}`)
+                .set(true);
+            await firebase
+                .database()
+                .ref(`/contacts/${contact_id}/${firebase.auth().currentUser.uid}`)
+                .set(true);
         } catch (error) {
-            console.log("error accept request", error)
+            console.log("error accept request", error);
         }
     },
 
     async rejectContactRequest(contact_id) {
+        // console.log("REJECT");
         try {
             await firebase
                 .database()
                 .ref(`/pending_contacts/${firebase.auth().currentUser.uid}/${contact_id}`)
                 .set(false);
         } catch (error) {
-            console.log("error reject request", error)
+            console.log("error reject request", error);
         }
     },
 
-    async addContactRequest(contact_id) {
+    async addContactRequest(contact_id, callback) {
+        // console.log("ADD");
         try {
             await firebase
                 .database()
                 .ref(`/pending_contacts/${contact_id}/${firebase.auth().currentUser.uid}`)
-                .set(true);
+                .set(true, callback(null, true));
         } catch (error) {
-            console.log("error reject request", error)
+            callback(error, null);
         }
     },
 
-    async cancelContactRequest(contact_id) {
+    async cancelContactRequest(contact_id, callback) {
+        // console.log("CANCEL");
         try {
             await firebase
                 .database()
                 .ref(`/pending_contacts/${contact_id}/${firebase.auth().currentUser.uid}`)
-                .set(false);
+                .set(false, callback(null, true));
         } catch (error) {
-            console.log("error reject request", error)
+            callback(error, null);
         }
-    }
+    },
 };
 
 // const FirebaseService = new _FirebaseService();

@@ -5,7 +5,7 @@ import { Icon, Avatar } from "react-native-elements";
 import { SWATCH } from "../../constants";
 import { FirebaseService } from "../../services/FirebaseService";
 
-const ContactItem = ({ item, type }) => {
+const ContactItem = ({ item, type, extraButtonPress }) => {
     if (!!item) {
         const { id, displayName, photoURL } = item;
 
@@ -20,6 +20,22 @@ const ContactItem = ({ item, type }) => {
             extraButtonsContainer,
         } = styles;
 
+        handleAddPress = () => {
+            FirebaseService.addContactRequest(id, (err, res) => {
+                if (!err && res) {
+                    extraButtonPress();
+                }
+            });
+        };
+
+        handleCancelPress = () => {
+            FirebaseService.cancelContactRequest(id, (err, res) => {
+                if (!err && res) {
+                    extraButtonPress();
+                }
+            });
+        };
+
         return (
             <TouchableOpacity onPress={() => null}>
                 <View style={container}>
@@ -31,8 +47,8 @@ const ContactItem = ({ item, type }) => {
                                 source={{ uri: photoURL }}
                             />
                         ) : (
-                                <Avatar medium rounded icon={{ name: "person" }} />
-                            )}
+                            <Avatar medium rounded icon={{ name: "person" }} />
+                        )}
                     </View>
                     <View style={fullNameContainer}>
                         <Text style={fullNameText} numberOfLines={1} ellipsizeMode="tail">
@@ -42,65 +58,29 @@ const ContactItem = ({ item, type }) => {
 
                     {type === "Request" ? (
                         <View style={extraButtonsContainer}>
-                            {/* <TouchableWithoutFeedback>
-                                <TouchableOpacity onPress={() => FirebaseService.rejectContactRequest(id)}>
-                                    <Icon
-                                        name="clear"
-                                        type="material-icons"
-                                        color={SWATCH.RED}
-                                        containerStyle={iconContainer}
-                                    />
-                                </TouchableOpacity>
-                            </TouchableWithoutFeedback> */}
                             <ContactItemButton
                                 onPress={() => FirebaseService.rejectContactRequest(id)}
-                                icon={{ name: "clear", color: SWATCH.RED, container: iconContainer }} />
+                                icon={{ name: "clear", color: SWATCH.RED, container: iconContainer }}
+                            />
 
-                            {/* <TouchableWithoutFeedback>
-                                <TouchableOpacity onPress={() => FirebaseService.acceptContactRequest(id)}>
-                                    <Icon
-                                        name="check"
-                                        type="material-icons"
-                                        color={SWATCH.GREEN}
-                                        containerStyle={[iconContainer, iconEmphasis]}
-                                    />
-                                </TouchableOpacity>
-                            </TouchableWithoutFeedback> */}
                             <ContactItemButton
                                 onPress={() => FirebaseService.acceptContactRequest(id)}
-                                icon={{ name: "check", color: SWATCH.GREEN, container: [iconContainer, iconEmphasis] }} />
+                                icon={{ name: "check", color: SWATCH.GREEN, container: [iconContainer, iconEmphasis] }}
+                            />
                         </View>
                     ) : type === "Add" ? (
                         <View style={extraButtonsContainer}>
-                            {/* <TouchableWithoutFeedback>
-                                <TouchableOpacity onPress={() => FirebaseService.addContactRequest(id)}>
-                                    <Icon
-                                        name="add"
-                                        type="material-icons"
-                                        color={SWATCH.BLACK}
-                                        containerStyle={[iconContainer, iconEmphasis]}
-                                    />
-                                </TouchableOpacity>
-                            </TouchableWithoutFeedback> */}
                             <ContactItemButton
-                                onPress={() => FirebaseService.addContactRequest(id)}
-                                icon={{ name: "add", color: SWATCH.BLACK, container: [iconContainer, iconEmphasis] }} />
+                                onPress={handleAddPress}
+                                icon={{ name: "add", color: SWATCH.BLACK, container: [iconContainer, iconEmphasis] }}
+                            />
                         </View>
-                    ) : type === "Remove" ? (
+                    ) : type === "Cancel" ? (
                         <View style={extraButtonsContainer}>
-                            {/* <TouchableWithoutFeedback>
-                                <TouchableOpacity onPress={() => FirebaseService.cancelContactRequest(id)}>
-                                    <Icon
-                                        name="remove"
-                                        type="material-icons"
-                                        color={SWATCH.BLACK}
-                                        containerStyle={[iconContainer, iconEmphasis]}
-                                    />
-                                </TouchableOpacity>
-                            </TouchableWithoutFeedback> */}
                             <ContactItemButton
-                                onPress={() => FirebaseService.cancelContactRequest(id)}
-                                icon={{ name: "remove", color: SWATCH.BLACK, container: [iconContainer, iconEmphasis] }} />
+                                onPress={handleCancelPress}
+                                icon={{ name: "remove", color: SWATCH.BLACK, container: [iconContainer, iconEmphasis] }}
+                            />
                         </View>
                     ) : null}
                 </View>
@@ -121,8 +101,7 @@ const ContactItemButton = (props) => (
             />
         </TouchableOpacity>
     </TouchableWithoutFeedback>
-)
-
+);
 
 export default ContactItem;
 
