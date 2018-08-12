@@ -1,11 +1,18 @@
 import React from "react";
-import { View, Text, Image, TouchableOpacity, TouchableWithoutFeedback, StyleSheet } from "react-native";
+import {
+    View,
+    Text,
+    Image,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    StyleSheet,
+} from "react-native";
 import { Icon, Avatar } from "react-native-elements";
 
 import { SWATCH } from "../../constants";
 import { FirebaseService } from "../../services/FirebaseService";
 
-const ContactItem = ({ item, type, extraButtonPress }) => {
+const ContactItem = ({ item, type, extraButtonPress, onSelectContact }) => {
     if (!!item) {
         const { id, displayName, photoURL } = item;
 
@@ -36,8 +43,12 @@ const ContactItem = ({ item, type, extraButtonPress }) => {
             });
         };
 
+        selectContact = () => {
+            onSelectContact(item);
+        };
+
         return (
-            <TouchableOpacity onPress={() => null}>
+            <TouchableOpacity onPress={selectContact}>
                 <View style={container}>
                     <View style={imageContainer}>
                         {!!photoURL ? (
@@ -51,7 +62,10 @@ const ContactItem = ({ item, type, extraButtonPress }) => {
                         )}
                     </View>
                     <View style={fullNameContainer}>
-                        <Text style={fullNameText} numberOfLines={1} ellipsizeMode="tail">
+                        <Text
+                            style={fullNameText}
+                            numberOfLines={1}
+                            ellipsizeMode="tail">
                             {displayName}
                         </Text>
                     </View>
@@ -59,27 +73,47 @@ const ContactItem = ({ item, type, extraButtonPress }) => {
                     {type === "Request" ? (
                         <View style={extraButtonsContainer}>
                             <ContactItemButton
-                                onPress={() => FirebaseService.rejectContactRequest(id)}
-                                icon={{ name: "clear", color: SWATCH.RED, container: iconContainer }}
+                                onPress={() =>
+                                    FirebaseService.rejectContactRequest(id)
+                                }
+                                icon={{
+                                    name: "clear",
+                                    color: SWATCH.RED,
+                                    container: iconContainer,
+                                }}
                             />
 
                             <ContactItemButton
-                                onPress={() => FirebaseService.acceptContactRequest(id)}
-                                icon={{ name: "check", color: SWATCH.GREEN, container: [iconContainer, iconEmphasis] }}
+                                onPress={() =>
+                                    FirebaseService.acceptContactRequest(id)
+                                }
+                                icon={{
+                                    name: "check",
+                                    color: SWATCH.GREEN,
+                                    container: [iconContainer, iconEmphasis],
+                                }}
                             />
                         </View>
                     ) : type === "Add" ? (
                         <View style={extraButtonsContainer}>
                             <ContactItemButton
                                 onPress={handleAddPress}
-                                icon={{ name: "add", color: SWATCH.BLACK, container: [iconContainer, iconEmphasis] }}
+                                icon={{
+                                    name: "add",
+                                    color: SWATCH.BLACK,
+                                    container: [iconContainer, iconEmphasis],
+                                }}
                             />
                         </View>
                     ) : type === "Cancel" ? (
                         <View style={extraButtonsContainer}>
                             <ContactItemButton
                                 onPress={handleCancelPress}
-                                icon={{ name: "remove", color: SWATCH.BLACK, container: [iconContainer, iconEmphasis] }}
+                                icon={{
+                                    name: "remove",
+                                    color: SWATCH.BLACK,
+                                    container: [iconContainer, iconEmphasis],
+                                }}
                             />
                         </View>
                     ) : null}

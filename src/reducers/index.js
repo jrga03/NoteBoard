@@ -6,6 +6,7 @@ import ContactList from "./contacts_reducer";
 import PendingContactList from "./pending_contact_reducer";
 import Loading from "./loading_reducer";
 import SearchContactList from "./search_contact_reducer";
+import SelectedContact from "./selected_contact_reducer";
 
 const rootReducer = combineReducers({
     user: User,
@@ -15,6 +16,7 @@ const rootReducer = combineReducers({
     pendingContactList: PendingContactList,
     loading: Loading,
     searchContactList: SearchContactList,
+    selectedContact: SelectedContact,
 });
 
 export default rootReducer;

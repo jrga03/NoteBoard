@@ -21,6 +21,9 @@ import {
     SEARCH_CONTACT,
     UPDATE_CONTACT_LIST_SUCCESS,
     UPDATE_PENDING_CONTACT_LIST_SUCCESS,
+    CLEAR_SELECTED_NOTE,
+    SELECT_CONTACT,
+    CLEAR_SELECTED_CONTACT,
 } from "./constants";
 
 export function loginFlowStart() {
@@ -126,6 +129,12 @@ export function updateSelectedNote(note) {
     };
 }
 
+export function clearSelectedNote() {
+    return {
+        type: CLEAR_SELECTED_NOTE,
+    };
+}
+
 export function fetchContactList() {
     return {
         type: UPDATE_CONTACT_LIST,
@@ -156,5 +165,18 @@ export function searchContact(searchString) {
     return {
         type: SEARCH_CONTACT,
         payload: searchString,
+    };
+}
+
+export function selectContact(contact) {
+    return {
+        type: SELECT_CONTACT,
+        payload: contact,
+    };
+}
+
+export function clearSelectedContact() {
+    return {
+        type: CLEAR_SELECTED_CONTACT,
     };
 }

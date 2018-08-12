@@ -23,6 +23,7 @@ import NoteItemScreen from "../screens/notes/NoteItem";
 import SignUpScreen from "../screens/signup/SignUp";
 import ContactsScreen from "../screens/contacts/Contacts";
 import AddContactScreen from "../screens/contacts/AddContact";
+import ContactProfile from "../screens/contacts/ContactProfile";
 
 const generateIcon = (type, name, color = SWATCH.BLACK, size = 27) => {
     return <Icon name={name} type={type} color={color} size={size} />;
@@ -30,7 +31,8 @@ const generateIcon = (type, name, color = SWATCH.BLACK, size = 27) => {
 
 const commonNavigationOptions = (navigation, screenProps, ...props) => ({
     headerLeft: (
-        <TouchableOpacity onPress={() => navigation.toggleDrawer({ key: "Main" })}>
+        <TouchableOpacity
+            onPress={() => navigation.toggleDrawer({ key: "Main" })}>
             {generateIcon("material-icons", "menu")}
         </TouchableOpacity>
     ),
@@ -63,19 +65,29 @@ const noteHomeNavigationOptions = (navigation, screenProps, ...props) => {
 
     return {
         headerLeft: (
-            <TouchableOpacity onPress={() => navigation.toggleDrawer({ key: "Main" })}>
+            <TouchableOpacity
+                onPress={() => navigation.toggleDrawer({ key: "Main" })}>
                 {generateIcon("material-icons", "menu")}
             </TouchableOpacity>
         ),
         headerRight: (
             <View style={{ flexDirection: "row" }}>
-                <TouchableOpacity style={{ paddingHorizontal: 10 }} onPress={() => null}>
+                <TouchableOpacity
+                    style={{ paddingHorizontal: 10 }}
+                    onPress={() => null}>
                     {generateIcon("material-icons", "search")}
                 </TouchableOpacity>
-                <TouchableOpacity style={{ paddingHorizontal: 10 }} onPress={toggleLayout}>
-                    {generateIcon("material-icons", layout === "tile" ? "view-quilt" : "view-stream")}
+                <TouchableOpacity
+                    style={{ paddingHorizontal: 10 }}
+                    onPress={toggleLayout}>
+                    {generateIcon(
+                        "material-icons",
+                        layout === "tile" ? "view-quilt" : "view-stream"
+                    )}
                 </TouchableOpacity>
-                <TouchableOpacity style={{ paddingLeft: 10 }} onPress={() => navigation.navigate("Notifications")}>
+                <TouchableOpacity
+                    style={{ paddingLeft: 10 }}
+                    onPress={() => navigation.navigate("Notifications")}>
                     {generateIcon("material-icons", "notifications")}
                 </TouchableOpacity>
             </View>
@@ -109,13 +121,19 @@ const noteItemNavigationOptions = (navigation, screenProps, ...props) => {
     return {
         headerRight: (
             <View style={{ flexDirection: "row" }}>
-                <TouchableOpacity style={{ paddingHorizontal: 10 }} onPress={handlePinOnPress}>
+                <TouchableOpacity
+                    style={{ paddingHorizontal: 10 }}
+                    onPress={handlePinOnPress}>
                     {generateIcon("material-community", "pin", pinColor)}
                 </TouchableOpacity>
-                <TouchableOpacity style={{ paddingHorizontal: 10 }} onPress={() => null}>
+                <TouchableOpacity
+                    style={{ paddingHorizontal: 10 }}
+                    onPress={() => null}>
                     {generateIcon("material-icons", "event-note")}
                 </TouchableOpacity>
-                <TouchableOpacity style={{ paddingLeft: 10 }} onPress={() => null}>
+                <TouchableOpacity
+                    style={{ paddingLeft: 10 }}
+                    onPress={() => null}>
                     {generateIcon("material-icons", "archive")}
                 </TouchableOpacity>
             </View>
@@ -175,14 +193,28 @@ const ContactsTab = createMaterialTopTabNavigator({
 
 const ContactsStack = createStackNavigator(
     {
-        ContactsTab,
+        ContactsTab: {
+            screen: ContactsTab,
+            navigationOptions: ({ navigation, screenProps }) => ({
+                title: "Contacts".toUpperCase(),
+                ...commonNavigationOptions(navigation, screenProps),
+            }),
+        },
+        ContactProfile: {
+            screen: ContactProfile,
+            navigationOptions: {
+                headerStyle: {
+                    backgroundColor: SWATCH.GRAY,
+                    height: 50,
+                    paddingHorizontal: 10,
+                },
+                headerTintColor: SWATCH.BLACK,
+            },
+        },
     },
     {
         initialRouteName: "ContactsTab",
-        navigationOptions: ({ navigation, screenProps }) => ({
-            title: "Contacts".toUpperCase(),
-            ...commonNavigationOptions(navigation, screenProps),
-        }),
+        headerBackTitleVisible: true,
     }
 );
 
