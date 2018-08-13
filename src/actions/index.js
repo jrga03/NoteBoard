@@ -168,10 +168,13 @@ export function searchContact(searchString) {
     };
 }
 
-export function selectContact(contact) {
+export function selectContact(contact, type) {
     return {
         type: SELECT_CONTACT,
-        payload: contact,
+        payload: {
+            ...contact,
+            type,
+        },
     };
 }
 

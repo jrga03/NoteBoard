@@ -214,7 +214,7 @@ const ContactsStack = createStackNavigator(
     },
     {
         initialRouteName: "ContactsTab",
-        headerBackTitleVisible: true,
+        // headerBackTitleVisible: true,
     }
 );
 
@@ -254,6 +254,7 @@ const MainDrawer = createDrawerNavigator(
     },
     {
         initialRouteName: "NotesStack",
+        // initialRouteName: "ContactsStack",
         // headerMode: "none",
         backBehavior: "initialRoute",
         // getCustomActionCreators: (route, stateKey) => {

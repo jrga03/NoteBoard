@@ -41,12 +41,7 @@ class AddContact extends Component {
     handleRefresh = () => this.props.searchContact(this.state.searchString);
 
     render() {
-        const {
-            container,
-            searchContainer,
-            searchField,
-            iconContainer,
-        } = styles;
+        const { container, searchContainer, searchField, iconContainer } = styles;
         return (
             <View style={container}>
                 <View style={searchContainer}>
@@ -62,11 +57,7 @@ class AddContact extends Component {
                         autoFocus={false}
                         returnKeyType="search"
                         blurOnSubmit={false}
-                        onSubmitEditing={
-                            this.state.searchString === ""
-                                ? null
-                                : this.handleRefresh
-                        }
+                        onSubmitEditing={this.state.searchString === "" ? null : this.handleRefresh}
                     />
                     {this.state.searchString !== "" && (
                         <Icon
@@ -93,12 +84,7 @@ class AddContact extends Component {
                     refreshing={this.props.loading}
                     onRefresh={this.handleRefresh}
                     ItemSeparatorComponent={({ leadingItem }) =>
-                        leadingItem ? (
-                            <View
-                                backgroundColor={SWATCH.LIGHT_GRAY}
-                                height={0.5}
-                            />
-                        ) : null
+                        leadingItem ? <View backgroundColor={SWATCH.LIGHT_GRAY} height={0.5} /> : null
                     }
                 />
                 {/* <ContactItem /> */}

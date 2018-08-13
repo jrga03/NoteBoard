@@ -81,20 +81,14 @@ class Contacts extends Component {
         FirebaseService.fetchPendingContacts(this.fetchPendingContacts);
     }
 
-    handleSelectContact = (contact) => {
-        // console.log(contact)
-        this.props.selectContact(contact);
+    handleSelectContact = (contact, type) => {
+        // console.log(contact, type);
+        this.props.selectContact(contact, type);
         this.props.navigation.navigate("ContactProfile");
     };
 
     render() {
-        const {
-            container,
-            listContainer,
-            emptyListContainer,
-            sectionTitleText,
-            sectionSeparator,
-        } = styles;
+        const { container, listContainer, emptyListContainer, sectionTitleText, sectionSeparator } = styles;
         return (
             <SectionList
                 style={container}
@@ -107,9 +101,7 @@ class Contacts extends Component {
                     />
                 )}
                 renderSectionHeader={({ section: { title, data } }) =>
-                    title === "Requests" && data.length > 0 ? (
-                        <Text style={sectionTitleText}>{title}</Text>
-                    ) : null
+                    title === "Requests" && data.length > 0 ? <Text style={sectionTitleText}>{title}</Text> : null
                 }
                 sections={[
                     { title: "Requests", data: this.props.pendingContacts },
@@ -119,17 +111,10 @@ class Contacts extends Component {
                 refreshing={this.props.isLoading}
                 onRefresh={this.handleRefresh}
                 SectionSeparatorComponent={({ trailingSection, leadingItem }) =>
-                    trailingSection && leadingItem ? (
-                        <View style={sectionSeparator} />
-                    ) : null
+                    trailingSection && leadingItem ? <View style={sectionSeparator} /> : null
                 }
                 ItemSeparatorComponent={({ leadingItem }) =>
-                    leadingItem ? (
-                        <View
-                            backgroundColor={SWATCH.LIGHT_GRAY}
-                            height={0.5}
-                        />
-                    ) : null
+                    leadingItem ? <View backgroundColor={SWATCH.LIGHT_GRAY} height={0.5} /> : null
                 }
                 renderSectionFooter={({ section: { title, data } }) =>
                     // !isLoading &&
@@ -154,16 +139,15 @@ mapStateToProps = (state) => ({
     contacts: state.contactList,
     pendingContacts: state.pendingContactList,
     isLoading: state.loading,
-    selectedContact: state.selectedContact
+    selectedContact: state.selectedContact,
 });
 
 mapDispatchToProps = (dispatch) => ({
     fetchContactList: () => dispatch(fetchContactList()),
     fetchPendingContactList: () => dispatch(fetchPendingContactList()),
     updateContactList: (contacts) => dispatch(updateContactList(contacts)),
-    updatePendingContactList: (contacts) =>
-        dispatch(updatePendingContactList(contacts)),
-    selectContact: (contact) => dispatch(selectContact(contact)),
+    updatePendingContactList: (contacts) => dispatch(updatePendingContactList(contacts)),
+    selectContact: (contact, type) => dispatch(selectContact(contact, type)),
 });
 
 export default connect(

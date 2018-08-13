@@ -1,12 +1,5 @@
 import React from "react";
-import {
-    View,
-    Text,
-    Image,
-    TouchableOpacity,
-    TouchableWithoutFeedback,
-    StyleSheet,
-} from "react-native";
+import { View, Text, Image, TouchableOpacity, TouchableWithoutFeedback, StyleSheet } from "react-native";
 import { Icon, Avatar } from "react-native-elements";
 
 import { SWATCH } from "../../constants";
@@ -44,7 +37,7 @@ const ContactItem = ({ item, type, extraButtonPress, onSelectContact }) => {
         };
 
         selectContact = () => {
-            onSelectContact(item);
+            onSelectContact(item, type);
         };
 
         return (
@@ -52,20 +45,18 @@ const ContactItem = ({ item, type, extraButtonPress, onSelectContact }) => {
                 <View style={container}>
                     <View style={imageContainer}>
                         {!!photoURL ? (
-                            <Image
-                                style={imageContent}
-                                // resizeMode="center"
-                                source={{ uri: photoURL }}
-                            />
+                            // <Image
+                            //     style={imageContent}
+                            //     // resizeMode="center"
+                            //     source={{ uri: photoURL }}
+                            // />
+                            <Avatar medium rounded source={{ uri: photoURL }} />
                         ) : (
                             <Avatar medium rounded icon={{ name: "person" }} />
                         )}
                     </View>
                     <View style={fullNameContainer}>
-                        <Text
-                            style={fullNameText}
-                            numberOfLines={1}
-                            ellipsizeMode="tail">
+                        <Text style={fullNameText} numberOfLines={1} ellipsizeMode="tail">
                             {displayName}
                         </Text>
                     </View>
@@ -73,9 +64,7 @@ const ContactItem = ({ item, type, extraButtonPress, onSelectContact }) => {
                     {type === "Request" ? (
                         <View style={extraButtonsContainer}>
                             <ContactItemButton
-                                onPress={() =>
-                                    FirebaseService.rejectContactRequest(id)
-                                }
+                                onPress={() => FirebaseService.rejectContactRequest(id)}
                                 icon={{
                                     name: "clear",
                                     color: SWATCH.RED,
@@ -84,9 +73,7 @@ const ContactItem = ({ item, type, extraButtonPress, onSelectContact }) => {
                             />
 
                             <ContactItemButton
-                                onPress={() =>
-                                    FirebaseService.acceptContactRequest(id)
-                                }
+                                onPress={() => FirebaseService.acceptContactRequest(id)}
                                 icon={{
                                     name: "check",
                                     color: SWATCH.GREEN,
