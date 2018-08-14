@@ -382,6 +382,22 @@ const FirebaseService = {
             callback(error, null);
         }
     },
+
+    async deleteContact(contact_id) {
+        // console.log("CANCEL");
+        try {
+            await firebase
+                .database()
+                .ref(`/contacts/${firebase.auth().currentUser.uid}/${contact_id}`)
+                .set(false);
+            await firebase
+                .database()
+                .ref(`/contacts/${contact_id}/${firebase.auth().currentUser.uid}`)
+                .set(false);
+        } catch (error) {
+            console.log("error deleting contact", error);
+        }
+    },
 };
 
 // const FirebaseService = new _FirebaseService();

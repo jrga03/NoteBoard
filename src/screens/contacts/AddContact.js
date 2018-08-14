@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 
 import ContactItem from "./ContactItem";
 import { SWATCH } from "../../constants";
-import { searchContact } from "../../actions";
+import { searchContact, selectContact } from "../../actions";
 import { FirebaseService } from "../../services";
 
 class AddContact extends Component {
@@ -36,6 +36,12 @@ class AddContact extends Component {
         this.setState({ searchString }, () => {
             this.props.searchContact(this.state.searchString);
         });
+    };
+
+    handleSelectContact = (contact, type) => {
+        // console.log(contact, type);
+        this.props.selectContact(contact, type);
+        this.props.navigation.navigate("ContactProfile", { onAddOrCancelPress: this.handleRefresh.bind(this) });
     };
 
     handleRefresh = () => this.props.searchContact(this.state.searchString);
@@ -76,7 +82,7 @@ class AddContact extends Component {
                             item={item}
                             type={item.requested ? "Cancel" : "Add"}
                             extraButtonPress={this.handleRefresh}
-                            onSelectContact={() => null}
+                            onSelectContact={this.handleSelectContact}
                         />
                     )}
                     data={this.props.searchResult}
@@ -101,6 +107,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
     searchContact: (searchString) => dispatch(searchContact(searchString)),
+    selectContact: (contact, type) => dispatch(selectContact(contact, type)),
 });
 
 export default connect(
