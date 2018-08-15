@@ -139,7 +139,7 @@ mapStateToProps = (state) => ({
     contacts: state.contactList,
     pendingContacts: state.pendingContactList,
     isLoading: state.loading,
-    selectedContact: state.selectedContact,
+    // selectedContact: state.selectedContact,
 });
 
 mapDispatchToProps = (dispatch) => ({

@@ -1,13 +1,13 @@
 import React, { Component } from "react";
-import { View, Text, TextInput, StyleSheet, FlatList, TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, TextInput, StyleSheet, FlatList, TouchableOpacity, ScrollView, Platform } from "react-native";
 import { Icon } from "react-native-elements";
 import Moment from "moment";
 import { connect } from "react-redux";
 
 import { SWATCH, LAYOUT_MARGIN } from "../../constants";
 import {
-    editNoteTitle,
-    editNoteContent,
+    // editNoteTitle,
+    // editNoteContent,
     editNoteItem,
     deleteNote,
     togglePin,
@@ -300,9 +300,13 @@ class NoteItem extends Component {
                 break;
             case "gallery":
                 break;
+            case "location":
+                this.props.navigation.navigate("NoteMap");
+                break;
             case "checkbox":
                 break;
             case "collaborator":
+                break;
         }
     };
 
@@ -333,9 +337,16 @@ class NoteItem extends Component {
                 value={item.content}
                 underlineColorAndroid="transparent"
                 multiline={true}
+                returnKeyType={Platform.OS === "ios" ? "default" : "next"}
                 onChangeText={onChangeText}
                 autoCorrect={false}
                 autoFocus={this.state.index === null ? true : false}
+                onFocus={() =>
+                    this.setState({
+                        footerMenu: [],
+                        footerMenuSelected: null,
+                    })
+                }
                 onKeyPress={onAddOrDeleteLine}
                 onSelectionChange={onSelectionChange}
                 ref={(ref) => (this.inputs[`content_${item.cId}`] = ref)}
@@ -381,12 +392,19 @@ class NoteItem extends Component {
                     value={item.content}
                     underlineColorAndroid="transparent"
                     multiline={true}
+                    returnKeyType={Platform.OS === "ios" ? "default" : "next"}
                     onChangeText={selection.start === 0 && selection.end === 0 ? null : onChangeText}
                     // onChange={(e) => e.nativeEvent.text.indexOf("\n") > -1 ? e.preventDefault : null}
                     blurOnSubmit={true}
                     // onBlur={() => console.log("this", this)}
                     autoCorrect={false}
                     autoFocus={this.state.index === null ? true : false}
+                    onFocus={() =>
+                        this.setState({
+                            footerMenu: [],
+                            footerMenuSelected: null,
+                        })
+                    }
                     onKeyPress={onAddOrDeleteLine}
                     onSelectionChange={onSelectionChange}
                     ref={(ref) => (this.inputs[`content_${item.cId}`] = ref)}
@@ -670,6 +688,14 @@ const noteItemMenuItems = {
             onPress: "gallery",
         },
         {
+            text: "Tag Location",
+            icon: {
+                type: "material-icons",
+                name: "pin-drop",
+            },
+            onPress: "location",
+        },
+        {
             text: "Checkboxes",
             icon: {
                 type: "material-icons",
@@ -694,6 +720,14 @@ const noteItemMenuItems = {
                 name: "insert-photo",
             },
             onPress: "gallery",
+        },
+        {
+            text: "Tag Location",
+            icon: {
+                type: "material-icons",
+                name: "pin-drop",
+            },
+            onPress: "location",
         },
     ],
     more: [
