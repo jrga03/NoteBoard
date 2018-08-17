@@ -19,11 +19,9 @@
 #include <folly/portability/Sockets.h>
 #include <sys/types.h>
 
-#if !defined(FOLLY_ALLOW_TFO)
-#if defined(__linux__) || defined(__APPLE__)
+#if !defined(FOLLY_ALLOW_TFO) && defined(__linux__) && !defined(__ANDROID__)
 // only allow for linux right now
 #define FOLLY_ALLOW_TFO 1
-#endif
 #endif
 
 namespace folly {

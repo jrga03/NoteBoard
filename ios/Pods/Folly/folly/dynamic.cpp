@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-#include <folly/Hash.h>
 #include <folly/dynamic.h>
-#include <folly/portability/BitsFunctexcept.h>
+#include <folly/Hash.h>
 
 namespace folly {
 
@@ -224,7 +223,7 @@ dynamic const& dynamic::at(dynamic const& idx) const& {
       throw TypeError("int64", idx.type());
     }
     if (idx < 0 || idx >= parray->size()) {
-      std::__throw_out_of_range("out of range in dynamic array");
+      throw std::out_of_range("out of range in dynamic array");
     }
     return (*parray)[idx.asInt()];
   } else if (auto* pobject = get_nothrow<ObjectImpl>()) {

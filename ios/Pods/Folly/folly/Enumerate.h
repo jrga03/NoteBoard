@@ -60,18 +60,6 @@ struct MakeConst<T*> {
   using type = const T*;
 };
 
-// Raw pointers don't have an operator->() member function, so the
-// second overload will be SFINAEd out in that case. Otherwise, the
-// second is preferred in the partial order for getPointer(_, 0).
-template <class Iterator>
-auto getPointer(const Iterator& it, long) -> decltype(std::addressof(*it)) {
-  return std::addressof(*it);
-}
-template <class Iterator>
-auto getPointer(const Iterator& it, int) -> decltype(it.operator->()) {
-  return it.operator->();
-}
-
 template <class Iterator>
 class Enumerator {
  public:
@@ -92,7 +80,7 @@ class Enumerator {
       return *it_;
     }
     pointer operator->() {
-      return getPointer(it_, 0);
+      return std::addressof(**this);
     }
 
     // Const Proxy: Force const references.
@@ -100,7 +88,7 @@ class Enumerator {
       return *it_;
     }
     typename MakeConst<pointer>::type operator->() const {
-      return getPointer(it_, 0);
+      return std::addressof(**this);
     }
 
    private:

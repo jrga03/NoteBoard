@@ -20,7 +20,6 @@
 #include <exception>
 #include <stdarg.h>
 #include <string>
-#include <vector>
 #include <boost/type_traits.hpp>
 #include <boost/regex/pending/unicode_iterator.hpp>
 

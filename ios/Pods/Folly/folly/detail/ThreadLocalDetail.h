@@ -254,7 +254,7 @@ struct StaticMetaBase {
     }
   };
 
-  StaticMetaBase(ThreadEntry* (*threadEntry)(), bool strict);
+  explicit StaticMetaBase(ThreadEntry* (*threadEntry)());
 
   ~StaticMetaBase() {
     LOG(FATAL) << "StaticMeta lives forever!";
@@ -296,11 +296,9 @@ struct StaticMetaBase {
   uint32_t nextId_;
   std::vector<uint32_t> freeIds_;
   std::mutex lock_;
-  SharedMutex accessAllThreadsLock_;
   pthread_key_t pthreadKey_;
   ThreadEntry head_;
   ThreadEntry* (*threadEntry_)();
-  bool strict_;
 };
 
 // Held in a singleton to track our global instances.
@@ -310,23 +308,19 @@ struct StaticMetaBase {
 // Creating and destroying ThreadLocalPtr objects, as well as thread exit
 // for threads that use ThreadLocalPtr objects collide on a lock inside
 // StaticMeta; you can specify multiple Tag types to break that lock.
-template <class Tag, class AccessMode>
+template <class Tag>
 struct StaticMeta : StaticMetaBase {
-  StaticMeta()
-      : StaticMetaBase(
-            &StaticMeta::getThreadEntrySlow,
-            std::is_same<AccessMode, AccessModeStrict>::value) {
+  StaticMeta() : StaticMetaBase(&StaticMeta::getThreadEntrySlow) {
     registerAtFork(
         /*prepare*/ &StaticMeta::preFork,
         /*parent*/ &StaticMeta::onForkParent,
         /*child*/ &StaticMeta::onForkChild);
   }
 
-  static StaticMeta<Tag, AccessMode>& instance() {
+  static StaticMeta<Tag>& instance() {
     // Leak it on exit, there's only one per process and we don't have to
     // worry about synchronization with exiting threads.
-    /* library-local */ static auto instance =
-        detail::createGlobal<StaticMeta<Tag, AccessMode>, void>();
+    static auto instance = detail::createGlobal<StaticMeta<Tag>, void>();
     return *instance;
   }
 

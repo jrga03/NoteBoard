@@ -1,1 +1,1 @@
-../../../../glog/src/glog/log_severity.h
+../../../../GLog/src/glog/log_severity.h

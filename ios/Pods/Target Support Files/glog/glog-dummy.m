@@ -1,5 +1,5 @@
 #import <Foundation/Foundation.h>
-@interface PodsDummy_glog : NSObject
+@interface PodsDummy_GLog : NSObject
 @end
-@implementation PodsDummy_glog
+@implementation PodsDummy_GLog
 @end

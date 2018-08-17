@@ -67,6 +67,17 @@ typedef int detail::NoneHelper::*None;
 
 const None none = nullptr;
 
+/**
+ * gcc-4.7 warns about use of uninitialized memory around the use of storage_
+ * even though this is explicitly initialized at each point.
+ */
+#if defined(__GNUC__) && !defined(__clang__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wuninitialized"
+# pragma GCC diagnostic ignored "-Wpragmas"
+# pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif // __GNUC__
+
 class OptionalEmptyException : public std::runtime_error {
  public:
   OptionalEmptyException()
@@ -262,18 +273,9 @@ class Optional {
   }
 
   struct StorageTriviallyDestructible {
-    // The union trick allows to initialize the Optional's memory,
-    // so that compiler/tools don't complain about unitialized memory,
-    // without actually calling Value's default constructor.
-    // The rest of the implementation enforces that hasValue/value are
-    // synchronized.
-    union {
-      bool hasValue;
-      struct {
-        bool paddingForHasValue_[1];
-        Value value;
-      };
-    };
+    // uninitialized
+    union { Value value; };
+    bool hasValue;
 
     StorageTriviallyDestructible() : hasValue{false} {}
 
@@ -283,16 +285,12 @@ class Optional {
   };
 
   struct StorageNonTriviallyDestructible {
-    // See StorageTriviallyDestructible's union
-    union {
-      bool hasValue;
-      struct {
-        bool paddingForHasValue_[1];
-        Value value;
-      };
-    };
+    // uninitialized
+    union { Value value; };
+    bool hasValue;
 
     StorageNonTriviallyDestructible() : hasValue{false} {}
+
     ~StorageNonTriviallyDestructible() {
       clear();
     }
@@ -312,6 +310,10 @@ class Optional {
 
   Storage storage_;
 };
+
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
 
 template<class T>
 const T* get_pointer(const Optional<T>& opt) {

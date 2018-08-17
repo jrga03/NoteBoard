@@ -47,7 +47,6 @@
 #include <folly/Malloc.h>
 #include <folly/Portability.h>
 #include <folly/SmallLocks.h>
-#include <folly/portability/BitsFunctexcept.h>
 #include <folly/portability/Constexpr.h>
 #include <folly/portability/Malloc.h>
 #include <folly/portability/TypeTraits.h>
@@ -782,14 +781,14 @@ class small_vector
 
   reference at(size_type i) {
     if (i >= size()) {
-      std::__throw_out_of_range("index out of range");
+      throw std::out_of_range("index out of range");
     }
     return (*this)[i];
   }
 
   const_reference at(size_type i) const {
     if (i >= size()) {
-      std::__throw_out_of_range("index out of range");
+      throw std::out_of_range("index out of range");
     }
     return (*this)[i];
   }

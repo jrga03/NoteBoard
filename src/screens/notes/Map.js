@@ -79,7 +79,7 @@ export default class NoteMap extends Component {
                     latitudeDelta: this.state.latitudeDelta,
                     longitudeDelta: this.state.longitudeDelta,
                 }}
-                provider={null}
+                provider={PROVIDER_GOOGLE}
                 showsTraffic={false}
                 showsUserLocation={true}
                 followsUserLocation={true}

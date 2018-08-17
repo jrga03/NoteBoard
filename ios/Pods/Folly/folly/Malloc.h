@@ -111,7 +111,6 @@ __attribute__((__weak__));
 #include <cstdlib>
 #include <cstring>
 
-#include <atomic>
 #include <new>
 
 #ifdef _LIBSTDCXX_FBSTRING
@@ -122,25 +121,17 @@ namespace folly {
 #endif
 
 // Cannot depend on Portability.h when _LIBSTDCXX_FBSTRING.
-#if defined(__GNUC__)
+// Disabled for nvcc because it fails on attributes on lambdas.
+#if defined(__GNUC__) && !defined(__NVCC__)
 #define FOLLY_MALLOC_NOINLINE __attribute__((__noinline__))
-#if (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL) >= 40900
-// This is for checked malloc-like functions (returns non-null pointer
-// which cannot alias any outstanding pointer).
-#define FOLLY_MALLOC_CHECKED_MALLOC                     \
-  __attribute__((__returns_nonnull__, __malloc__))
-#else
-#define FOLLY_MALLOC_CHECKED_MALLOC __attribute__((__malloc__))
-#endif
 #else
 #define FOLLY_MALLOC_NOINLINE
-#define FOLLY_MALLOC_CHECKED_MALLOC
 #endif
 
 /**
  * Determine if we are using jemalloc or not.
  */
-FOLLY_MALLOC_NOINLINE inline bool usingJEMalloc() noexcept {
+inline bool usingJEMalloc() noexcept {
   // Checking for rallocx != NULL is not sufficient; we may be in a dlopen()ed
   // module that depends on libjemalloc, so rallocx is resolved, but the main
   // program might be using a different memory allocator.
@@ -149,7 +140,7 @@ FOLLY_MALLOC_NOINLINE inline bool usingJEMalloc() noexcept {
   // per-thread counter of allocated memory increases. This makes me
   // feel dirty inside. Also note that this requires jemalloc to have
   // been compiled with --enable-stats.
-  static const bool result = [] () noexcept {
+  static const bool result = [] () FOLLY_MALLOC_NOINLINE noexcept {
     // Some platforms (*cough* OSX *cough*) require weak symbol checks to be
     // in the form if (mallctl != nullptr). Not if (mallctl) or if (!mallctl)
     // (!!). http://goo.gl/xpmctm
@@ -179,7 +170,7 @@ FOLLY_MALLOC_NOINLINE inline bool usingJEMalloc() noexcept {
     // Static because otherwise clever compilers will find out that
     // the ptr is not used and does not escape the scope, so they will
     // just optimize away the malloc.
-    static const void* ptr = malloc(1);
+    static void* ptr = malloc(1);
     if (!ptr) {
       // wtf, failing to allocate 1 byte
       return false;
@@ -244,11 +235,10 @@ inline void* checkedRealloc(void* ptr, size_t size) {
  * routine just tries to call realloc() (thus benefitting of potential
  * copy-free coalescing) unless there's too much slack memory.
  */
-FOLLY_MALLOC_CHECKED_MALLOC FOLLY_MALLOC_NOINLINE inline void* smartRealloc(
-    void* p,
-    const size_t currentSize,
-    const size_t currentCapacity,
-    const size_t newCapacity) {
+inline void* smartRealloc(void* p,
+                          const size_t currentSize,
+                          const size_t currentCapacity,
+                          const size_t newCapacity) {
   assert(p);
   assert(currentSize <= currentCapacity &&
          currentCapacity < newCapacity);
