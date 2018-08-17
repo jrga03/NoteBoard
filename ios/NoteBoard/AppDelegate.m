@@ -14,6 +14,7 @@
 #import <Firebase.h>
 @import Firebase;
 @import GoogleMaps; //add this line if you want to use Google Maps
+@import GooglePlaces;
 
 @implementation AppDelegate
 
@@ -23,6 +24,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+  [GMSPlacesClient provideAPIKey:@"AIzaSyDbNRYm1CGnAkTcn_9gwDM4OHX-UN0DaME"];
   [GMSServices provideAPIKey:@"AIzaSyDbNRYm1CGnAkTcn_9gwDM4OHX-UN0DaME"];
 
   NSURL *jsCodeLocation;

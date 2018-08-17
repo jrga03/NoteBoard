@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { View, Dimensions, StyleSheet } from "react-native";
-import MapView, { Marker, AnimatedRegion, Animated } from "react-native-maps";
+import MapView, { Marker, AnimatedRegion, PROVIDER_GOOGLE } from "react-native-maps";
 
 let { width, height } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;
@@ -71,7 +71,7 @@ export default class NoteMap extends Component {
 
     render() {
         return (
-            <Animated
+            <MapView.Animated
                 ref={(ref) => (this.map = ref)}
                 style={styles.container}
                 initialRegion={{
@@ -87,7 +87,7 @@ export default class NoteMap extends Component {
                 onRegionChange={this.onRegionChange}
                 onRegionChangeComplete={this.onRegionChangeComplete}>
                 <Marker coordinate={this.state.curPos} anchor={{ x: 0.5, y: 0.5 }} />
-            </Animated>
+            </MapView.Animated>
         );
     }
 }

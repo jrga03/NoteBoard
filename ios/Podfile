@@ -51,7 +51,9 @@ target 'NoteBoard' do
   # react-native-maps dependencies
   pod 'react-native-maps', path: rn_maps_path
   pod 'react-native-google-maps', path: rn_maps_path  # Remove this line if you don't want to support GoogleMaps on iOS
+  pod 'GooglePlaces'
   pod 'GoogleMaps'  # Remove this line if you don't want to support GoogleMaps on iOS
+  pod 'GooglePlacePicker'
   pod 'Google-Maps-iOS-Utils' # Remove this line if you don't want to support GoogleMaps on iOS
 
 end
