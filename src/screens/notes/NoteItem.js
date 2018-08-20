@@ -301,7 +301,13 @@ class NoteItem extends Component {
             case "gallery":
                 break;
             case "location":
-                this.props.navigation.navigate("NoteMap");
+                this.setState(
+                    {
+                        footerMenu: [],
+                        footerMenuSelected: null,
+                    },
+                    () => this.props.navigation.navigate("NoteMap")
+                );
                 break;
             case "checkbox":
                 break;
