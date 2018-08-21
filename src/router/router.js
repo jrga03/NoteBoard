@@ -147,7 +147,22 @@ const NotesStack = createStackNavigator(
                 gesturesEnabled: false,
             }),
         },
-        NoteMap: NoteMap,
+        NoteMap: {
+            screen: NoteMap,
+            navigationOptions: {
+                headerStyle: {
+                    backgroundColor: SWATCH.GRAY,
+                    height: 50,
+                    paddingHorizontal: 10,
+                },
+                headerTitleStyle: {
+                    color: SWATCH.BLACK,
+                    fontSize: 18,
+                    textAlign: "left",
+                    width: "100%",
+                },
+            },
+        },
     },
     {
         initialRouteName: "Notes",

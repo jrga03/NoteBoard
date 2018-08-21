@@ -1,8 +1,10 @@
 import React, { Component } from "react";
-import { View, Text, Dimensions, StyleSheet, TouchableOpacity } from "react-native";
-import MapView, { Marker, Callout, AnimatedRegion, PROVIDER_GOOGLE } from "react-native-maps";
+import { View, Text, Alert, Dimensions, StyleSheet, TouchableOpacity } from "react-native";
+import MapView, { Marker, AnimatedRegion, PROVIDER_GOOGLE } from "react-native-maps";
 import RNGooglePlaces from "react-native-google-places";
-import { SWATCH } from "../../constants";
+import { Icon } from "react-native-elements";
+
+import { SWATCH, LAYOUT_MARGIN } from "../../constants";
 
 let { width, height } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;
@@ -11,7 +13,41 @@ const LONGITUDE = 121.044975;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
+let markerCount = 0;
+
 export default class NoteMap extends Component {
+    static navigationOptions = ({ navigation }) => {
+        return !!navigation.getParam("selectedMarker", "")
+            ? {
+                  title: navigation.getParam("selectedMarker", ""),
+                  headerLeft: (
+                      <TouchableOpacity onPress={() => navigation.state.params.deselectMarker()}>
+                          <Icon type="material-icons" name="clear" color={SWATCH.BLACK} size={27} />
+                      </TouchableOpacity>
+                  ),
+                  headerStyle: {
+                      backgroundColor: SWATCH.GRAY,
+                      height: 50,
+                      paddingHorizontal: 10,
+                  },
+                  headerTitleStyle: {
+                      color: SWATCH.BLACK,
+                      fontSize: 18,
+                      textAlign: "left",
+                      width: "100%",
+                  },
+              }
+            : {
+                  title: navigation.getParam("selectedMarker", ""),
+                  headerStyle: {
+                      backgroundColor: SWATCH.GRAY,
+                      height: 50,
+                      paddingHorizontal: 10,
+                  },
+                  headerTintColor: SWATCH.BLACK,
+              };
+    };
+
     constructor(props) {
         super(props);
 
@@ -22,22 +58,15 @@ export default class NoteMap extends Component {
                 latitudeDelta: LATITUDE_DELTA,
                 longitudeDelta: LONGITUDE_DELTA,
             }),
-            // prevPos: null,
-            // curPos: { latitude: LATITUDE, longitude: LONGITUDE },
-            // curAng: 45,
-            // latitudeDelta: LATITUDE_DELTA,
-            // longitudeDelta: LONGITUDE_DELTA,
-            markers: [
-                // {
-                //     latlng: { latitude: LATITUDE, longitude: LONGITUDE },
-                //     // title: "initial title",
-                //     description: "initial description",
-                // },
-            ],
+            markers: [],
+            markerIDs: [],
+            selectedMarker: null,
         };
     }
 
     componentDidMount() {
+        this.props.navigation.setParams({ deselectMarker: this.deselectMarker.bind(this) });
+
         navigator.geolocation.getCurrentPosition(
             ({ coords: { latitude, longitude } }) =>
                 this.setState({
@@ -53,75 +82,99 @@ export default class NoteMap extends Component {
         );
     }
 
-    componentDidUpdate() {
-        // console.log(this.state);
-    }
+    deselectMarker = () =>
+        this.setState({ selectedMarker: null }, () => {
+            this.state.markerIDs.forEach((marker) => this[marker].hideCallout());
+            this.props.navigation.setParams({ selectedMarker: "" });
+        });
 
-    // changePosition = (latOffset, lonOffset) => {
-    //     const latitude = this.state.curPos.latitude + latOffset;
-    //     const longitude = this.state.curPos.longitude + lonOffset;
-    //     this.setState({ prevPos: this.state.curPos, curPos: { latitude, longitude } });
-    //     this.updateMap();
-    // };
+    removeMarker = () => {
+        Alert.alert("", "Remove location?", [
+            { text: "Cancel", onPress: () => {} },
+            {
+                text: "Yes",
+                onPress: () => {
+                    const { selectedMarker } = this.state;
+                    this.deselectMarker();
 
-    // getRotation = (prevPos, curPos) => {
-    //     if (!prevPos) return 0;
-    //     const xDiff = curPos.latitude - prevPos.latitude;
-    //     const yDiff = curPos.longitude - prevPos.longitude;
-    //     return (Math.atan2(yDiff, xDiff) * 180.0) / Math.PI;
-    // };
+                    const markerIDs = this.state.markerIDs.filter((id) => id !== selectedMarker);
+                    const markers = this.state.markers.filter((marker) => marker.id !== selectedMarker);
 
-    // updateMap = () => {
-    //     const { curPos, prevPos, curAng } = this.state;
-    //     const curRot = this.getRotation(prevPos, curPos);
-    //     console.log(this.map);
-    //     // this.map.animateToNavigation(curPos, curRot, curAng);
-    // };
-
-    onRegionChange = (region) => {
-        this.setState({ region });
-        // console.log(this.map);
-        // this.changePosition(
-        //     region.latitude - this.state.curPos.latitude,
-        //     region.longitude - this.state.curPos.longitude
-        // );
-    };
-
-    onRegionChangeComplete = (region) => {
-        this.setState({ region });
-        // this.changePosition(
-        //     region.latitude - this.state.curPos.latitude,
-        //     region.longitude - this.state.curPos.longitude
-        // );
+                    this.setState({ markers, markerIDs });
+                },
+            },
+        ]);
     };
 
     openSearchModal = () => {
-        RNGooglePlaces.openPlacePickerModal({
-            latitude: this.state.region.latitude,
-            longitude: this.state.region.longitude,
-            radius: 1,
-        })
-            .then(({ latitude, longitude, address }) =>
-                this.setState({
-                    markers: [
-                        ...this.state.markers,
+        this.state.markerIDs.forEach((marker) => this[marker].hideCallout());
+
+        RNGooglePlaces.openPlacePickerModal()
+            .then(({ latitude, longitude, address }) => {
+                let noSamePlace = true;
+
+                this.state.markers.forEach((marker) => {
+                    if (marker.latlng.latitude === latitude && marker.latlng.longitude === longitude) {
+                        noSamePlace = false;
+                    }
+                });
+
+                if (noSamePlace) {
+                    this.setState(
                         {
-                            latlng: {
-                                latitude,
-                                longitude,
-                            },
-                            description: address,
+                            markers: [
+                                ...this.state.markers,
+                                {
+                                    latlng: {
+                                        latitude,
+                                        longitude,
+                                    },
+                                    description: address,
+                                    id: `Marker_${markerCount}`,
+                                },
+                            ],
+                            markerIDs: [...this.state.markerIDs, `Marker_${markerCount}`],
                         },
-                    ],
-                })
-            )
+                        () => {
+                            markerCount++;
+                            this.map.animateToRegion(
+                                {
+                                    latitude,
+                                    longitude,
+                                    latitudeDelta: 0.01,
+                                    longitudeDelta: 0.01 * ASPECT_RATIO,
+                                },
+                                500
+                            );
+                        }
+                    );
+                } else {
+                }
+            })
             .catch((error) => console.log(error));
+    };
+
+    focusAllMarkers = () => {
+        this.state.markerIDs.forEach((marker) => this[marker].hideCallout());
+
+        if (this.state.markers.length == 1) {
+            this.map.animateToRegion(
+                {
+                    ...this.state.markers[0].latlng,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01 * ASPECT_RATIO,
+                },
+                500
+            );
+        } else {
+            this.map.fitToSuppliedMarkers(this.state.markerIDs, true);
+        }
     };
 
     render() {
         return (
             <View style={styles.container}>
-                <MapView.Animated
+                <MapView
                     ref={(ref) => (this.map = ref)}
                     style={styles.map}
                     initialRegion={this.state.initialRegion}
@@ -130,31 +183,57 @@ export default class NoteMap extends Component {
                     // showsUserLocation={true}
                     // followsUserLocation={true}
                     // toolbarEnabled={true}
-                    onRegionChange={this.onRegionChange}
                     // onRegionChangeComplete={this.onRegionChangeComplete}
-                >
+                    onPress={this.deselectMarker}>
                     {this.state.markers.map((marker, index) => (
                         <Marker
-                            key={`marker_${index}`}
+                            key={marker.id}
+                            ref={(ref) => (this[marker.id] = ref)}
+                            identifier={marker.id}
                             coordinate={marker.latlng}
                             title={`Location ${index + 1}`}
                             description={!!marker.description ? marker.description : undefined}
+                            onPress={() =>
+                                this.setState({ selectedMarker: marker.id }, () => {
+                                    this.props.navigation.setParams({ selectedMarker: `Location ${index + 1}` });
+                                    this.map.animateToRegion(
+                                        {
+                                            ...marker.latlng,
+                                            latitudeDelta: 0.01,
+                                            longitudeDelta: 0.01 * ASPECT_RATIO,
+                                        },
+                                        500
+                                    );
+                                })
+                            }
+                            stopPropagation={true}
                         />
                     ))}
-                    {/* <Marker
-                        ref={(ref) => (this.marker = ref)}
-                        onPress={() => this.marker.showCallout()}
-                        coordinate={this.state.curPos}
-                        anchor={{ x: 0.5, y: 0.5 }}>
-                        <Callout onPress={() => this.marker.hideCallout()}>
-                            <Text>HELLO</Text>
-                        </Callout>
-                    </Marker> */}
-                </MapView.Animated>
+                </MapView>
                 <View style={styles.overlayContainer}>
-                    <TouchableOpacity style={styles.overlayButton} onPress={this.openSearchModal}>
-                        <Text style={styles.overlayText}>Search for a place</Text>
-                    </TouchableOpacity>
+                    {!this.state.selectedMarker ? (
+                        <View>
+                            <TouchableOpacity style={styles.overlayButton} onPress={this.openSearchModal}>
+                                <Text style={styles.overlayText}>
+                                    {this.state.markers.length > 0 ? "Add another location" : "Search for a place"}
+                                </Text>
+                            </TouchableOpacity>
+
+                            {this.state.markers.length > 0 ? (
+                                <TouchableOpacity style={styles.overlayButton} onPress={this.focusAllMarkers}>
+                                    <Text style={styles.overlayText}>
+                                        {this.state.markers.length == 1
+                                            ? "Show tagged location"
+                                            : "Show all tagged locations"}
+                                    </Text>
+                                </TouchableOpacity>
+                            ) : null}
+                        </View>
+                    ) : (
+                        <TouchableOpacity style={styles.overlayButton} onPress={this.removeMarker}>
+                            <Text style={styles.overlayText}>Remove location</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
             </View>
         );
@@ -173,7 +252,8 @@ const styles = StyleSheet.create({
     overlayContainer: {
         backgroundColor: "transparent",
         // flex: 1,
-        height: "15%",
+        // height: "15%",
+        paddingVertical: 25,
     },
     overlayButton: {
         opacity: 0.7,
@@ -183,6 +263,13 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         paddingHorizontal: 15,
+        marginBottom: 15,
+    },
+    overlayCloseButton: {
+        position: "absolute",
+        top: LAYOUT_MARGIN,
+        left: LAYOUT_MARGIN,
+        backgroundColor: "red",
     },
     overlayText: {
         color: SWATCH.BLACK,
