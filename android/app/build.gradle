@@ -169,6 +169,7 @@ dependencies {
     implementation "com.google.firebase:firebase-core:16.0.1"
     implementation "com.google.firebase:firebase-auth:16.0.2"
     implementation "com.google.firebase:firebase-database:16.0.1"
+    implementation "com.google.firebase:firebase-storage:16.0.1"
     implementation 'com.facebook.android:facebook-android-sdk:[4,5)'
 }
 

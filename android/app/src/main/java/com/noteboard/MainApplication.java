@@ -14,6 +14,7 @@ import com.oblador.vectoricons.VectorIconsPackage;
 import io.invertase.firebase.RNFirebasePackage;
 import io.invertase.firebase.auth.RNFirebaseAuthPackage;
 import io.invertase.firebase.database.RNFirebaseDatabasePackage;
+import io.invertase.firebase.storage.RNFirebaseStoragePackage;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookSdk;
@@ -50,6 +51,7 @@ public class MainApplication extends Application implements ReactApplication {
             new RNFirebasePackage(),
             new RNFirebaseAuthPackage(),
             new RNFirebaseDatabasePackage(),
+            new RNFirebaseStoragePackage(),
             new FBSDKPackage(mCallbackManager),
             new RNGoogleSigninPackage(),
             new VectorIconsPackage()
