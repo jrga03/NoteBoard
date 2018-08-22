@@ -398,6 +398,16 @@ const FirebaseService = {
             console.log("error deleting contact", error);
         }
     },
+
+    async uploadFile(uri, callback) {
+        await firebase
+            .storage()
+            .ref(`/map_snapshots/${uri.split("/").pop()}`)
+            .putFile(uri, { contentType: "image/png" })
+            .then((uploadedFile) => callback(null, uploadedFile))
+            .catch((error) => callback(error, null));
+        // console.log("uploaded", test);
+    },
 };
 
 // const FirebaseService = new _FirebaseService();

@@ -6,6 +6,7 @@ import { Icon } from "react-native-elements";
 import Toast, { DURATION } from "react-native-easy-toast";
 
 import { SWATCH, LAYOUT_MARGIN } from "../../constants";
+import { FirebaseService } from "../../services";
 
 let { width, height } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;
@@ -101,28 +102,32 @@ export default class NoteMap extends Component {
         });
 
     saveTaggedLocations = () => {
+        let message = "";
+
         if (this.state.markers.length > 0) {
             this.focusAllMarkers();
+            message = "Saving";
 
             this.saveTimer = setTimeout(() => {
                 const snapshot = this.map.takeSnapshot({
                     // width: 300, // optional, when omitted the view-width is used
-                    height: 300, // optional, when omitted the view-height is used
+                    height: 100, // optional, when omitted the view-height is used
                     format: "png", // image formats: 'png', 'jpg' (default: 'png')
-                    quality: 0.8, // image quality: 0..1 (only relevant for jpg, default: 1)
+                    quality: 0.5, // image quality: 0..1 (only relevant for jpg, default: 1)
                     result: "file", // result types: 'file', 'base64' (default: 'file')
                 });
                 snapshot.then((uri) => {
-                    this.setState({ mapSnapshot: uri }, () => console.log(this.state.mapSnapshot));
+                    this.props.navigation.state.params.saveMapSnapshot(uri);
                     this.saveTimer = null;
+                    this.props.navigation.goBack();
                 });
             }, 1000);
         } else {
-            const message = "Add at least one location";
-            Platform.OS === "ios"
-                ? this.toast.show(message, DURATION.LENGTH_SHORT)
-                : ToastAndroid.show(message, ToastAndroid.SHORT);
+            message = "Add at least one location";
         }
+        Platform.OS === "ios"
+            ? this.toast.show(message, DURATION.LENGTH_SHORT)
+            : ToastAndroid.show(message, ToastAndroid.SHORT);
     };
 
     removeMarker = () => {

@@ -1,8 +1,20 @@
 import React, { Component } from "react";
-import { View, Text, TextInput, StyleSheet, FlatList, TouchableOpacity, ScrollView, Platform } from "react-native";
+import {
+    View,
+    Text,
+    TextInput,
+    StyleSheet,
+    FlatList,
+    TouchableOpacity,
+    ScrollView,
+    Platform,
+    ToastAndroid,
+    Image,
+} from "react-native";
 import { Icon } from "react-native-elements";
 import Moment from "moment";
 import { connect } from "react-redux";
+import Toast, { DURATION } from "react-native-easy-toast";
 
 import { SWATCH, LAYOUT_MARGIN } from "../../constants";
 import {
@@ -14,6 +26,7 @@ import {
     updateSelectedNote,
     clearSelectedNote,
 } from "../../actions";
+import { FirebaseService } from "../../services";
 
 const selection = { start: null, end: null };
 let contentId;
@@ -31,6 +44,7 @@ class NoteItem extends Component {
                 pinned: false,
                 title: null,
                 type: null,
+                mapSnapshot: null,
             },
             index: null,
             footerMenuSelected: null,
@@ -63,6 +77,8 @@ class NoteItem extends Component {
             note: {
                 ...note,
                 contents: contentsWithId,
+                mapSnapshot:
+                    "https://firebasestorage.googleapis.com/v0/b/note-board-1527334009294.appspot.com/o/map_snapshots%2FAirMapSnapshot1563303203571930080.png?alt=media&token=3a40a598-ff08-44f3-9aa5-e6b97d211703",
             },
             index,
         });
@@ -306,7 +322,8 @@ class NoteItem extends Component {
                         footerMenu: [],
                         footerMenuSelected: null,
                     },
-                    () => this.props.navigation.navigate("NoteMap")
+                    () =>
+                        this.props.navigation.navigate("NoteMap", { saveMapSnapshot: this.saveMapSnapshot.bind(this) })
                 );
                 break;
             case "checkbox":
@@ -314,6 +331,20 @@ class NoteItem extends Component {
             case "collaborator":
                 break;
         }
+    };
+
+    saveMapSnapshot = (uri) => {
+        console.log(uri);
+        // this.setState({ note: { ...this.state.note, mapSnapshot: uri } }, () =>
+        //     console.log(this.state.note.mapSnapshot)
+        // );
+        // FirebaseService.uploadFile(uri, (error, result) => {
+        //     if (!error) {
+        //         console.log("uploaded", result);
+        //     } else {
+        //         console.log("error", error);
+        //     }
+        // });
     };
 
     renderNoteContentMemo = ({ item, index }) => {
@@ -428,12 +459,14 @@ class NoteItem extends Component {
             noteContentText,
             footerContainer,
             staticFooterText,
+            mapSnapshotImage,
             footerMenuActive,
             contentContainer,
             listItemContainer,
             footerRowContainer,
             footerItemContainer,
             noteContentCheckBox,
+            mapSnapshotContainer,
             checklistRowContainer,
             staticFooterContainer,
             footerItemTextContainer,
@@ -485,6 +518,15 @@ class NoteItem extends Component {
                             )
                         }
                     />
+                    {this.state.note.mapSnapshot && (
+                        <View style={mapSnapshotContainer}>
+                            <Image
+                                style={mapSnapshotImage}
+                                source={{ uri: this.state.note.mapSnapshot }}
+                                resizeMode="cover"
+                            />
+                        </View>
+                    )}
                 </ScrollView>
                 <View style={footerContainer}>
                     <View>
@@ -549,6 +591,7 @@ class NoteItem extends Component {
                         </TouchableOpacity>
                     </View>
                 </View>
+                <Toast ref={(ref) => (this.toast = ref)} />
             </View>
         );
     }
@@ -672,6 +715,21 @@ const styles = StyleSheet.create({
     },
     footerMenuActive: {
         backgroundColor: SWATCH.LIGHT_GRAY,
+    },
+    mapSnapshotContainer: {
+        backgroundColor: SWATCH.WHITE,
+        margin: LAYOUT_MARGIN,
+        elevation: 2,
+        shadowRadius: 3,
+        shadowOffset: {
+            width: 0,
+            height: 1,
+        },
+        shadowColor: "#000000",
+        shadowOpacity: 0.08,
+    },
+    mapSnapshotImage: {
+        height: 150,
     },
 });
 
