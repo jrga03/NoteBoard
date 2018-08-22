@@ -1,5 +1,5 @@
 import React from "react";
-import { View, TouchableOpacity, Platform } from "react-native";
+import { View, TouchableOpacity, Text, Platform } from "react-native";
 import {
     createStackNavigator,
     createDrawerNavigator,
@@ -125,7 +125,7 @@ const noteItemNavigationOptions = (navigation, screenProps, ...props) => {
         headerStyle: {
             backgroundColor: SWATCH.GRAY,
             height: 50,
-            paddingHorizontal: 10,
+            paddingRight: Platform.OS === "ios" ? 10 : 15,
         },
         headerTintColor: SWATCH.BLACK,
     };
@@ -138,6 +138,7 @@ const NotesStack = createStackNavigator(
             navigationOptions: ({ navigation, screenProps }) => ({
                 title: "Notes".toUpperCase(),
                 ...noteHomeNavigationOptions(navigation, screenProps),
+                headerBackTitle: "NOTES",
             }),
         },
         NoteItem: {
@@ -145,22 +146,56 @@ const NotesStack = createStackNavigator(
             navigationOptions: ({ navigation, screenProps }) => ({
                 ...noteItemNavigationOptions(navigation, screenProps),
                 gesturesEnabled: false,
+                headerBackTitle: "NOTE",
             }),
         },
         NoteMap: {
             screen: NoteMap,
-            navigationOptions: {
-                headerStyle: {
-                    backgroundColor: SWATCH.GRAY,
-                    height: 50,
-                    paddingHorizontal: 10,
-                },
-                headerTitleStyle: {
-                    color: SWATCH.BLACK,
-                    fontSize: 18,
-                    textAlign: "left",
-                    width: "100%",
-                },
+            navigationOptions: ({ navigation }) => {
+                return !!navigation.getParam("selectedMarker", "")
+                    ? {
+                          title: navigation.getParam("selectedMarker", ""),
+                          headerLeft: (
+                              <TouchableOpacity
+                                  onPress={() =>
+                                      navigation.state.params && navigation.state.params.deselectMarker
+                                          ? navigation.state.params.deselectMarker()
+                                          : null
+                                  }>
+                                  <Icon type="material-icons" name="clear" color={SWATCH.BLACK} size={27} />
+                              </TouchableOpacity>
+                          ),
+                          headerStyle: {
+                              backgroundColor: SWATCH.GRAY,
+                              height: 50,
+                              paddingRight: Platform.OS === "ios" ? 10 : 20,
+                          },
+                          headerTitleStyle: {
+                              color: SWATCH.BLACK,
+                              fontSize: 18,
+                              textAlign: "left",
+                              width: "100%",
+                          },
+                      }
+                    : {
+                          title: navigation.getParam("selectedMarker", ""),
+                          headerRight: (
+                              <TouchableOpacity
+                                  onPress={() =>
+                                      navigation.state.params && navigation.state.params.saveTaggedLocations
+                                          ? navigation.state.params.saveTaggedLocations()
+                                          : null
+                                  }>
+                                  <Text style={{ color: SWATCH.BLACK }}>SAVE</Text>
+                              </TouchableOpacity>
+                          ),
+                          headerStyle: {
+                              backgroundColor: SWATCH.GRAY,
+                              height: 50,
+                              paddingRight: Platform.OS === "ios" ? 15 : 20,
+                          },
+                          headerTintColor: SWATCH.BLACK,
+                      };
             },
         },
     },

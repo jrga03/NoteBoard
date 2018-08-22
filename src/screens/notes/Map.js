@@ -1,8 +1,9 @@
 import React, { Component } from "react";
-import { View, Text, Alert, Dimensions, StyleSheet, TouchableOpacity } from "react-native";
-import MapView, { Marker, AnimatedRegion, PROVIDER_GOOGLE } from "react-native-maps";
+import { View, Text, Alert, Dimensions, StyleSheet, TouchableOpacity, ToastAndroid, Platform } from "react-native";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import RNGooglePlaces from "react-native-google-places";
 import { Icon } from "react-native-elements";
+import Toast, { DURATION } from "react-native-easy-toast";
 
 import { SWATCH, LAYOUT_MARGIN } from "../../constants";
 
@@ -52,20 +53,25 @@ export default class NoteMap extends Component {
         super(props);
 
         this.state = {
-            region: new AnimatedRegion({
-                latitude: LATITUDE,
-                longitude: LONGITUDE,
-                latitudeDelta: LATITUDE_DELTA,
-                longitudeDelta: LONGITUDE_DELTA,
-            }),
+            // region: new AnimatedRegion({
+            //     latitude: LATITUDE,
+            //     longitude: LONGITUDE,
+            //     latitudeDelta: LATITUDE_DELTA,
+            //     longitudeDelta: LONGITUDE_DELTA,
+            // }),
             markers: [],
             markerIDs: [],
             selectedMarker: null,
         };
+
+        this.saveTimer = null;
     }
 
     componentDidMount() {
-        this.props.navigation.setParams({ deselectMarker: this.deselectMarker.bind(this) });
+        this.props.navigation.setParams({
+            deselectMarker: this.deselectMarker.bind(this),
+            saveTaggedLocations: this.saveTaggedLocations.bind(this),
+        });
 
         navigator.geolocation.getCurrentPosition(
             ({ coords: { latitude, longitude } }) =>
@@ -82,11 +88,42 @@ export default class NoteMap extends Component {
         );
     }
 
+    componentWillUnmount() {
+        if (this.saveTimer !== null) {
+            clearTimeout(this.saveTimer);
+        }
+    }
+
     deselectMarker = () =>
         this.setState({ selectedMarker: null }, () => {
             this.state.markerIDs.forEach((marker) => this[marker].hideCallout());
             this.props.navigation.setParams({ selectedMarker: "" });
         });
+
+    saveTaggedLocations = () => {
+        if (this.state.markers.length > 0) {
+            this.focusAllMarkers();
+
+            this.saveTimer = setTimeout(() => {
+                const snapshot = this.map.takeSnapshot({
+                    // width: 300, // optional, when omitted the view-width is used
+                    height: 300, // optional, when omitted the view-height is used
+                    format: "png", // image formats: 'png', 'jpg' (default: 'png')
+                    quality: 0.8, // image quality: 0..1 (only relevant for jpg, default: 1)
+                    result: "file", // result types: 'file', 'base64' (default: 'file')
+                });
+                snapshot.then((uri) => {
+                    this.setState({ mapSnapshot: uri }, () => console.log(this.state.mapSnapshot));
+                    this.saveTimer = null;
+                });
+            }, 1000);
+        } else {
+            const message = "Add at least one location";
+            Platform.OS === "ios"
+                ? this.toast.show(message, DURATION.LENGTH_SHORT)
+                : ToastAndroid.show(message, ToastAndroid.SHORT);
+        }
+    };
 
     removeMarker = () => {
         Alert.alert("", "Remove location?", [
@@ -109,7 +146,7 @@ export default class NoteMap extends Component {
     openSearchModal = () => {
         this.state.markerIDs.forEach((marker) => this[marker].hideCallout());
 
-        RNGooglePlaces.openPlacePickerModal()
+        RNGooglePlaces.openPlacePickerModal({})
             .then(({ latitude, longitude, address }) => {
                 let noSamePlace = true;
 
@@ -235,6 +272,7 @@ export default class NoteMap extends Component {
                         </TouchableOpacity>
                     )}
                 </View>
+                <Toast ref={(ref) => (this.toast = ref)} />
             </View>
         );
     }
