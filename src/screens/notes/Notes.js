@@ -91,7 +91,7 @@ class Notes extends Component {
             rightPinned,
             isLoading: false,
         });
-        this.props.updateNoteList(data);
+        this.props.updateNoteList(data.toJSON());
     };
 
     handleRefresh = () => {

@@ -6,7 +6,6 @@ import { Icon } from "react-native-elements";
 import Toast, { DURATION } from "react-native-easy-toast";
 
 import { SWATCH, LAYOUT_MARGIN } from "../../constants";
-import { FirebaseService } from "../../services";
 
 let { width, height } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;
@@ -69,6 +68,14 @@ export default class NoteMap extends Component {
     }
 
     componentDidMount() {
+        // this.loadMarkers();
+        const markers = this.props.navigation.getParam("markers", []);
+        let markerIDs = [];
+        if (!!markers) {
+            markerIDs = markers.map((marker) => marker.id);
+            markerCount = markers.length;
+        }
+
         this.props.navigation.setParams({
             deselectMarker: this.deselectMarker.bind(this),
             saveTaggedLocations: this.saveTaggedLocations.bind(this),
@@ -76,17 +83,28 @@ export default class NoteMap extends Component {
 
         navigator.geolocation.getCurrentPosition(
             ({ coords: { latitude, longitude } }) =>
-                this.setState({
-                    initialRegion: {
-                        latitude,
-                        longitude,
-                        latitudeDelta: LATITUDE_DELTA,
-                        longitudeDelta: LONGITUDE_DELTA,
+                this.setState(
+                    {
+                        initialRegion: {
+                            latitude,
+                            longitude,
+                            latitudeDelta: LATITUDE_DELTA,
+                            longitudeDelta: LONGITUDE_DELTA,
+                        },
+                        markers,
+                        markerIDs,
                     },
-                }),
+                    () => {
+                        if (this.state.markers.length > 0) setTimeout(this.focusAllMarkers, 1000);
+                    }
+                ),
             (error) => console.log("error getting current location", error),
             { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
         );
+    }
+
+    componentDidUpdate() {
+        // console.log("map update", this.state);
     }
 
     componentWillUnmount() {
@@ -94,6 +112,19 @@ export default class NoteMap extends Component {
             clearTimeout(this.saveTimer);
         }
     }
+
+    loadMarkers = () => {
+        const markers = this.props.navigation.getParam("markers", []);
+        let markerIDs = [];
+        if (!!markers) {
+            markerIDs = markers.map((marker) => marker.id);
+        }
+
+        this.setState({
+            markers,
+            markerIDs,
+        });
+    };
 
     deselectMarker = () =>
         this.setState({ selectedMarker: null }, () => {
@@ -108,6 +139,11 @@ export default class NoteMap extends Component {
             this.focusAllMarkers();
             message = "Saving";
 
+            // this.toast.show(message, DURATION.LENGTH_SHORT);
+            Platform.OS === "ios"
+                ? this.toast.show(message, DURATION.LENGTH_SHORT)
+                : ToastAndroid.show(message, ToastAndroid.SHORT);
+
             this.saveTimer = setTimeout(() => {
                 const snapshot = this.map.takeSnapshot({
                     // width: 300, // optional, when omitted the view-width is used
@@ -117,17 +153,21 @@ export default class NoteMap extends Component {
                     result: "file", // result types: 'file', 'base64' (default: 'file')
                 });
                 snapshot.then((uri) => {
-                    this.props.navigation.state.params.saveMapSnapshot(uri);
-                    this.saveTimer = null;
-                    this.props.navigation.goBack();
+                    const saveLocation = this.props.navigation.getParam("saveLocationDetails", null);
+                    if (saveLocation) {
+                        this.props.navigation.state.params.saveLocationDetails(this.state.markers, uri);
+                        this.saveTimer = null;
+                        this.props.navigation.goBack();
+                    }
                 });
             }, 1000);
         } else {
-            message = "Add at least one location";
+            const saveLocation = this.props.navigation.getParam("saveLocationDetails", null);
+            if (saveLocation) {
+                this.props.navigation.state.params.saveLocationDetails(this.state.markers);
+                this.props.navigation.goBack();
+            }
         }
-        Platform.OS === "ios"
-            ? this.toast.show(message, DURATION.LENGTH_SHORT)
-            : ToastAndroid.show(message, ToastAndroid.SHORT);
     };
 
     removeMarker = () => {
@@ -277,7 +317,12 @@ export default class NoteMap extends Component {
                         </TouchableOpacity>
                     )}
                 </View>
-                <Toast ref={(ref) => (this.toast = ref)} />
+                <Toast
+                    ref={(ref) => (this.toast = ref)}
+                    // style={styles.toastContainer}
+                    // opacity={0.8}
+                    // textStyle={styles.toastText}
+                />
             </View>
         );
     }
@@ -316,5 +361,11 @@ const styles = StyleSheet.create({
     },
     overlayText: {
         color: SWATCH.BLACK,
+    },
+    toastContainer: {
+        backgroundColor: SWATCH.BLACK,
+    },
+    toastText: {
+        color: SWATCH.WHITE,
     },
 });

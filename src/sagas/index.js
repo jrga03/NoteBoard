@@ -1,4 +1,4 @@
-import { put, take, takeLatest, call, all, fork, cps, race, takeEvery, cancel, select } from "redux-saga/effects";
+import { put, take, takeLatest, call, all, fork, cps, race, takeEvery, select } from "redux-saga/effects";
 import { delay } from "redux-saga";
 import {
     // CURRENT_USER,
@@ -24,9 +24,11 @@ import {
     SEARCH_CONTACT,
     SEARCH_CONTACT_FAIL,
     SEARCH_CONTACT_SUCCESS,
+    SAVE_NOTE_LOCATION,
+    UPDATE_SELECTED_NOTE,
 } from "../actions/constants";
 
-import { getContacts, getPendingContacts } from "./selectors";
+import { getContacts, getNote, getSelectedNote } from "./selectors";
 import { NavigationService, FirebaseService } from "../services";
 import authentication from "../auth";
 
@@ -160,7 +162,8 @@ function* registerFlow() {
  * Edit note item
  */
 function* editNote({ payload }) {
-    yield cps(FirebaseService.editNote, payload);
+    const { overallIndex, ...newPayload } = payload;
+    yield cps(FirebaseService.editNote, newPayload);
     yield put({ type: CLEAR_SELECTED_NOTE });
 }
 
@@ -170,6 +173,40 @@ function* editNote({ payload }) {
 function* deleteNote({ payload }) {
     yield put({ type: CLEAR_SELECTED_NOTE });
     yield cps(FirebaseService.deleteNote, payload);
+}
+
+/**
+ * Upload map snapshot
+ */
+function* uploadMapSnapshotAndUpdateNote({ id, payload: { markers, uri } }) {
+    try {
+        const uploadedFile = yield cps(FirebaseService.uploadFile, uri, "map_snapshot");
+        const note = yield select(getNote, `note${id}`);
+        const selectedNote = yield select(getSelectedNote);
+
+        yield cps(FirebaseService.editNote, {
+            ...note,
+            location: {
+                markers,
+                mapSnapshot: uploadedFile,
+            },
+        });
+
+        if (id === selectedNote.note.id) {
+            yield put({
+                type: UPDATE_SELECTED_NOTE,
+                payload: {
+                    ...selectedNote.note,
+                    location: {
+                        markers,
+                        mapSnapshot: uploadedFile,
+                    },
+                },
+            });
+        }
+    } catch (error) {
+        console.log("error uploading map snapshot", error);
+    }
 }
 
 /**
@@ -214,6 +251,7 @@ export default function* rootSaga() {
         fork(logoutFlow),
         takeEvery(EDIT_NOTE_ITEM, editNote),
         takeEvery(DELETE_NOTE, deleteNote),
+        takeEvery(SAVE_NOTE_LOCATION, uploadMapSnapshotAndUpdateNote),
         watchSearchContact(),
     ]);
 }

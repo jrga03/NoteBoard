@@ -399,12 +399,29 @@ const FirebaseService = {
         }
     },
 
-    async uploadFile(uri, callback) {
+    async uploadFile(uri, type, callback) {
+        let ref;
+        switch (type) {
+            case "map_snapshot":
+                ref = `/map_snapshots/${uri.split("/").pop()}`;
+                break;
+            case "profile_photo":
+                ref = `/profile_photos/${uri.split("/").pop()}`;
+                break;
+            default:
+                ref = `/${uri.split("/").pop()}`;
+        }
         await firebase
             .storage()
-            .ref(`/map_snapshots/${uri.split("/").pop()}`)
+            .ref(ref)
             .putFile(uri, { contentType: "image/png" })
-            .then((uploadedFile) => callback(null, uploadedFile))
+            .then((uploadedFile) => {
+                if (uploadedFile.state == "success") {
+                    callback(null, uploadedFile.downloadURL);
+                } else {
+                    throw "Upload failed";
+                }
+            })
             .catch((error) => callback(error, null));
         // console.log("uploaded", test);
     },

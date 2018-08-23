@@ -25,6 +25,7 @@ import {
     togglePin,
     updateSelectedNote,
     clearSelectedNote,
+    saveNoteLocation,
 } from "../../actions";
 import { FirebaseService } from "../../services";
 
@@ -44,7 +45,10 @@ class NoteItem extends Component {
                 pinned: false,
                 title: null,
                 type: null,
-                mapSnapshot: null,
+                location: {
+                    markers: [],
+                    mapSnapshot: null,
+                },
             },
             index: null,
             footerMenuSelected: null,
@@ -77,15 +81,32 @@ class NoteItem extends Component {
             note: {
                 ...note,
                 contents: contentsWithId,
-                mapSnapshot:
-                    "https://firebasestorage.googleapis.com/v0/b/note-board-1527334009294.appspot.com/o/map_snapshots%2FAirMapSnapshot1563303203571930080.png?alt=media&token=3a40a598-ff08-44f3-9aa5-e6b97d211703",
             },
             index,
         });
     }
 
     componentDidUpdate() {
-        // console.log("update selected note", this.state);
+        if (this.state.note.lastEditedAt !== this.props.selectedNote.note.lastEditedAt) {
+            if (this.props.selectedNote.note.location) {
+                this.setState({
+                    note: {
+                        ...this.state.note,
+                        location: this.props.selectedNote.note.location,
+                        lastEditedAt: this.props.selectedNote.note.lastEditedAt,
+                    },
+                });
+            } else {
+                this.setState({
+                    note: {
+                        ...this.state.note,
+                        lastEditedAt: this.props.selectedNote.note.lastEditedAt,
+                    },
+                });
+            }
+        }
+        // console.log("updated state", this.state);
+        // console.log("updated props", this.props);
     }
 
     componentWillUnmount() {
@@ -323,7 +344,13 @@ class NoteItem extends Component {
                         footerMenuSelected: null,
                     },
                     () =>
-                        this.props.navigation.navigate("NoteMap", { saveMapSnapshot: this.saveMapSnapshot.bind(this) })
+                        this.props.navigation.navigate("NoteMap", {
+                            saveLocationDetails: this.saveLocationDetails.bind(this),
+                            markers:
+                                this.state.note.location && this.state.note.location.markers
+                                    ? this.state.note.location.markers
+                                    : [],
+                        })
                 );
                 break;
             case "checkbox":
@@ -333,18 +360,24 @@ class NoteItem extends Component {
         }
     };
 
-    saveMapSnapshot = (uri) => {
-        console.log(uri);
-        // this.setState({ note: { ...this.state.note, mapSnapshot: uri } }, () =>
-        //     console.log(this.state.note.mapSnapshot)
-        // );
-        // FirebaseService.uploadFile(uri, (error, result) => {
-        //     if (!error) {
-        //         console.log("uploaded", result);
-        //     } else {
-        //         console.log("error", error);
-        //     }
-        // });
+    saveLocationDetails = (markers, uri = null) => {
+        if (!!uri) {
+            this.props.saveNoteLocation(this.state.note.id, markers, uri);
+        } else {
+            this.setState(
+                {
+                    wasChanged: true,
+                    note: {
+                        ...this.state.note,
+                        location: {
+                            markers: [],
+                            mapSnapshot: null,
+                        },
+                    },
+                },
+                this.updateNote
+            );
+        }
     };
 
     renderNoteContentMemo = ({ item, index }) => {
@@ -471,6 +504,8 @@ class NoteItem extends Component {
             staticFooterContainer,
             footerItemTextContainer,
             checklistFooterContainer,
+            mapSnapshotDescriptionText,
+            mapSnapshotDescriptionContainer,
             staticFooterMainContentContainer,
         } = styles;
         const { footerMenu, footerMenuSelected, note } = this.state;
@@ -518,15 +553,33 @@ class NoteItem extends Component {
                             )
                         }
                     />
-                    {this.state.note.mapSnapshot && (
-                        <View style={mapSnapshotContainer}>
-                            <Image
-                                style={mapSnapshotImage}
-                                source={{ uri: this.state.note.mapSnapshot }}
-                                resizeMode="cover"
-                            />
-                        </View>
-                    )}
+                    {this.state.note.location &&
+                        this.state.note.location.mapSnapshot && (
+                            <TouchableOpacity
+                                style={mapSnapshotContainer}
+                                onPress={() =>
+                                    this.props.navigation.navigate("NoteMap", {
+                                        saveLocationDetails: this.saveLocationDetails.bind(this),
+                                        markers:
+                                            this.state.note.location && this.state.note.location.markers
+                                                ? this.state.note.location.markers
+                                                : [],
+                                    })
+                                }>
+                                <Image
+                                    style={mapSnapshotImage}
+                                    source={{ uri: this.state.note.location.mapSnapshot }}
+                                    resizeMode="cover"
+                                />
+                                <View style={mapSnapshotDescriptionContainer}>
+                                    {this.state.note.location.markers.map((marker) => (
+                                        <Text style={mapSnapshotDescriptionText} key={marker.id}>
+                                            {marker.description}
+                                        </Text>
+                                    ))}
+                                </View>
+                            </TouchableOpacity>
+                        )}
                 </ScrollView>
                 <View style={footerContainer}>
                     <View>
@@ -609,6 +662,7 @@ const mapDispatchToProps = (dispatch) => ({
     togglePinNote: () => dispatch(togglePin()),
     updateSelectedNote: (note) => dispatch(updateSelectedNote(note)),
     clearSelectedNote: () => dispatch(clearSelectedNote()),
+    saveNoteLocation: (id, markers, uri) => dispatch(saveNoteLocation(id, markers, uri)),
 });
 
 export default connect(
@@ -719,6 +773,7 @@ const styles = StyleSheet.create({
     mapSnapshotContainer: {
         backgroundColor: SWATCH.WHITE,
         margin: LAYOUT_MARGIN,
+        marginTop: 40,
         elevation: 2,
         shadowRadius: 3,
         shadowOffset: {
@@ -730,6 +785,16 @@ const styles = StyleSheet.create({
     },
     mapSnapshotImage: {
         height: 150,
+    },
+    mapSnapshotDescriptionContainer: {
+        padding: LAYOUT_MARGIN,
+        backgroundColor: SWATCH.LIGHT_GRAY,
+        borderTopWidth: 0.5,
+        borderTopColor: SWATCH.GRAY,
+    },
+    mapSnapshotDescriptionText: {
+        fontStyle: "italic",
+        paddingVertical: 5,
     },
 });
 

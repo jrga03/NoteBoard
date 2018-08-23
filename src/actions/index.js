@@ -24,6 +24,7 @@ import {
     CLEAR_SELECTED_NOTE,
     SELECT_CONTACT,
     CLEAR_SELECTED_CONTACT,
+    SAVE_NOTE_LOCATION,
 } from "./constants";
 
 export function loginFlowStart() {
@@ -181,5 +182,16 @@ export function selectContact(contact, type) {
 export function clearSelectedContact() {
     return {
         type: CLEAR_SELECTED_CONTACT,
+    };
+}
+
+export function saveNoteLocation(id, markers, uri) {
+    return {
+        type: SAVE_NOTE_LOCATION,
+        id,
+        payload: {
+            markers,
+            uri,
+        },
     };
 }
