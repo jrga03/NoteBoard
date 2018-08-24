@@ -146,6 +146,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-camera')
     implementation(project(':react-native-firebase')) {
         transitive = false
     }
