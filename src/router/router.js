@@ -203,6 +203,7 @@ const NotesStack = createStackNavigator(
             screen: Camera,
             navigationOptions: {
                 header: null,
+                gesturesEnabled: false,
             },
         },
     },
