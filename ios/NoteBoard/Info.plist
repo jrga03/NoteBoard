@@ -111,5 +111,13 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSCameraUsageDescription</key>
+	<string>We need your permission to use your phone camera</string>
+	<!-- Include this only if you are planning to use the camera roll -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We need your permission to access your photo library</string>
+	<!-- Include this only if you are planning to use the camera roll on iOS 11 and later-->
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>We need your permission to access your photo library</string>
 </dict>
 </plist>

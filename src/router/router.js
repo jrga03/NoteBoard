@@ -25,6 +25,7 @@ import ContactsScreen from "../screens/contacts/Contacts";
 import AddContactScreen from "../screens/contacts/AddContact";
 import ContactProfile from "../screens/contacts/ContactProfile";
 import NoteMap from "../screens/notes/Map";
+import Camera from "../screens/notes/Camera";
 
 const generateIcon = (type, name, color = SWATCH.BLACK, size = 27) => {
     return <Icon name={name} type={type} color={color} size={size} />;
@@ -196,6 +197,12 @@ const NotesStack = createStackNavigator(
                           },
                           headerTintColor: SWATCH.BLACK,
                       };
+            },
+        },
+        Camera: {
+            screen: Camera,
+            navigationOptions: {
+                header: null,
             },
         },
     },

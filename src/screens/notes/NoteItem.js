@@ -334,6 +334,7 @@ class NoteItem extends Component {
                 }
                 break;
             case "photo":
+                this.props.navigation.navigate("Camera");
                 break;
             case "gallery":
                 break;
@@ -584,25 +585,34 @@ class NoteItem extends Component {
                 <View style={footerContainer}>
                     <View>
                         {!!footerMenuSelected &&
-                            footerMenu.map((item) => (
-                                <TouchableOpacity
-                                    key={item.onPress}
-                                    onPress={() => this.handleFooterMenuItemPress(item.onPress, id)}>
-                                    <View style={[footerRowContainer, listItemContainer]}>
-                                        <View style={footerItemContainer}>
-                                            <Icon
-                                                type={item.icon.type}
-                                                name={item.icon.name}
-                                                size={22}
-                                                color={SWATCH.GRAY}
-                                            />
-                                        </View>
-                                        <View style={[footerItemContainer, footerItemTextContainer]}>
-                                            <Text style={footerItemText}>{item.text}</Text>
-                                        </View>
-                                    </View>
-                                </TouchableOpacity>
-                            ))}
+                            footerMenu.map(
+                                (item) =>
+                                    !(this.state.index === null && item.onPress === "delete") && (
+                                        <TouchableOpacity
+                                            key={item.onPress}
+                                            onPress={() => this.handleFooterMenuItemPress(item.onPress, id)}>
+                                            <View style={[footerRowContainer, listItemContainer]}>
+                                                <View style={footerItemContainer}>
+                                                    <Icon
+                                                        type={item.icon.type}
+                                                        name={item.icon.name}
+                                                        size={22}
+                                                        color={item.onPress === "delete" ? SWATCH.RED : SWATCH.GRAY}
+                                                    />
+                                                </View>
+                                                <View style={[footerItemContainer, footerItemTextContainer]}>
+                                                    <Text
+                                                        style={[
+                                                            footerItemText,
+                                                            item.onPress === "delete" ? { color: SWATCH.RED } : null,
+                                                        ]}>
+                                                        {item.text}
+                                                    </Text>
+                                                </View>
+                                            </View>
+                                        </TouchableOpacity>
+                                    )
+                            )}
                     </View>
                     <View style={[footerRowContainer, staticFooterContainer]}>
                         <TouchableOpacity
@@ -869,7 +879,7 @@ const noteItemMenuItems = {
             onPress: "delete",
         },
         {
-            text: "Collaborator",
+            text: "Collaborators",
             icon: {
                 type: "material-icons",
                 name: "person-add",
