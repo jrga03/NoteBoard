@@ -101,7 +101,7 @@ class ContactProfile extends Component {
                                     rounded
                                     title="Ignore Request"
                                     textStyle={extraButtonText}
-                                    icon={{ name: "person-outline" }}
+                                    icon={{ type: "font-awesome" ,name: "ban" }}
                                     onPress={() => {
                                         FirebaseService.rejectContactRequest(id);
                                         this.setState({ type: "Add" });

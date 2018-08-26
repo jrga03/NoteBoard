@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Platform, Image } from "react-native";
 import { RNCamera } from "react-native-camera";
 
 import { SWATCH } from "../../constants";
@@ -24,6 +24,7 @@ export default class Camera extends Component {
         this.state = {
             cameraType: RNCamera.Constants.Type.back,
             flashMode: RNCamera.Constants.FlashMode.off,
+            capturedPhoto: null,
         };
     }
 
@@ -43,55 +44,92 @@ export default class Camera extends Component {
                     : RNCamera.Constants.FlashMode.on,
         });
 
-    takePicture = async function() {
+    takePicture = async () => {
         if (this.camera) {
-            const options = { quality: 0.5 };
+            const options = { quality: 0.5, fixOrientation: true, forceUpOrientation: true };
             const data = await this.camera.takePictureAsync(options);
-            console.log(data.uri);
+            this.setState({ capturedPhoto: data.uri });
         }
     };
 
+    savePicture = () => null;
+
     render() {
-        return (
-            <View style={styles.container}>
-                <RNCamera
-                    ref={(ref) => (this.camera = ref)}
-                    type={this.state.cameraType}
-                    style={styles.cameraPreview}
-                    mirrorImage={this.state.cameraType === RNCamera.Constants.Type.front}
-                    permissionDialogTitle={"Permission to use camera"}
-                    permissionDialogMessage={"We need your permission to use your phone camera"}>
-                    {/* {({ camera, status }) => {
-                        console.log("camera", camera, "status", status);
-                        if (status !== "READY") return <PendingView />;
-                        return (
-                            <View style={{ flex: 0, flexDirection: "row", justifyContent: "center" }}>
-                                <TouchableOpacity onPress={() => this.takePicture(camera)} style={styles.captureButton}>
-                                    <Text style={{ fontSize: 14 }}> SNAP </Text>
-                                </TouchableOpacity>
-                            </View>
-                        );
-                    }} */}
-                </RNCamera>
-                <TouchableOpacity
-                    style={{ backgroundColor: SWATCH.WHITE, position: "absolute", top: 10, left: 10 }}
-                    onPress={() => this.props.navigation.goBack()}>
-                    {/* <Icon /> */}
-                    <Text>BACK</Text>
-                </TouchableOpacity>
-                <View style={{ flex: 0, flexDirection: "row", justifyContent: "center" }}>
-                    <TouchableOpacity onPress={this.toggleCameraType} style={styles.captureButton}>
-                        <Text style={{ fontSize: 14 }}> ROTATE </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={this.takePicture.bind(this)} style={styles.captureButton}>
-                        <Text style={{ fontSize: 14 }}> SNAP </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={this.toggleCameraFlash} style={styles.captureButton}>
-                        <Text style={{ fontSize: 14 }}> FLASH </Text>
-                    </TouchableOpacity>
+        if (this.state.capturedPhoto !== null) {
+            return (
+                <View style={styles.container}>
+                    <Image source={{ uri: this.state.capturedPhoto }} style={styles.photoPreview} resizeMode="cover" />
+                    <View style={styles.controlContainer}>
+                        <Icon
+                            type="material-icon"
+                            name="clear"
+                            color={SWATCH.WHITE}
+                            size={30}
+                            onPress={() => this.setState({ capturedPhoto: null })}
+                        />
+                        <Icon
+                            type="material-icon"
+                            name="check"
+                            color={SWATCH.WHITE}
+                            size={30}
+                            onPress={this.savePicture}
+                        />
+                    </View>
                 </View>
-            </View>
-        );
+            );
+        } else {
+            return (
+                <View style={styles.container}>
+                    <RNCamera
+                        ref={(ref) => (this.camera = ref)}
+                        type={this.state.cameraType}
+                        style={styles.cameraPreview}
+                        mirrorImage={this.state.cameraType === RNCamera.Constants.Type.front}
+                        permissionDialogTitle={"Permission to use camera"}
+                        permissionDialogMessage={"We need your permission to use your phone camera"}>
+                        {/* {({ camera, status }) => {
+                            console.log("camera", camera, "status", status);
+                            if (status !== "READY") return <PendingView />;
+                            return (
+                                <View style={{ flex: 0, flexDirection: "row", justifyContent: "center" }}>
+                                    <TouchableOpacity onPress={() => this.takePicture(camera)} style={styles.captureButton}>
+                                        <Text style={{ fontSize: 14 }}> SNAP </Text>
+                                    </TouchableOpacity>
+                                </View>
+                            );
+                        }} */}
+                    </RNCamera>
+                    {Platform.OS === "ios" ? (
+                        <TouchableOpacity
+                            style={styles.backButtonContainer}
+                            onPress={() => this.props.navigation.goBack()}>
+                            <Text style={styles.backButtonText}>BACK</Text>
+                        </TouchableOpacity>
+                    ) : null}
+                    <View style={styles.controlContainer}>
+                        <TouchableOpacity onPress={this.toggleCameraFlash} style={styles.buttonStyle}>
+                            <Icon
+                                type="material-icons"
+                                name={
+                                    this.state.flashMode === RNCamera.Constants.FlashMode.on ? "flash-on" : "flash-off"
+                                }
+                                color={SWATCH.WHITE}
+                                size={30}
+                            />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={this.takePicture.bind(this)}
+                            style={[styles.buttonStyle, styles.captureButtonContainer]}>
+                            <View style={styles.captureButton} />
+                            {/* <Text style={{ fontSize: 14 }}> SNAP </Text> */}
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={this.toggleCameraType} style={styles.buttonStyle}>
+                            <Icon type="material-icons" name="switch-camera" color={SWATCH.WHITE} size={30} />
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            );
+        }
     }
 }
 
@@ -105,13 +143,43 @@ const styles = StyleSheet.create({
         justifyContent: "flex-end",
         alignItems: "center",
     },
-    captureButton: {
+    photoPreview: {
+        flex: 1,
+        justifyContent: "flex-end",
+        alignItems: "center",
+    },
+    controlContainer: {
         flex: 0,
-        backgroundColor: "#fff",
-        borderRadius: 5,
-        padding: 15,
-        paddingHorizontal: 20,
+        flexBasis: 134,
+        flexDirection: "row",
+        justifyContent: "space-around",
+        // paddingVertical: 30,
+    },
+    buttonStyle: {
+        flex: 0,
+        padding: 7,
         alignSelf: "center",
-        margin: 20,
+    },
+    captureButtonContainer: {
+        backgroundColor: "#fff",
+        borderRadius: 37,
+    },
+    captureButton: {
+        height: 60,
+        width: 60,
+        borderRadius: 30,
+        backgroundColor: SWATCH.LIGHT_GRAY,
+    },
+    backButtonContainer: {
+        backgroundColor: SWATCH.WHITE,
+        position: "absolute",
+        top: 10,
+        left: 10,
+        opacity: 0.7,
+        borderRadius: 10,
+    },
+    backButtonText: {
+        marginVertical: 10,
+        marginHorizontal: 15,
     },
 });
