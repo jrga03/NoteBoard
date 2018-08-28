@@ -48,24 +48,36 @@ export default class Camera extends Component {
         if (this.camera) {
             const options = { quality: 0.5, fixOrientation: true, forceUpOrientation: true };
             const data = await this.camera.takePictureAsync(options);
-            this.setState({ capturedPhoto: data.uri });
+            this.setState({ capturedPhoto: data });
         }
     };
 
-    savePicture = () => null;
+    deletePicture = () => this.setState({ capturedPhoto: null });
+
+    savePicture = () => {
+        const savePicture = this.props.navigation.getParam("saveImage", null);
+        if (savePicture !== null) {
+            savePicture(this.state.capturedPhoto);
+            this.props.navigation.goBack();
+        }
+    };
 
     render() {
         if (this.state.capturedPhoto !== null) {
             return (
                 <View style={styles.container}>
-                    <Image source={{ uri: this.state.capturedPhoto }} style={styles.photoPreview} resizeMode="cover" />
+                    <Image
+                        source={{ uri: this.state.capturedPhoto.uri }}
+                        style={styles.photoPreview}
+                        resizeMode="cover"
+                    />
                     <View style={styles.controlContainer}>
                         <Icon
                             type="material-icon"
                             name="clear"
                             color={SWATCH.WHITE}
                             size={30}
-                            onPress={() => this.setState({ capturedPhoto: null })}
+                            onPress={this.deletePicture}
                         />
                         <Icon
                             type="material-icon"
