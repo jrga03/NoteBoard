@@ -38,6 +38,7 @@ target 'NoteBoard' do
     'RCTText',
     'RCTVibration',
     'RCTWebSocket',
+    'ART'
   ]
 
   # React Native third party dependencies podspecs
