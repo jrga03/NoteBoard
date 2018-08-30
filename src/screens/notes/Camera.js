@@ -72,20 +72,12 @@ export default class Camera extends Component {
                         resizeMode="cover"
                     />
                     <View style={styles.controlContainer}>
-                        <Icon
-                            type="material-icon"
-                            name="clear"
-                            color={SWATCH.WHITE}
-                            size={30}
-                            onPress={this.deletePicture}
-                        />
-                        <Icon
-                            type="material-icon"
-                            name="check"
-                            color={SWATCH.WHITE}
-                            size={30}
-                            onPress={this.savePicture}
-                        />
+                        <TouchableOpacity onPress={this.deletePicture}>
+                            <Icon type="material-icon" name="clear" color={SWATCH.WHITE} size={30} />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={this.savePicture}>
+                            <Icon type="material-icon" name="check" color={SWATCH.WHITE} size={30} />
+                        </TouchableOpacity>
                     </View>
                 </View>
             );
@@ -165,7 +157,7 @@ const styles = StyleSheet.create({
         flexBasis: 134,
         flexDirection: "row",
         justifyContent: "space-around",
-        // paddingVertical: 30,
+        alignItems: "center",
     },
     buttonStyle: {
         flex: 0,

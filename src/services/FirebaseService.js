@@ -425,6 +425,22 @@ const FirebaseService = {
             .catch((error) => callback(error, null));
         // console.log("uploaded", test);
     },
+
+    uploadFileListener(uri, type, otherData, ...callbacks) {
+        let ref;
+        switch (type) {
+            case "note_image":
+                ref = `/note_images/u${firebase.auth().currentUser.uid}/n${otherData.noteId}/${uri.split("/").pop()}`;
+                break;
+            default:
+                ref = `/${uri.split("/").pop()}`;
+        }
+        return firebase
+            .storage()
+            .ref(ref)
+            .putFile(uri)
+            .on("state_changed", ...callbacks);
+    },
 };
 
 // const FirebaseService = new _FirebaseService();

@@ -115,9 +115,9 @@
 	<string>We need your permission to use your phone camera</string>
 	<!-- Include this only if you are planning to use the camera roll -->
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>We need your permission to access your photo library</string>
+	<string>We need your permission to access your photo library for attaching photo to a note</string>
 	<!-- Include this only if you are planning to use the camera roll on iOS 11 and later-->
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>We need your permission to access your photo library</string>
+	<string>e need your permission to access your photo library for attaching photo to a note</string>
 </dict>
 </plist>

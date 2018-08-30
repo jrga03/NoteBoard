@@ -1,20 +1,92 @@
 import React, { Component } from "react";
-import { View, Text, FlatList, StyleSheet, Platform, TouchableOpacity } from "react-native";
+import { View, Text, FlatList, StyleSheet, Platform } from "react-native";
 import { Icon } from "react-native-elements";
+import ImageProgress from "react-native-image-progress";
+import * as Progress from "react-native-progress";
+
 import { SWATCH, LAYOUT_MARGIN } from "../../constants";
 
-export default class NoteMemo extends Component {
-    constructor(props) {
-        super(props);
+const imageBorder = 4;
 
-        this.state = {
-            title: null,
-            type: null,
-            contents: null,
-            lastEditedAt: null,
-            pinned: null,
-        };
-    }
+export default class NoteMemo extends Component {
+    renderImageRow = ({ item }) => {
+        console.log("renderImageRow item", item);
+        const { imageRowContainer } = styles;
+
+        item.reverse();
+        const memoWidth = this.props.windowWidth - LAYOUT_MARGIN * 2;
+
+        if (item.length === 1) {
+            const rowHeight = memoWidth / (item[0].width / item[0].height); // memoWidth / aspectRatio
+
+            return (
+                <View style={imageRowContainer}>
+                    <ImageProgress
+                        source={{ uri: item[0].uri }}
+                        style={{ height: rowHeight, width: memoWidth }}
+                        indicator={Progress.Circle}
+                        resizeMode="cover"
+                    />
+                </View>
+            );
+        } else {
+            const smallestImageHeight = item.reduce(
+                (min, image) => (min < image.height ? min : image.height, item[0].height)
+            );
+            const totalWidth = item.reduce((total, image) => total + image.width, 0);
+            const rowHeight = memoWidth / (totalWidth / smallestImageHeight);
+            const memoWidthWithBorder = memoWidth - (item.length - 1) * imageBorder;
+
+            if (item.length === 2) {
+                const itemWidth0 = Math.round((item[0].width / totalWidth) * 100) / 100;
+                const itemWidth1 = parseFloat(parseFloat(1 - itemWidth0).toFixed(2));
+                return (
+                    <View style={imageRowContainer}>
+                        <ImageProgress
+                            source={{ uri: item[0].uri }}
+                            style={{ height: rowHeight, width: Math.round(memoWidthWithBorder * itemWidth0) }}
+                            indicator={Progress.Circle}
+                            resizeMode="cover"
+                        />
+                        <ImageProgress
+                            source={{ uri: item[1].uri }}
+                            style={{ height: rowHeight, width: Math.round(memoWidthWithBorder * itemWidth1) }}
+                            indicator={Progress.Circle}
+                            resizeMode="cover"
+                        />
+                    </View>
+                );
+            } else {
+                const itemWidth0 = Math.round((item[0].width / totalWidth) * 100) / 100;
+                const itemWidth1 = Math.round((item[1].width / totalWidth) * 100) / 100;
+                const itemWidth2 = parseFloat(parseFloat(1 - itemWidth0 - itemWidth1).toFixed(2));
+                // console.log("widths", itemWidth0, itemWidth1, itemWidth2);
+                return (
+                    <View style={imageRowContainer}>
+                        <ImageProgress
+                            source={{ uri: item[0].uri }}
+                            style={{ height: rowHeight, width: Math.round(memoWidthWithBorder * itemWidth0) }}
+                            indicator={Progress.Circle}
+                            resizeMode="cover"
+                        />
+                        <ImageProgress
+                            source={{ uri: item[1].uri }}
+                            style={{ height: rowHeight, width: Math.round(memoWidthWithBorder * itemWidth1) }}
+                            indicator={Progress.Circle}
+                            resizeMode="cover"
+                        />
+                        <ImageProgress
+                            source={{ uri: item[2].uri }}
+                            style={{ height: rowHeight, width: Math.round(memoWidthWithBorder * itemWidth2) }}
+                            indicator={Progress.Circle}
+                            resizeMode="cover"
+                        />
+                    </View>
+                );
+            }
+        }
+    };
+
     renderNoteContent = ({ item }) => {
         const {
             noteContentText,
@@ -56,33 +128,118 @@ export default class NoteMemo extends Component {
                 );
             }
         } else {
-            return <Text style={noteContentText}>{item.content}</Text>;
+            return (
+                <Text style={noteContentText} numberOfLines={7} ellipsizeMode="tail">
+                    {item.content}
+                </Text>
+            );
         }
     };
 
     render() {
-        const { container, titleText, checkedItemText, pinContainer } = styles;
+        const {
+            titleText,
+            container,
+            pinContainer,
+            noteContentText,
+            checkedItemText,
+            contentContainer,
+            checkboxIconContainer,
+            checklistItemContainer,
+            noteContentTextTileStyle,
+            noteContentTextListStyle,
+            checkboxIconContainerTileStyle,
+            checkboxIconContainerListStyle,
+        } = styles;
         const { memo, index, onLayoutEvent, layout } = this.props;
         const { title, contents, type, pinned } = memo;
 
         const checkedItemsCount = contents.reduce((acc, item) => (item.checked ? acc + 1 : acc), 0);
+
+        let contentToRender = [];
+        if (type === "checklist" && contents.length - checkedItemsCount > 7) {
+            const uncheckedContentArray = contents.filter((content) => !content.checked);
+            contentToRender = uncheckedContentArray.slice(0, 6);
+        } else if (type === "memo" && contents.length === 1 && contents[0].content === "") {
+            contentToRender = [];
+        } else {
+            contentToRender = [...contents];
+        }
+
+        let imagesArray = [];
+        if (memo.images) {
+            imagesArray = memo.images;
+
+            if (imagesArray.length > 0) {
+                const imageChunksArray = [];
+                do {
+                    imageChunksArray.push(imagesArray.splice(0, 3));
+                } while (imagesArray.length > 0);
+
+                let imagesToRender = [];
+                if (imageChunksArray.length > 2) {
+                    imagesToRender = imageChunksArray.slice(-2);
+                } else {
+                    imagesToRender = [...imageChunksArray];
+                }
+            }
+        }
 
         return (
             <View
                 style={container}
                 // onLayout={layout === "tile" ? (e) => onLayoutEvent(e.nativeEvent.layout, index) : null}
             >
+                {imagesArray.length > 0 && (
+                    <FlatList
+                        inverted={true}
+                        data={imagesToRender}
+                        renderItem={this.renderImageRow}
+                        keyExtractor={(item, i) => `Row_${i}`}
+                    />
+                )}
                 {pinned && (
                     <View style={pinContainer}>
-                        <Icon type="material-community" name="pin" size={16} color={SWATCH.DARK_TURQUOISE} />
+                        <Icon type="material-community" name="pin" size={16} color={SWATCH.RED_ORANGE} />
                     </View>
                 )}
                 {!!title && <Text style={titleText}>{title}</Text>}
-                <FlatList
-                    data={contents}
-                    renderItem={this.renderNoteContent}
-                    keyExtractor={(item, index) => item + index}
-                />
+                {contentToRender.length > 0 && (
+                    <FlatList
+                        style={contentContainer}
+                        data={contentToRender}
+                        renderItem={this.renderNoteContent}
+                        keyExtractor={(item, index) => item + index}
+                        ListFooterComponent={() =>
+                            type === "checklist" && contents.length > 7 ? (
+                                <View style={checklistItemContainer}>
+                                    <View
+                                        style={[
+                                            checkboxIconContainer,
+                                            layout === "tile"
+                                                ? checkboxIconContainerTileStyle
+                                                : checkboxIconContainerListStyle,
+                                        ]}>
+                                        {/* style={[checkboxIconContainer, checkboxIconContainerTileStyle]}> */}
+                                        {/* <Icon
+                                        type="material-icons"
+                                        name={"check-box-outline-blank"}
+                                        color={SWATCH.BLACK}
+                                        size={16}
+                                    /> */}
+                                    </View>
+                                    <Text
+                                        style={[
+                                            noteContentText,
+                                            layout === "tile" ? noteContentTextTileStyle : noteContentTextListStyle,
+                                        ]}>
+                                        ...
+                                    </Text>
+                                </View>
+                            ) : null
+                        }
+                    />
+                )}
                 {type === "checklist" &&
                     checkedItemsCount > 0 && (
                         <Text style={checkedItemText}>
@@ -108,13 +265,17 @@ const styles = StyleSheet.create({
         },
         shadowColor: "#000000",
         shadowOpacity: 0.08,
+        justifyContent: "center",
+    },
+    contentContainer: {
+        paddingTop: 7,
     },
     titleText: {
         fontWeight: "bold",
         fontFamily: Platform.OS === "ios" ? "HelveticaNeue-Bold" : "Roboto",
         color: SWATCH.BLACK,
-        paddingTop: Platform.OS === "ios" ? 4 : 2,
-        paddingBottom: Platform.OS === "ios" ? 11 : 9,
+        paddingVertical: Platform.OS === "ios" ? 4 : 2,
+        // paddingBottom: Platform.OS === "ios" ? 11 : 9,
     },
     checklistItemContainer: {
         flexDirection: "row",
@@ -154,5 +315,10 @@ const styles = StyleSheet.create({
         position: "absolute",
         top: 8,
         right: 5,
+    },
+    imageRowContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginBottom: imageBorder,
     },
 });

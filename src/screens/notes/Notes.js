@@ -4,6 +4,7 @@ import {
     Text,
     FlatList,
     StyleSheet,
+    Dimensions,
     ScrollView,
     SectionList,
     TouchableOpacity,
@@ -34,6 +35,7 @@ class Notes extends Component {
             rightPinned: [],
             multiSelectMode: false,
             selected: [],
+            windowWidth: Dimensions.get("window").width,
         };
     }
 
@@ -41,17 +43,21 @@ class Notes extends Component {
         // console.log("home props", this.props);
         // this.fetchNotes();
         FirebaseService.addNotesListener(this.fetchNotes);
+        Dimensions.addEventListener("change", this.handleOrientationChange);
     }
 
     componentWillUnmount() {
         FirebaseService.removeNotesListener(this.fetchNotes);
+        Dimensions.removeEventListener("change", this.handleOrientationChange);
     }
 
     componentDidUpdate() {
         // const test = this.props.navigation.getParam("noteLayout", null);
         // console.log("getparam", test);
-        // console.log("home props update", this.props, this.state);
+        console.log("home props update", this.props, this.state);
     }
+
+    handleOrientationChange = ({ window }) => this.setState({ windowWidth: window.width });
 
     fetchNotes = (data) => {
         this.setState({ isLoading: true });
@@ -59,19 +65,22 @@ class Notes extends Component {
         const notes = [];
         let index = 0;
         data.forEach((note) => {
-            const noteObj = note.val();
-            noteObj.overallIndex = index;
+            let noteObj = {
+                ...note.val(),
+                overallIndex: index,
+            };
             notes.push(noteObj);
+
             index++;
         });
 
-        const list = [];
-        const listPinned = [];
-        const leftList = [];
-        const rightList = [];
-        const leftPinned = [];
-        const rightPinned = [];
-        notes.map((item) => {
+        let list = [];
+        let listPinned = [];
+        let leftList = [];
+        let rightList = [];
+        let leftPinned = [];
+        let rightPinned = [];
+        notes.forEach((item) => {
             item.pinned ? listPinned.push(item) : list.push(item);
             item.pinned
                 ? leftPinned.length > rightPinned.length
@@ -91,7 +100,15 @@ class Notes extends Component {
             rightPinned,
             isLoading: false,
         });
-        this.props.updateNoteList(data.toJSON());
+        this.props.updateNoteList(
+            Object.values(data.toJSON())
+                .sort((a, b) => {
+                    if (a.lastEditedAtMsec < b.lastEditedAtMsec) return -1;
+                    if (a.lastEditedAtMsec > b.lastEditedAtMsec) return 1;
+                    return 0;
+                })
+                .map((note, index) => ({ ...note, overallIndex: index }))
+        );
     };
 
     handleRefresh = () => {
@@ -176,6 +193,7 @@ class Notes extends Component {
                     layout={layout}
                     onLayoutEvent={this.handleOnLayoutEvent}
                     // handleNoteChanges={this.handleNoteChanges}
+                    windowWidth={this.state.windowWidth}
                 />
             </TouchableOpacity>
         );
@@ -325,6 +343,7 @@ export default connect(
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: SWATCH.SOLITUDE,
     },
     scrollContainer: {
         // flex: 1,
@@ -340,6 +359,7 @@ const styles = StyleSheet.create({
     sectionTitleText: {
         fontWeight: "bold",
         paddingVertical: 8,
+        backgroundColor: SWATCH.SOLITUDE,
     },
     sectionFooter: {
         height: 20,

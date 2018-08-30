@@ -16,6 +16,20 @@ const SWATCH = {
     YELLOW: "yellow",
 
     LIGHT_GRAY: "lightgray",
+
+    SOLITUDE: "#ECEDEE",
+
+    JET_STREAM: "#B6D6CC",
+
+    RED_ORANGE: "#FF3A20",
+
+    GLACIER: "#74A4BC",
+
+    EGYPTIAN_BLUE: "#29339B",
+
+    MYSTIC: "#CDD5D1",
+
+    BUBBLES: "#DDF8E8",
 };
 
 const LAYOUT_MARGIN = 10;

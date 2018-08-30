@@ -43,7 +43,7 @@ const commonNavigationOptions = (navigation, screenProps, ...props) => ({
         </TouchableOpacity>
     ),
     headerStyle: {
-        backgroundColor: SWATCH.GRAY,
+        backgroundColor: SWATCH.GLACIER,
         height: 50,
         paddingHorizontal: 10,
     },
@@ -51,7 +51,6 @@ const commonNavigationOptions = (navigation, screenProps, ...props) => ({
         color: SWATCH.BLACK,
         fontSize: 18,
         textAlign: "left",
-        // alignSelf: "flex-start",
         width: "100%",
     },
 });
@@ -83,25 +82,25 @@ const noteHomeNavigationOptions = (navigation, screenProps, ...props) => {
                 </TouchableOpacity>
             </View>
         ),
-        headerStyle: {
-            backgroundColor: SWATCH.GRAY,
-            height: 50,
-            paddingHorizontal: 10,
-        },
+        // headerStyle: {
+        //     backgroundColor: SWATCH.GLACIER,
+        //     height: 50,
+        //     paddingHorizontal: 10,
+        // },
         headerBackTitle: null,
         headerTintColor: SWATCH.BLACK,
-        headerTitleStyle: {
-            color: SWATCH.BLACK,
-            fontSize: 18,
-            textAlign: "left",
-            width: "100%",
-        },
+        // headerTitleStyle: {
+        //     color: SWATCH.BLACK,
+        //     fontSize: 18,
+        //     textAlign: "left",
+        //     width: "100%",
+        // },
     };
 };
 
 const noteItemNavigationOptions = (navigation, screenProps, ...props) => {
     const isPinned = navigation.getParam("isPinned", false);
-    const pinColor = isPinned ? SWATCH.DARK_TURQUOISE : SWATCH.BLACK;
+    const pinColor = isPinned ? SWATCH.RED_ORANGE : SWATCH.BLACK;
 
     handlePinOnPress = () => {
         if (navigation.state.params && navigation.state.params.togglePin) {
@@ -124,7 +123,7 @@ const noteItemNavigationOptions = (navigation, screenProps, ...props) => {
             </View>
         ),
         headerStyle: {
-            backgroundColor: SWATCH.GRAY,
+            backgroundColor: SWATCH.GLACIER,
             height: 50,
             paddingRight: Platform.OS === "ios" ? 10 : 15,
         },
@@ -138,6 +137,7 @@ const NotesStack = createStackNavigator(
             screen: NotesScreen,
             navigationOptions: ({ navigation, screenProps }) => ({
                 title: "Notes".toUpperCase(),
+                ...commonNavigationOptions(navigation, screenProps),
                 ...noteHomeNavigationOptions(navigation, screenProps),
                 headerBackTitle: "NOTES",
             }),
@@ -167,7 +167,7 @@ const NotesStack = createStackNavigator(
                               </TouchableOpacity>
                           ),
                           headerStyle: {
-                              backgroundColor: SWATCH.GRAY,
+                              backgroundColor: SWATCH.GLACIER,
                               height: 50,
                               paddingRight: Platform.OS === "ios" ? 10 : 20,
                           },
@@ -191,7 +191,7 @@ const NotesStack = createStackNavigator(
                               </TouchableOpacity>
                           ),
                           headerStyle: {
-                              backgroundColor: SWATCH.GRAY,
+                              backgroundColor: SWATCH.GLACIER,
                               height: 50,
                               paddingRight: Platform.OS === "ios" ? 15 : 20,
                           },
@@ -228,10 +228,24 @@ const NotesStack = createStackNavigator(
     }
 );
 
-const ContactsTab = createMaterialTopTabNavigator({
-    Contacts: ContactsScreen,
-    Add: AddContactScreen,
-});
+const ContactsTab = createMaterialTopTabNavigator(
+    {
+        Contacts: ContactsScreen,
+        Add: AddContactScreen,
+    },
+    {
+        tabBarOptions: {
+            indicatorStyle: {
+                backgroundColor: SWATCH.RED_ORANGE,
+            },
+            activeTintColor: SWATCH.RED_ORANGE,
+            inactiveTintColor: SWATCH.BLACK,
+            style: {
+                backgroundColor: SWATCH.MYSTIC
+            }
+        },
+    }
+);
 
 const ContactsStack = createStackNavigator(
     {
@@ -246,7 +260,7 @@ const ContactsStack = createStackNavigator(
             screen: ContactProfile,
             navigationOptions: {
                 headerStyle: {
-                    backgroundColor: SWATCH.GRAY,
+                    backgroundColor: SWATCH.GLACIER,
                     height: 50,
                     paddingHorizontal: 10,
                 },
@@ -330,7 +344,7 @@ const MainStack = createStackNavigator(
         initialRouteName: "Main",
         navigationOptions: {
             headerStyle: {
-                backgroundColor: SWATCH.GRAY,
+                backgroundColor: SWATCH.GLACIER,
                 height: 50,
             },
             headerTitleStyle: {

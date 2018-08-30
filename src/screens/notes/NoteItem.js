@@ -10,11 +10,15 @@ import {
     Platform,
     ToastAndroid,
     Image,
+    CameraRoll,
+    PermissionsAndroid,
 } from "react-native";
 import { Icon } from "react-native-elements";
 import Moment from "moment";
 import { connect } from "react-redux";
 import Toast, { DURATION } from "react-native-easy-toast";
+
+import NoteImages from "./NoteImages";
 
 import { SWATCH, LAYOUT_MARGIN } from "../../constants";
 import {
@@ -27,7 +31,6 @@ import {
     clearSelectedNote,
     saveNoteLocation,
 } from "../../actions";
-import { FirebaseService } from "../../services";
 
 const selection = { start: null, end: null };
 let contentId;
@@ -49,11 +52,14 @@ class NoteItem extends Component {
                     markers: [],
                     mapSnapshot: null,
                 },
+                images: [],
             },
             index: null,
             footerMenuSelected: null,
             footerMenu: [],
             forDeletion: false,
+            tempImages: [],
+            imagesModified: false,
         };
 
         this.inputs = {};
@@ -79,6 +85,7 @@ class NoteItem extends Component {
 
         this.setState({
             note: {
+                ...this.state.note,
                 ...note,
                 contents: contentsWithId,
             },
@@ -87,6 +94,7 @@ class NoteItem extends Component {
     }
 
     componentDidUpdate() {
+        // console.log("update", this.state);
         if (this.state.note.lastEditedAt !== this.props.selectedNote.note.lastEditedAt) {
             if (this.props.selectedNote.note.location) {
                 this.setState({
@@ -121,7 +129,8 @@ class NoteItem extends Component {
                 !!index ||
                 !!note.title ||
                 note.contents.reduce((acc, item) => (acc = !!item.content), false) ||
-                checkboxChanged
+                checkboxChanged ||
+                this.state.imagesModified
             ) {
                 // console.log("update triggered");
                 this.props.updateNoteList(index, note);
@@ -334,9 +343,19 @@ class NoteItem extends Component {
                 }
                 break;
             case "photo":
-                this.props.navigation.navigate("Camera");
+                this.setState(
+                    {
+                        footerMenu: [],
+                        footerMenuSelected: null,
+                    },
+                    () =>
+                        this.props.navigation.navigate("Camera", {
+                            saveImage: this.saveImageToTempList.bind(this),
+                        })
+                );
                 break;
             case "gallery":
+                this.requestGalleryAccess();
                 break;
             case "location":
                 this.setState(
@@ -378,6 +397,64 @@ class NoteItem extends Component {
                 },
                 this.updateNote
             );
+        }
+    };
+
+    saveImageToTempList = (data) =>
+        this.setState({
+            tempImages: [
+                ...this.state.tempImages,
+                {
+                    ...data,
+                    id: Date.now(),
+                },
+            ],
+        });
+
+    saveUploadedImageToNote = (data) => {
+        const { tempImages } = this.state;
+        const imageIndex = tempImages.findIndex((image) => image.id === data.id);
+
+        if (imageIndex !== -1) {
+            tempImages.splice(imageIndex, 1);
+
+            this.setState(
+                {
+                    tempImages,
+                    note: {
+                        ...this.state.note,
+                        images: [...this.state.note.images, data],
+                    },
+                    wasChanged: true,
+                    imagesModified: true,
+                },
+                this.updateNote
+            );
+        }
+    };
+
+    requestGalleryAccess = async () => {
+        try {
+            const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE, {
+                title: "Permission to access photos",
+                message: "We need your permission to access your gallery",
+            });
+            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                const params = { first: 20, mimeTypes: ["image/jpeg"] };
+
+                CameraRoll.getPhotos(params)
+                    .then((res) => console.log(res))
+                    .catch((err) => console.log(err));
+            } else {
+                Platform.OS === "ios"
+                    ? this.toast.show(message, DURATION.LENGTH_SHORT)
+                    : ToastAndroid.show(message, ToastAndroid.SHORT);
+                console.log("Gallery permission denied");
+            }
+        } catch (err) {
+            console.warn(err);
+        } finally {
+            this.setState({ footer: [], footerMenuSelected: null });
         }
     };
 
@@ -509,8 +586,8 @@ class NoteItem extends Component {
             mapSnapshotDescriptionContainer,
             staticFooterMainContentContainer,
         } = styles;
-        const { footerMenu, footerMenuSelected, note } = this.state;
-        const { id, title, lastEditedAt, contents, type } = note;
+        const { footerMenu, footerMenuSelected, note, tempImages } = this.state;
+        const { id, title, lastEditedAt, contents, type, images } = note;
         const { memoAdd, checklistAdd, more } = noteItemMenuItems;
 
         lastEditedAtFormatted = () => {
@@ -528,6 +605,12 @@ class NoteItem extends Component {
         return (
             <View style={mainContainer}>
                 <ScrollView style={mainContainer} contentContainerStyle={container}>
+                    <NoteImages
+                        noteId={id}
+                        tempImages={tempImages}
+                        images={images}
+                        saveUploadedImage={this.saveUploadedImageToNote}
+                    />
                     <TextInput
                         style={noteTitleText}
                         value={title}
@@ -688,12 +771,13 @@ const styles = StyleSheet.create({
         // flex: 1,
         justifyContent: "center",
         alignItems: "stretch",
-        paddingTop: LAYOUT_MARGIN * 2,
+        paddingBottom: LAYOUT_MARGIN * 6,
     },
     contentContainer: {
         paddingHorizontal: LAYOUT_MARGIN * 2,
     },
     noteTitleText: {
+        marginTop: LAYOUT_MARGIN * 2,
         fontWeight: "bold",
         fontSize: 18,
         padding: 0,
