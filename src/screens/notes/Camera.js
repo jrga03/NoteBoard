@@ -57,7 +57,7 @@ export default class Camera extends Component {
     savePicture = () => {
         const savePicture = this.props.navigation.getParam("saveImage", null);
         if (savePicture !== null) {
-            savePicture(this.state.capturedPhoto);
+            savePicture([{ ...this.state.capturedPhoto, id: Date.now() }]);
             this.props.navigation.goBack();
         }
     };

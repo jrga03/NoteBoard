@@ -34,4 +34,6 @@ const SWATCH = {
 
 const LAYOUT_MARGIN = 10;
 
-export { SWATCH, LAYOUT_MARGIN };
+const ACTION_BAR_HEIGHT = 50;
+
+export { SWATCH, LAYOUT_MARGIN, ACTION_BAR_HEIGHT };

@@ -11,7 +11,7 @@ import {
 } from "react-navigation";
 import { Icon } from "react-native-elements";
 
-import { SWATCH } from "../constants";
+import { SWATCH, ACTION_BAR_HEIGHT } from "../constants";
 
 import Initiator from "../screens/initiator/Initiator";
 import SignInScreen from "../screens/signin/SignIn";
@@ -26,6 +26,7 @@ import AddContactScreen from "../screens/contacts/AddContact";
 import ContactProfile from "../screens/contacts/ContactProfile";
 import NoteMap from "../screens/notes/Map";
 import Camera from "../screens/notes/Camera";
+import Gallery from "../screens/notes/Gallery";
 
 const generateIcon = (type, name, color = SWATCH.BLACK, size = 27) => {
     return <Icon name={name} type={type} color={color} size={size} />;
@@ -44,7 +45,7 @@ const commonNavigationOptions = (navigation, screenProps, ...props) => ({
     ),
     headerStyle: {
         backgroundColor: SWATCH.GLACIER,
-        height: 50,
+        height: ACTION_BAR_HEIGHT,
         paddingHorizontal: 10,
     },
     headerTitleStyle: {
@@ -84,7 +85,7 @@ const noteHomeNavigationOptions = (navigation, screenProps, ...props) => {
         ),
         // headerStyle: {
         //     backgroundColor: SWATCH.GLACIER,
-        //     height: 50,
+        //     height: ACTION_BAR_HEIGHT,
         //     paddingHorizontal: 10,
         // },
         headerBackTitle: null,
@@ -124,7 +125,7 @@ const noteItemNavigationOptions = (navigation, screenProps, ...props) => {
         ),
         headerStyle: {
             backgroundColor: SWATCH.GLACIER,
-            height: 50,
+            height: ACTION_BAR_HEIGHT,
             paddingRight: Platform.OS === "ios" ? 10 : 15,
         },
         headerTintColor: SWATCH.BLACK,
@@ -153,23 +154,21 @@ const NotesStack = createStackNavigator(
         NoteMap: {
             screen: NoteMap,
             navigationOptions: ({ navigation }) => {
+                const deselectMarker = navigation.getParam("deselectMarker", null);
+                const saveTaggedLocations = navigation.getParam("saveTaggedLocations", null);
+
                 return !!navigation.getParam("selectedMarker", "")
                     ? {
                           title: navigation.getParam("selectedMarker", ""),
                           headerLeft: (
-                              <TouchableOpacity
-                                  onPress={() =>
-                                      navigation.state.params && navigation.state.params.deselectMarker
-                                          ? navigation.state.params.deselectMarker()
-                                          : null
-                                  }>
+                              <TouchableOpacity onPress={deselectMarker}>
                                   <Icon type="material-icons" name="clear" color={SWATCH.BLACK} size={27} />
                               </TouchableOpacity>
                           ),
                           headerStyle: {
                               backgroundColor: SWATCH.GLACIER,
-                              height: 50,
-                              paddingRight: Platform.OS === "ios" ? 10 : 20,
+                              height: ACTION_BAR_HEIGHT,
+                              paddingHorizontal: Platform.OS === "ios" ? 10 : 15,
                           },
                           headerTitleStyle: {
                               color: SWATCH.BLACK,
@@ -181,18 +180,13 @@ const NotesStack = createStackNavigator(
                     : {
                           title: navigation.getParam("selectedMarker", ""),
                           headerRight: (
-                              <TouchableOpacity
-                                  onPress={() =>
-                                      navigation.state.params && navigation.state.params.saveTaggedLocations
-                                          ? navigation.state.params.saveTaggedLocations()
-                                          : null
-                                  }>
+                              <TouchableOpacity onPress={saveTaggedLocations}>
                                   <Text style={{ color: SWATCH.BLACK }}>SAVE</Text>
                               </TouchableOpacity>
                           ),
                           headerStyle: {
                               backgroundColor: SWATCH.GLACIER,
-                              height: 50,
+                              height: ACTION_BAR_HEIGHT,
                               paddingRight: Platform.OS === "ios" ? 15 : 20,
                           },
                           headerTintColor: SWATCH.BLACK,
@@ -203,7 +197,17 @@ const NotesStack = createStackNavigator(
             screen: Camera,
             navigationOptions: {
                 header: null,
-                gesturesEnabled: false,
+                // gesturesEnabled: false,
+            },
+        },
+        Gallery: {
+            screen: Gallery,
+            navigationOptions: {
+                headerStyle: {
+                    backgroundColor: SWATCH.GLACIER,
+                    height: ACTION_BAR_HEIGHT,
+                    // paddingRight: Platform.OS === "ios" ? 15 : 20,
+                },
             },
         },
     },
@@ -241,8 +245,8 @@ const ContactsTab = createMaterialTopTabNavigator(
             activeTintColor: SWATCH.RED_ORANGE,
             inactiveTintColor: SWATCH.BLACK,
             style: {
-                backgroundColor: SWATCH.MYSTIC
-            }
+                backgroundColor: SWATCH.MYSTIC,
+            },
         },
     }
 );
@@ -261,7 +265,7 @@ const ContactsStack = createStackNavigator(
             navigationOptions: {
                 headerStyle: {
                     backgroundColor: SWATCH.GLACIER,
-                    height: 50,
+                    height: ACTION_BAR_HEIGHT,
                     paddingHorizontal: 10,
                 },
                 headerTintColor: SWATCH.BLACK,
@@ -345,7 +349,7 @@ const MainStack = createStackNavigator(
         navigationOptions: {
             headerStyle: {
                 backgroundColor: SWATCH.GLACIER,
-                height: 50,
+                height: ACTION_BAR_HEIGHT,
             },
             headerTitleStyle: {
                 color: SWATCH.BLACK,

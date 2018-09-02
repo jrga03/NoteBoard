@@ -54,7 +54,7 @@ class Notes extends Component {
     componentDidUpdate() {
         // const test = this.props.navigation.getParam("noteLayout", null);
         // console.log("getparam", test);
-        console.log("home props update", this.props, this.state);
+        // console.log("home props update", this.props, this.state);
     }
 
     handleOrientationChange = ({ window }) => this.setState({ windowWidth: window.width });

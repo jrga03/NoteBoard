@@ -402,13 +402,7 @@ class NoteItem extends Component {
 
     saveImageToTempList = (data) =>
         this.setState({
-            tempImages: [
-                ...this.state.tempImages,
-                {
-                    ...data,
-                    id: Date.now(),
-                },
-            ],
+            tempImages: [...this.state.tempImages, ...data],
         });
 
     saveUploadedImageToNote = (data) => {
@@ -440,16 +434,56 @@ class NoteItem extends Component {
                 message: "We need your permission to access your gallery",
             });
             if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                const params = { first: 20, mimeTypes: ["image/jpeg"] };
+                const params = {
+                    first: 1000,
+                    mimeTypes: ["image/jpeg", "image/png", "image/bmp"],
+                };
 
                 CameraRoll.getPhotos(params)
-                    .then((res) => console.log(res))
+                    .then((res) => {
+                        const data = res.edges.reduce((acc, rawPhoto) => {
+                            let dateKey = Moment(
+                                Moment(rawPhoto.node.timestamp * 1000).format("MMMM D, YYYY"),
+                                "MMMM D, YYYY"
+                            )
+                                .format("x")
+                                .toString();
+                            let date = Moment(rawPhoto.node.timestamp * 1000)
+                                .format("MMMM D, YYYY")
+                                .toString();
+
+                            if (!acc[dateKey]) {
+                                acc[dateKey] = { title: date, data: [] };
+                            }
+                            acc[dateKey].data.push({ ...rawPhoto.node.image, id: rawPhoto.node.timestamp * 1000 });
+                            return acc;
+                        }, {});
+
+                        const sortedPhotos = Object.keys(data)
+                            .sort((a, b) => {
+                                if (Number(a) < Number(b)) return 1;
+                                if (Number(a) > Number(b)) return -1;
+                                return 0;
+                            })
+                            .map((key) => data[key]);
+
+                        // console.log("data", sortedPhotos);
+                        this.props.navigation.navigate("Gallery", {
+                            photos: sortedPhotos,
+                            endCursor: res.page_info.end_cursor,
+                        });
+
+                        // const photos = res.edges.map((photo) => ({
+                        //     ...photo.node.image,
+                        //     id: photo.node.timestamp * 1000,
+                        // }));
+                        // this.props.navigation.navigate("Gallery", { photos });
+                    })
                     .catch((err) => console.log(err));
             } else {
                 Platform.OS === "ios"
                     ? this.toast.show(message, DURATION.LENGTH_SHORT)
                     : ToastAndroid.show(message, ToastAndroid.SHORT);
-                console.log("Gallery permission denied");
             }
         } catch (err) {
             console.warn(err);

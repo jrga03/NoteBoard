@@ -75,32 +75,42 @@ export default class NoteMap extends Component {
             markerIDs = markers.map((marker) => marker.id);
             markerCount = markers.length;
         }
-
+        
         this.props.navigation.setParams({
             deselectMarker: this.deselectMarker.bind(this),
             saveTaggedLocations: this.saveTaggedLocations.bind(this),
         });
 
-        navigator.geolocation.getCurrentPosition(
-            ({ coords: { latitude, longitude } }) =>
-                this.setState(
-                    {
-                        initialRegion: {
-                            latitude,
-                            longitude,
-                            latitudeDelta: LATITUDE_DELTA,
-                            longitudeDelta: LONGITUDE_DELTA,
-                        },
-                        markers,
-                        markerIDs,
-                    },
-                    () => {
-                        if (this.state.markers.length > 0) setTimeout(this.focusAllMarkers, 1000);
-                    }
-                ),
-            (error) => console.log("error getting current location", error),
-            { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+        this.setState(
+            {
+                markers,
+                markerIDs,
+            },
+            () => {
+                if (this.state.markers.length > 0) setTimeout(this.focusAllMarkers, 50);
+            }
         );
+
+        // navigator.geolocation.getCurrentPosition(
+        //     ({ coords: { latitude, longitude } }) =>
+        //         this.setState(
+        //             {
+        //                 initialRegion: {
+        //                     latitude,
+        //                     longitude,
+        //                     latitudeDelta: LATITUDE_DELTA,
+        //                     longitudeDelta: LONGITUDE_DELTA,
+        //                 },
+        //                 markers,
+        //                 markerIDs,
+        //             },
+        //             () => {
+        //                 if (this.state.markers.length > 0) setTimeout(this.focusAllMarkers, 1000);
+        //             }
+        //         ),
+        //     (error) => console.log("error getting current location", error),
+        //     { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+        // );
     }
 
     componentDidUpdate() {
@@ -259,7 +269,7 @@ export default class NoteMap extends Component {
                 <MapView
                     ref={(ref) => (this.map = ref)}
                     style={styles.map}
-                    initialRegion={this.state.initialRegion}
+                    // initialRegion={this.state.initialRegion}
                     provider={PROVIDER_GOOGLE}
                     showsTraffic={false}
                     // showsUserLocation={true}
