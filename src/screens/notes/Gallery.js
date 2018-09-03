@@ -1,11 +1,41 @@
 import React, { Component } from "react";
-import { View, Text, Image, StyleSheet, TouchableWithoutFeedback, FlatList, Dimensions } from "react-native";
-import { SWATCH } from "../../constants";
+import {
+    View,
+    Text,
+    Image,
+    FlatList,
+    StyleSheet,
+    Dimensions,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+} from "react-native";
+import { Icon } from "react-native-elements";
+import { SWATCH, ACTION_BAR_HEIGHT } from "../../constants";
 
 const imageBorder = 3;
 let photo_padding = 0;
 
 export default class Gallery extends Component {
+    static navigationOptions = ({ navigation }) => {
+        const deselectAllPhotos = navigation.getParam("deselectAllPhotos", null);
+        const saveImageArray = navigation.getParam("saveImageArray", null);
+
+        return navigation.getParam("photosSelected", false)
+            ? {
+                  headerLeft: (
+                      <TouchableOpacity onPress={deselectAllPhotos}>
+                          <Icon type="material-icons" name="clear" color={SWATCH.BLACK} size={27} />
+                      </TouchableOpacity>
+                  ),
+                  headerRight: (
+                      <TouchableOpacity onPress={saveImageArray}>
+                          <Text style={{ color: SWATCH.BLACK }}>SAVE</Text>
+                      </TouchableOpacity>
+                  ),
+              }
+            : undefined;
+    };
+
     constructor(props) {
         super(props);
 
@@ -39,6 +69,12 @@ export default class Gallery extends Component {
             orientation,
             windowWidth: window.width,
         });
+
+        this.props.navigation.setParams({
+            deselectAllPhotos: this.deselectAllPhotos.bind(this),
+            saveImageArray: this.saveImageArray.bind(this),
+        });
+
         Dimensions.addEventListener("change", this.handleOrientationChange);
     }
 
@@ -59,6 +95,21 @@ export default class Gallery extends Component {
             photoSize = (window.width - imageBorder * 2) / 3;
         }
         this.setState({ photoSize, orientation, windowWidth: window.width });
+    };
+
+    updateHeaderComponent = () => {
+        this.props.navigation.setParams({ photosSelected: this.state.selectedPhotosId.length > 0 });
+    };
+
+    deselectAllPhotos = () => this.setState({ selectedPhotos: [], selectedPhotosId: [] }, this.updateHeaderComponent);
+
+    saveImageArray = () => {
+        const saveImages = this.props.navigation.getParam("saveImages", null);
+
+        if (saveImages) {
+            saveImages(this.state.selectedPhotos);
+            this.props.navigation.goBack();
+        }
     };
 
     renderItem = ({ item }) => {
@@ -87,20 +138,26 @@ export default class Gallery extends Component {
                         <TouchableWithoutFeedback
                             onPress={() => {
                                 if (selectionIndex === -1) {
-                                    this.setState({
-                                        selectedPhotos: [...this.state.selectedPhotos, item],
-                                        selectedPhotosId: [...this.state.selectedPhotosId, item.id],
-                                    });
+                                    this.setState(
+                                        {
+                                            selectedPhotos: [...this.state.selectedPhotos, item],
+                                            selectedPhotosId: [...this.state.selectedPhotosId, item.id],
+                                        },
+                                        this.updateHeaderComponent
+                                    );
                                 } else {
                                     const newSelectedPhotos = Array.from(this.state.selectedPhotos);
                                     const newSelectedPhotosId = Array.from(this.state.selectedPhotosId);
 
                                     newSelectedPhotos.splice(selectionIndex, 1);
                                     newSelectedPhotosId.splice(selectionIndex, 1);
-                                    this.setState({
-                                        selectedPhotos: newSelectedPhotos,
-                                        selectedPhotosId: newSelectedPhotosId,
-                                    });
+                                    this.setState(
+                                        {
+                                            selectedPhotos: newSelectedPhotos,
+                                            selectedPhotosId: newSelectedPhotosId,
+                                        },
+                                        this.updateHeaderComponent
+                                    );
                                 }
                             }}>
                             <View

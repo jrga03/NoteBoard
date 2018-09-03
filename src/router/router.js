@@ -202,13 +202,22 @@ const NotesStack = createStackNavigator(
         },
         Gallery: {
             screen: Gallery,
-            navigationOptions: {
+            navigationOptions: ({ navigation }) => ({
                 headerStyle: {
                     backgroundColor: SWATCH.GLACIER,
                     height: ACTION_BAR_HEIGHT,
-                    // paddingRight: Platform.OS === "ios" ? 15 : 20,
+                    paddingLeft: navigation.getParam("photosSelected", false)
+                        ? Platform.OS === "ios"
+                            ? 10
+                            : 15
+                        : undefined,
+                    paddingRight: navigation.getParam("photosSelected", false)
+                        ? Platform.OS === "ios"
+                            ? 15
+                            : 20
+                        : undefined,
                 },
-            },
+            }),
         },
     },
     {

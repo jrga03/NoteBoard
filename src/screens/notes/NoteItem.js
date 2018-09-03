@@ -471,6 +471,7 @@ class NoteItem extends Component {
                         this.props.navigation.navigate("Gallery", {
                             photos: sortedPhotos,
                             endCursor: res.page_info.end_cursor,
+                            saveImages: this.saveImageToTempList.bind(this),
                         });
 
                         // const photos = res.edges.map((photo) => ({
