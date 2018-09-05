@@ -441,6 +441,18 @@ const FirebaseService = {
             .putFile(uri)
             .on("state_changed", ...callbacks);
     },
+
+    async fetchCollaboratorPhotos(collaboratorsIds) {
+        const collaboratorsPhotos = [];
+        for (let id of collaboratorsIds) {
+            let photo = await firebase
+                .database()
+                .ref(`/users/${id}/photoURL`)
+                .once("value");
+            collaboratorsPhotos.push(photo.val());
+        }
+        return collaboratorsPhotos;
+    },
 };
 
 // const FirebaseService = new _FirebaseService();

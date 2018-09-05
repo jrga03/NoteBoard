@@ -1,14 +1,34 @@
 import React, { Component } from "react";
 import { View, Text, FlatList, StyleSheet, Platform } from "react-native";
-import { Icon } from "react-native-elements";
+import { Icon, Avatar } from "react-native-elements";
 import ImageProgress from "react-native-image-progress";
 import * as Progress from "react-native-progress";
 
 import { SWATCH, LAYOUT_MARGIN } from "../../constants";
+import { FirebaseService } from "../../services";
 
 const imageBorder = 4;
 
 export default class NoteMemo extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            collaborators: [],
+        };
+    }
+
+    componentDidMount() {
+        if (this.props.memo.collaborators) {
+            this.fetchCollaboratorPhotos(this.props.memo.collaborators);
+        }
+    }
+
+    fetchCollaboratorPhotos = async (collabArray) => {
+        const photosArr = await FirebaseService.fetchCollaboratorPhotos(collabArray);
+        this.setState({ collaborators: photosArr });
+    };
+
     trimImageArray = (arr) => {
         const imagesArray = Array.from(arr);
 
@@ -162,15 +182,18 @@ export default class NoteMemo extends Component {
             noteContentText,
             checkedItemText,
             contentContainer,
+            collaboratorAvatar,
             checkboxIconContainer,
+            collaboratorContainer,
             checklistItemContainer,
             noteContentTextTileStyle,
             noteContentTextListStyle,
+            collaboratorAvatarContainer,
             checkboxIconContainerTileStyle,
             checkboxIconContainerListStyle,
         } = styles;
         const { memo, index, onLayoutEvent, layout } = this.props;
-        const { title, contents, type, pinned } = memo;
+        const { title, contents, type, pinned, images } = memo;
 
         const checkedItemsCount = contents.reduce((acc, item) => (item.checked ? acc + 1 : acc), 0);
 
@@ -184,7 +207,7 @@ export default class NoteMemo extends Component {
             contentToRender = [...contents];
         }
 
-        let imagesToRender = memo.images && this.trimImageArray(memo.images);
+        const imagesToRender = images && this.trimImageArray(images);
 
         return (
             <View
@@ -248,6 +271,32 @@ export default class NoteMemo extends Component {
                             {`+${checkedItemsCount} checked ${checkedItemsCount > 1 ? "items" : "item"}`}
                         </Text>
                     )}
+                {this.state.collaborators.length > 0 && (
+                    <View style={collaboratorContainer}>
+                        {this.state.collaborators.map(
+                            (collaborator, i) =>
+                                collaborator ? (
+                                    <Avatar
+                                        key={`${i}`}
+                                        // small
+                                        rounded
+                                        avatarStyle={collaboratorAvatar}
+                                        containerStyle={[collaboratorAvatar, collaboratorAvatarContainer]}
+                                        source={{ uri: collaborator }}
+                                    />
+                                ) : (
+                                    <Avatar
+                                        key={`${i}`}
+                                        // small
+                                        rounded
+                                        avatarStyle={collaboratorAvatar}
+                                        containerStyle={[collaboratorAvatar, collaboratorAvatarContainer]}
+                                        icon={{ name: "person" }}
+                                    />
+                                )
+                        )}
+                    </View>
+                )}
             </View>
         );
     }
@@ -325,5 +374,18 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         marginBottom: imageBorder,
+    },
+    collaboratorContainer: {
+        flexDirection: "row",
+        // marginTop: 7,
+        padding: 7,
+    },
+    collaboratorAvatar: {
+        width: 20,
+        height: 20,
+        // borderRadius: 10,
+    },
+    collaboratorAvatarContainer: {
+        marginRight: 10,
     },
 });

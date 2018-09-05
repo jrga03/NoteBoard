@@ -13,7 +13,7 @@ import {
     CameraRoll,
     PermissionsAndroid,
 } from "react-native";
-import { Icon } from "react-native-elements";
+import { Icon, Avatar } from "react-native-elements";
 import Moment from "moment";
 import { connect } from "react-redux";
 import Toast, { DURATION } from "react-native-easy-toast";
@@ -31,6 +31,7 @@ import {
     clearSelectedNote,
     saveNoteLocation,
 } from "../../actions";
+import { FirebaseService } from "../../services";
 
 const selection = { start: null, end: null };
 let contentId;
@@ -53,6 +54,7 @@ class NoteItem extends Component {
                     mapSnapshot: null,
                 },
                 images: [],
+                collaborators: [],
             },
             index: null,
             footerMenuSelected: null,
@@ -82,6 +84,11 @@ class NoteItem extends Component {
             contentId++;
             return c;
         });
+
+        if (note.collaborators) {
+            // console.log("note.collaborators", note.collaborators);
+            this.fetchCollaboratorPhotos(note.collaborators);
+        }
 
         this.setState({
             note: {
@@ -493,6 +500,11 @@ class NoteItem extends Component {
         }
     };
 
+    fetchCollaboratorPhotos = async (collabArray) => {
+        const photosArr = await FirebaseService.fetchCollaboratorPhotos(collabArray);
+        this.setState({ note: { ...this.state.note, collaborators: photosArr } });
+    };
+
     renderNoteContentMemo = ({ item, index }) => {
         const { noteContentText } = styles;
 
@@ -610,19 +622,22 @@ class NoteItem extends Component {
             contentContainer,
             listItemContainer,
             footerRowContainer,
+            collaboratorAvatar,
             footerItemContainer,
             noteContentCheckBox,
             mapSnapshotContainer,
             checklistRowContainer,
             staticFooterContainer,
+            collaboratorContainer,
             footerItemTextContainer,
             checklistFooterContainer,
             mapSnapshotDescriptionText,
+            collaboratorAvatarContainer,
             mapSnapshotDescriptionContainer,
             staticFooterMainContentContainer,
         } = styles;
         const { footerMenu, footerMenuSelected, note, tempImages } = this.state;
-        const { id, title, lastEditedAt, contents, type, images } = note;
+        const { id, title, lastEditedAt, contents, type, images, location, collaborators } = note;
         const { memoAdd, checklistAdd, more } = noteItemMenuItems;
 
         lastEditedAtFormatted = () => {
@@ -672,26 +687,49 @@ class NoteItem extends Component {
                             )
                         }
                     />
-                    {this.state.note.location &&
-                        this.state.note.location.mapSnapshot && (
+                    {collaborators.length > 0 && (
+                        <View style={collaboratorContainer}>
+                            {collaborators.map(
+                                (collaborator, i) =>
+                                    collaborator ? (
+                                        <Avatar
+                                            key={`Avatar_${i}`}
+                                            // small
+                                            rounded
+                                            avatarStyle={collaboratorAvatar}
+                                            containerStyle={[collaboratorAvatar, collaboratorAvatarContainer]}
+                                            source={{ uri: collaborator }}
+                                        />
+                                    ) : (
+                                        <Avatar
+                                            key={`Avatar_${i}`}
+                                            // small
+                                            rounded
+                                            avatarStyle={collaboratorAvatar}
+                                            containerStyle={[collaboratorAvatar, collaboratorAvatarContainer]}
+                                            icon={{ name: "person" }}
+                                        />
+                                    )
+                            )}
+                        </View>
+                    )}
+                    {location &&
+                        location.mapSnapshot && (
                             <TouchableOpacity
                                 style={mapSnapshotContainer}
                                 onPress={() =>
                                     this.props.navigation.navigate("NoteMap", {
                                         saveLocationDetails: this.saveLocationDetails.bind(this),
-                                        markers:
-                                            this.state.note.location && this.state.note.location.markers
-                                                ? this.state.note.location.markers
-                                                : [],
+                                        markers: location && location.markers ? location.markers : [],
                                     })
                                 }>
                                 <Image
                                     style={mapSnapshotImage}
-                                    source={{ uri: this.state.note.location.mapSnapshot }}
+                                    source={{ uri: location.mapSnapshot }}
                                     resizeMode="cover"
                                 />
                                 <View style={mapSnapshotDescriptionContainer}>
-                                    {this.state.note.location.markers.map((marker) => (
+                                    {location.markers.map((marker) => (
                                         <Text style={mapSnapshotDescriptionText} key={marker.id}>
                                             {marker.description}
                                         </Text>
@@ -902,7 +940,7 @@ const styles = StyleSheet.create({
     mapSnapshotContainer: {
         backgroundColor: SWATCH.WHITE,
         margin: LAYOUT_MARGIN,
-        marginTop: 40,
+        marginTop: 30,
         elevation: 2,
         shadowRadius: 3,
         shadowOffset: {
@@ -923,7 +961,19 @@ const styles = StyleSheet.create({
     },
     mapSnapshotDescriptionText: {
         fontStyle: "italic",
-        paddingVertical: 5,
+        // paddingVertical: 5,
+    },
+    collaboratorContainer: {
+        flexDirection: "row",
+        paddingTop: 20,
+        paddingHorizontal: LAYOUT_MARGIN,
+    },
+    collaboratorAvatar: {
+        width: 20,
+        height: 20,
+    },
+    collaboratorAvatarContainer: {
+        marginRight: 10,
     },
 });
 

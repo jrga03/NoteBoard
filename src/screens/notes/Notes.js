@@ -115,42 +115,6 @@ class Notes extends Component {
         FirebaseService.fetchNotes(this.fetchNotes);
     };
 
-    // fetchNotes = () => {
-    //     return FirebaseService.fetchNotes((err, data) => {
-    //         if (err) {
-    //             console.log("error fetchNotes", err);
-    //         } else {
-    //             const list = [];
-    //             const listPinned = [];
-    //             const leftList = [];
-    //             const rightList = [];
-    //             const leftPinned = [];
-    //             const rightPinned = [];
-    //             data.map((item, index) => {
-    //                 item.pinned ? listPinned.push(item) : list.push(item);
-    //                 item.pinned
-    //                     ? leftPinned.length > rightPinned.length
-    //                         ? rightPinned.push(item)
-    //                         : leftPinned.push(item)
-    //                     : leftList.length > rightList.length
-    //                         ? rightList.push(item)
-    //                         : leftList.push(item);
-    //             });
-
-    //             this.setState({
-    //                 data: list,
-    //                 dataPinned: listPinned,
-    //                 leftList,
-    //                 leftPinned,
-    //                 rightList,
-    //                 rightPinned,
-    //                 isLoading: false,
-    //             });
-    //             this.props.updateNoteList(data);
-    //         }
-    //     });
-    // };
-
     handleMemoPress = (index, memo) => {
         this.props.openNote(index, memo);
         this.props.navigation.navigate("NoteItem");
@@ -160,8 +124,6 @@ class Notes extends Component {
         this.props.createNote(type);
         this.props.navigation.navigate("NoteItem");
     };
-
-    // handleNoteChanges = () => {};
 
     handleOnLayoutEvent = ({ height }, index) => {
         // const layout = this.props.navigation.getParam("noteLayout", "tile");
