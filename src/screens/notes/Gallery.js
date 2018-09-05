@@ -10,7 +10,7 @@ import {
     TouchableWithoutFeedback,
 } from "react-native";
 import { Icon } from "react-native-elements";
-import { SWATCH, ACTION_BAR_HEIGHT } from "../../constants";
+import { SWATCH } from "../../constants";
 
 const imageBorder = 3;
 let photo_padding = 0;

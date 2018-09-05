@@ -9,8 +9,26 @@ import { SWATCH, LAYOUT_MARGIN } from "../../constants";
 const imageBorder = 4;
 
 export default class NoteMemo extends Component {
+    trimImageArray = (arr) => {
+        const imagesArray = Array.from(arr);
+
+        const imageChunksArray = [];
+        do {
+            imageChunksArray.push(imagesArray.splice(0, 3));
+        } while (imagesArray.length > 0);
+
+        let imagesToRender = [];
+        if (imageChunksArray.length > 2) {
+            imagesToRender = imageChunksArray.slice(-2);
+        } else {
+            imagesToRender = [...imageChunksArray];
+        }
+
+        return imagesToRender;
+    };
+
     renderImageRow = ({ item }) => {
-        console.log("renderImageRow item", item);
+        // console.log("renderImageRow item", item);
         const { imageRowContainer } = styles;
 
         item.reverse();
@@ -166,35 +184,19 @@ export default class NoteMemo extends Component {
             contentToRender = [...contents];
         }
 
-        let imagesArray = [];
-        if (memo.images) {
-            imagesArray = memo.images;
-
-            if (imagesArray.length > 0) {
-                const imageChunksArray = [];
-                do {
-                    imageChunksArray.push(imagesArray.splice(0, 3));
-                } while (imagesArray.length > 0);
-
-                let imagesToRender = [];
-                if (imageChunksArray.length > 2) {
-                    imagesToRender = imageChunksArray.slice(-2);
-                } else {
-                    imagesToRender = [...imageChunksArray];
-                }
-            }
-        }
+        let imagesToRender = memo.images && this.trimImageArray(memo.images);
 
         return (
             <View
                 style={container}
                 // onLayout={layout === "tile" ? (e) => onLayoutEvent(e.nativeEvent.layout, index) : null}
             >
-                {imagesArray.length > 0 && (
+                {!!imagesToRender && (
                     <FlatList
                         inverted={true}
                         data={imagesToRender}
                         renderItem={this.renderImageRow}
+                        listKey={(item, i) => `Row_${i}`}
                         keyExtractor={(item, i) => `Row_${i}`}
                     />
                 )}
@@ -256,7 +258,7 @@ const styles = StyleSheet.create({
         marginVertical: LAYOUT_MARGIN / 2,
         backgroundColor: SWATCH.WHITE,
         width: "100%",
-        padding: 7,
+        // padding: 7,
         elevation: 2,
         shadowRadius: 3,
         shadowOffset: {
@@ -268,14 +270,16 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
     contentContainer: {
-        paddingTop: 7,
+        paddingVertical: 7,
+        paddingHorizontal: 7,
     },
     titleText: {
         fontWeight: "bold",
         fontFamily: Platform.OS === "ios" ? "HelveticaNeue-Bold" : "Roboto",
         color: SWATCH.BLACK,
-        paddingVertical: Platform.OS === "ios" ? 4 : 2,
+        paddingVertical: Platform.OS === "ios" ? 11 : 9,
         // paddingBottom: Platform.OS === "ios" ? 11 : 9,
+        paddingHorizontal: 7,
     },
     checklistItemContainer: {
         flexDirection: "row",
@@ -297,7 +301,8 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontFamily: Platform.OS === "ios" ? "Courier New" : "serif",
         color: SWATCH.GRAY,
-        paddingLeft: 5,
+        paddingLeft: 12,
+        paddingRight: 7,
         paddingTop: Platform.OS === "ios" ? 11 : 9,
         paddingBottom: Platform.OS === "ios" ? 4 : 2,
     },
