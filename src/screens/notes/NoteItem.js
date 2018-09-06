@@ -55,6 +55,7 @@ class NoteItem extends Component {
                 },
                 images: [],
                 collaborators: [],
+                author: null,
             },
             index: null,
             footerMenuSelected: null,
