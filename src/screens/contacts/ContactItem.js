@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, Image, TouchableOpacity, TouchableWithoutFeedback, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, TouchableWithoutFeedback, StyleSheet } from "react-native";
 import { Icon, Avatar } from "react-native-elements";
 
 import { SWATCH } from "../../constants";
@@ -7,17 +7,19 @@ import { FirebaseService } from "../../services/FirebaseService";
 
 const ContactItem = ({ item, type, extraButtonPress, onSelectContact }) => {
     if (!!item) {
-        const { id, displayName, photoURL } = item;
+        const { id, displayName, photoURL, email } = item;
 
         const {
             container,
             iconEmphasis,
-            imageContent,
+            // imageContent,
             fullNameText,
             iconContainer,
             imageContainer,
             fullNameContainer,
             extraButtonsContainer,
+            emailTextCollaborator,
+            fullNameTextCollaborator,
         } = styles;
 
         handleAddPress = () => {
@@ -56,9 +58,22 @@ const ContactItem = ({ item, type, extraButtonPress, onSelectContact }) => {
                         )}
                     </View>
                     <View style={fullNameContainer}>
-                        <Text style={fullNameText} numberOfLines={1} ellipsizeMode="tail">
+                        <Text
+                            style={[
+                                fullNameText,
+                                type === "Collaborator" || type === "CollaboratorCancel"
+                                    ? fullNameTextCollaborator
+                                    : null,
+                            ]}
+                            numberOfLines={1}
+                            ellipsizeMode="tail">
                             {displayName}
                         </Text>
+                        {(type === "Collaborator" || type === "CollaboratorCancel") && (
+                            <Text style={emailTextCollaborator} numberOfLines={1} ellipsizeMode="tail">
+                                {email}
+                            </Text>
+                        )}
                     </View>
 
                     {type === "Request" ? (
@@ -100,6 +115,17 @@ const ContactItem = ({ item, type, extraButtonPress, onSelectContact }) => {
                                     name: "remove",
                                     color: SWATCH.BLACK,
                                     container: [iconContainer, iconEmphasis],
+                                }}
+                            />
+                        </View>
+                    ) : type === "CollaboratorCancel" ? (
+                        <View style={extraButtonsContainer}>
+                            <ContactItemButton
+                                onPress={() => null}
+                                icon={{
+                                    name: "clear",
+                                    color: SWATCH.BLACK,
+                                    container: iconContainer,
                                 }}
                             />
                         </View>
@@ -151,6 +177,12 @@ const styles = StyleSheet.create({
     fullNameText: {
         fontSize: 18,
         color: SWATCH.BLACK,
+    },
+    fullNameTextCollaborator: {
+        fontWeight: "bold",
+    },
+    emailTextCollaborator: {
+        fontSize: 12,
     },
     extraButtonsContainer: {
         // flex: 1,
