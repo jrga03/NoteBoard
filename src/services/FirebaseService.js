@@ -207,6 +207,20 @@ const FirebaseService = {
             .off("value", callback);
     },
 
+    addCollaborationNotesListener(callback) {
+        firebase
+            .database()
+            .ref(`/collaboration_notes/${firebase.auth().currentUser.uid}`)
+            .on("value", callback);
+    },
+
+    removeCollaborationNotesListener(callback) {
+        firebase
+            .database()
+            .ref(`/collaboration_notes/${firebase.auth().currentUser.uid}`)
+            .off("value", callback);
+    },
+
     async editNote(note, callback) {
         try {
             await firebase

@@ -62,17 +62,17 @@ class Notes extends Component {
     fetchNotes = (data) => {
         this.setState({ isLoading: true });
 
-        const notes = [];
-        let index = 0;
-        data.forEach((note) => {
-            let noteObj = {
-                ...note.val(),
-                overallIndex: index,
-            };
-            notes.push(noteObj);
+        // const notes = [];
+        // let index = 0;
+        // data.forEach((note) => {
+        //     let noteObj = {
+        //         ...note.val(),
+        //         overallIndex: index,
+        //     };
+        //     notes.push(noteObj);
 
-            index++;
-        });
+        //     index++;
+        // });
 
         let list = [];
         let listPinned = [];
@@ -80,6 +80,16 @@ class Notes extends Component {
         let rightList = [];
         let leftPinned = [];
         let rightPinned = [];
+
+        const notes = Object.values(data.toJSON())
+            .concat()
+            .sort((a, b) => {
+                if (a.lastEditedAtMsec < b.lastEditedAtMsec) return -1;
+                if (a.lastEditedAtMsec > b.lastEditedAtMsec) return 1;
+                return 0;
+            })
+            .map((note, index) => ({ ...note, overallIndex: index }));
+
         notes.forEach((item) => {
             item.pinned ? listPinned.push(item) : list.push(item);
             item.pinned
@@ -100,15 +110,7 @@ class Notes extends Component {
             rightPinned,
             isLoading: false,
         });
-        this.props.updateNoteList(
-            Object.values(data.toJSON())
-                .sort((a, b) => {
-                    if (a.lastEditedAtMsec < b.lastEditedAtMsec) return -1;
-                    if (a.lastEditedAtMsec > b.lastEditedAtMsec) return 1;
-                    return 0;
-                })
-                .map((note, index) => ({ ...note, overallIndex: index }))
-        );
+        this.props.updateNoteList(notes);
     };
 
     handleRefresh = () => {

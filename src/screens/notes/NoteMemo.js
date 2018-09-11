@@ -326,8 +326,10 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         fontFamily: Platform.OS === "ios" ? "HelveticaNeue-Bold" : "Roboto",
         color: SWATCH.BLACK,
-        paddingTop: Platform.OS === "ios" ? 11 : 9,
-        paddingBottom: Platform.OS === "ios" ? 7 : 5,
+        height: 35,
+        textAlignVertical: "center",
+        // paddingTop: Platform.OS === "ios" ? 11 : 9,
+        // paddingBottom: Platform.OS === "ios" ? 7 : 5,
         paddingHorizontal: 7,
     },
     checklistItemContainer: {
