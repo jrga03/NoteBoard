@@ -267,7 +267,7 @@ const FirebaseService = {
             .ref(`/contacts/${firebase.auth().currentUser.uid}`)
             .orderByValue()
             .equalTo(true)
-            .on("value", callback);
+            .off("value", callback);
     },
 
     fetchPendingContacts(callback) {
