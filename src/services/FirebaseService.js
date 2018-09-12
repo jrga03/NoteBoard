@@ -207,26 +207,29 @@ const FirebaseService = {
             .off("value", callback);
     },
 
-    addCollaborationNotesListener(callback) {
-        firebase
-            .database()
-            .ref(`/collaboration_notes/${firebase.auth().currentUser.uid}`)
-            .on("value", callback);
-    },
+    // addCollaborationNotesListener(callback) {
+    //     firebase
+    //         .database()
+    //         .ref(`/collaboration_notes/${firebase.auth().currentUser.uid}`)
+    //         .on("value", callback);
+    // },
 
-    removeCollaborationNotesListener(callback) {
-        firebase
-            .database()
-            .ref(`/collaboration_notes/${firebase.auth().currentUser.uid}`)
-            .off("value", callback);
-    },
+    // removeCollaborationNotesListener(callback) {
+    //     firebase
+    //         .database()
+    //         .ref(`/collaboration_notes/${firebase.auth().currentUser.uid}`)
+    //         .off("value", callback);
+    // },
 
     async editNote(note, callback) {
         try {
-            await firebase
-                .database()
-                .ref(`/users_notes/${firebase.auth().currentUser.uid}/note${note.id}`)
-                .update(note, () => callback(null, true));
+            for (uid of note.collaborators) {
+                await firebase
+                    .database()
+                    .ref(`/users_notes/${uid}/note${note.id}`)
+                    .update(note);
+            }
+            callback(null, true);
         } catch (error) {
             return callback(error, null);
         }
@@ -459,6 +462,8 @@ const FirebaseService = {
     async fetchCollaboratorPhotos(collaboratorsIds) {
         const collaboratorsPhotos = [];
         for (let id of collaboratorsIds) {
+            if (id === this.currentUser().uid) continue;
+
             let photo = await firebase
                 .database()
                 .ref(`/users/${id}/photoURL`)

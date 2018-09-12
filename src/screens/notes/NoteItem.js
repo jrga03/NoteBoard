@@ -63,6 +63,7 @@ class NoteItem extends Component {
             forDeletion: false,
             tempImages: [],
             imagesModified: false,
+            collaboratorsPhotos: [],
         };
 
         this.inputs = {};
@@ -96,6 +97,8 @@ class NoteItem extends Component {
                 ...this.state.note,
                 ...note,
                 contents: contentsWithId,
+                author: note.author || FirebaseService.currentUser().uid,
+                collaborators: note.collaborators || [FirebaseService.currentUser().uid],
             },
             index,
         });
@@ -503,7 +506,7 @@ class NoteItem extends Component {
 
     fetchCollaboratorPhotos = async (collabArray) => {
         const photosArr = await FirebaseService.fetchCollaboratorPhotos(collabArray);
-        this.setState({ note: { ...this.state.note, collaborators: photosArr } });
+        this.setState({ collaboratorsPhotos: photosArr });
     };
 
     renderNoteContentMemo = ({ item, index }) => {
@@ -637,8 +640,8 @@ class NoteItem extends Component {
             mapSnapshotDescriptionContainer,
             staticFooterMainContentContainer,
         } = styles;
-        const { footerMenu, footerMenuSelected, note, tempImages } = this.state;
-        const { id, title, lastEditedAt, contents, type, images, location, collaborators } = note;
+        const { footerMenu, footerMenuSelected, note, tempImages, collaboratorsPhotos } = this.state;
+        const { id, title, lastEditedAt, contents, type, images, location } = note;
         const { memoAdd, checklistAdd, more } = noteItemMenuItems;
 
         lastEditedAtFormatted = () => {
@@ -688,9 +691,9 @@ class NoteItem extends Component {
                             )
                         }
                     />
-                    {collaborators.length > 0 && (
+                    {collaboratorsPhotos.length > 0 && (
                         <View style={collaboratorContainer}>
-                            {collaborators.map(
+                            {collaboratorsPhotos.map(
                                 (collaborator, i) =>
                                     collaborator ? (
                                         <Avatar

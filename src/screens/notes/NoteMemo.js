@@ -183,6 +183,7 @@ export default class NoteMemo extends Component {
             checkedItemText,
             contentContainer,
             collaboratorAvatar,
+            titleTextContainer,
             checkboxIconContainer,
             collaboratorContainer,
             checklistItemContainer,
@@ -228,7 +229,11 @@ export default class NoteMemo extends Component {
                         <Icon type="material-community" name="pin" size={16} color={SWATCH.RED_ORANGE} />
                     </View>
                 )}
-                {!!title && <Text style={titleText}>{title}</Text>}
+                {!!title && (
+                    <View style={titleTextContainer}>
+                        <Text style={titleText}>{title}</Text>
+                    </View>
+                )}
                 {contentToRender.length > 0 && (
                     <FlatList
                         style={contentContainer}
@@ -326,11 +331,11 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         fontFamily: Platform.OS === "ios" ? "HelveticaNeue-Bold" : "Roboto",
         color: SWATCH.BLACK,
-        height: 35,
-        textAlignVertical: "center",
-        // paddingTop: Platform.OS === "ios" ? 11 : 9,
-        // paddingBottom: Platform.OS === "ios" ? 7 : 5,
         paddingHorizontal: 7,
+    },
+    titleTextContainer: {
+        height: 30,
+        justifyContent: "center",
     },
     checklistItemContainer: {
         flexDirection: "row",
