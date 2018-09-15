@@ -27,6 +27,7 @@ import ContactProfile from "../screens/contacts/ContactProfile";
 import NoteMap from "../screens/notes/Map";
 import Camera from "../screens/notes/Camera";
 import Gallery from "../screens/notes/Gallery";
+import AddCollaborator from "../screens/notes/AddCollaborator";
 
 const generateIcon = (type, name, color = SWATCH.BLACK, size = 27) => {
     return <Icon name={name} type={type} color={color} size={size} />;
@@ -218,6 +219,9 @@ const NotesStack = createStackNavigator(
                         : undefined,
                 },
             }),
+        },
+        AddCollaborator: {
+            screen: AddCollaborator,
         },
     },
     {
