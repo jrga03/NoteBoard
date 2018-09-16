@@ -223,7 +223,7 @@ const FirebaseService = {
 
     async editNote(note, callback) {
         try {
-            for (uid of note.collaborators) {
+            for (let uid of note.collaborators) {
                 await firebase
                     .database()
                     .ref(`/users_notes/${uid}/note${note.id}`)
@@ -459,9 +459,19 @@ const FirebaseService = {
             .on("state_changed", ...callbacks);
     },
 
-    async fetchCollaboratorPhotos(collaboratorsIds) {
+    // async fetchCollaboratorProfiles(collaboratorIds) {
+    //     const collaboratorProfiles = [];
+    //     for (let id of collaboratorIds) {
+    //         let profile = await firebase
+    //         .database()
+    //         .ref(`/users/${id}`)
+    //         .on("value");
+    //     }
+    // },
+
+    async fetchCollaboratorPhotos(collaboratorIds) {
         const collaboratorsPhotos = [];
-        for (let id of collaboratorsIds) {
+        for (let id of collaboratorIds) {
             if (id === this.currentUser().uid) continue;
 
             let photo = await firebase

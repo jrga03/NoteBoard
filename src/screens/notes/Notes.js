@@ -82,7 +82,7 @@ class Notes extends Component {
         let rightPinned = [];
 
         const notes = Object.values(data.toJSON())
-            .concat()
+            // .concat()
             .sort((a, b) => {
                 if (a.lastEditedAtMsec < b.lastEditedAtMsec) return -1;
                 if (a.lastEditedAtMsec > b.lastEditedAtMsec) return 1;
