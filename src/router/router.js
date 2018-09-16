@@ -39,11 +39,12 @@ const commonNavigationOptions = (navigation, screenProps, ...props) => ({
             {generateIcon("material-icons", "menu")}
         </TouchableOpacity>
     ),
-    headerRight: (
-        <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
-            {generateIcon("material-icons", "notifications")}
-        </TouchableOpacity>
-    ),
+    headerRight: null,
+    // headerRight: (
+    //     <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
+    //         {generateIcon("material-icons", "notifications")}
+    //     </TouchableOpacity>
+    // ),
     headerStyle: {
         backgroundColor: SWATCH.GLACIER,
         height: ACTION_BAR_HEIGHT,
@@ -73,15 +74,15 @@ const noteHomeNavigationOptions = (navigation, screenProps, ...props) => {
         ),
         headerRight: (
             <View style={{ flexDirection: "row" }}>
-                <TouchableOpacity style={{ paddingHorizontal: 10 }} onPress={() => null}>
+                {/* <TouchableOpacity style={{ paddingHorizontal: 10 }} onPress={() => null}>
                     {generateIcon("material-icons", "search")}
-                </TouchableOpacity>
-                <TouchableOpacity style={{ paddingHorizontal: 10 }} onPress={toggleLayout}>
+                </TouchableOpacity> */}
+                <TouchableOpacity style={{ paddingLeft: 10 }} onPress={toggleLayout}>
                     {generateIcon("material-icons", layout === "tile" ? "view-quilt" : "view-stream")}
                 </TouchableOpacity>
-                <TouchableOpacity style={{ paddingLeft: 10 }} onPress={() => navigation.navigate("Notifications")}>
+                {/* <TouchableOpacity style={{ paddingLeft: 10 }} onPress={() => navigation.navigate("Notifications")}>
                     {generateIcon("material-icons", "notifications")}
-                </TouchableOpacity>
+                </TouchableOpacity> */}
             </View>
         ),
         // headerStyle: {
@@ -113,15 +114,15 @@ const noteItemNavigationOptions = (navigation, screenProps, ...props) => {
     return {
         headerRight: (
             <View style={{ flexDirection: "row" }}>
-                <TouchableOpacity style={{ paddingHorizontal: 10 }} onPress={handlePinOnPress}>
+                <TouchableOpacity style={{ /*paddingHorizontal: 10*/ }} onPress={handlePinOnPress}>
                     {generateIcon("material-community", "pin", pinColor)}
                 </TouchableOpacity>
-                <TouchableOpacity style={{ paddingHorizontal: 10 }} onPress={() => null}>
+                {/* <TouchableOpacity style={{ paddingHorizontal: 10 }} onPress={() => null}>
                     {generateIcon("material-icons", "event-note")}
                 </TouchableOpacity>
                 <TouchableOpacity style={{ paddingLeft: 10 }} onPress={() => null}>
                     {generateIcon("material-icons", "archive")}
-                </TouchableOpacity>
+                </TouchableOpacity> */}
             </View>
         ),
         headerStyle: {
@@ -222,6 +223,12 @@ const NotesStack = createStackNavigator(
         },
         AddCollaborator: {
             screen: AddCollaborator,
+            navigationOptions: {
+                headerStyle: {
+                    backgroundColor: SWATCH.GLACIER,
+                    height: ACTION_BAR_HEIGHT,
+                },
+            },
         },
     },
     {
@@ -230,10 +237,6 @@ const NotesStack = createStackNavigator(
             noteLayout: "list",
             isPinned: false,
         },
-        // navigationOptions: ({ navigation, screenProps }) => ({
-        //     title: "Notes".toUpperCase(),
-        //     ...commonNavigationOptions(navigation, screenProps),
-        // }),
 
         // getCustomActionCreators: (route, stateKey) => {
         //     console.log("NotesStack", route, stateKey);
