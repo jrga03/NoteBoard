@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import ContactItem from "../contacts/ContactItem";
 import { SWATCH } from "../../constants";
 import { searchContact, selectContact } from "../../actions";
-import { FirebaseService } from "../../services";
+// import { FirebaseService } from "../../services";
 
 class AddCollaborator extends Component {
     constructor(props) {
@@ -111,7 +111,7 @@ const mapDispatchToProps = (dispatch) => ({
 export default connect(
     mapStateToProps,
     mapDispatchToProps
-)(AddContact);
+)(AddCollaborator);
 
 const styles = StyleSheet.create({
     container: {
