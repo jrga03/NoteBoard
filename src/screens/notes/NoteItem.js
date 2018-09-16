@@ -64,6 +64,7 @@ class NoteItem extends Component {
             tempImages: [],
             imagesModified: false,
             collaboratorsPhotos: [],
+            // previousCollaborators: [],
         };
 
         this.inputs = {};
@@ -131,7 +132,6 @@ class NoteItem extends Component {
     componentWillUnmount() {
         if (!this.state.forDeletion && this.state.wasChanged) {
             const { note, index } = this.props.selectedNote;
-
             const checkboxChanged = note.contents.some(
                 (content, i) => content.checked === this.state.note.contents[i].checked
             );
@@ -387,6 +387,16 @@ class NoteItem extends Component {
             case "checkbox":
                 break;
             case "collaborator":
+                this.setState(
+                    {
+                        footerMenu: [],
+                        footerMenuSelected: null,
+                    },
+                    () =>
+                        this.props.navigation.navigate("AddCollaborator", {
+                            collaborators: this.state.note.collaborators,
+                        })
+                );
                 break;
         }
     };
@@ -1007,14 +1017,14 @@ const noteItemMenuItems = {
             },
             onPress: "location",
         },
-        {
-            text: "Checkboxes",
-            icon: {
-                type: "material-icons",
-                name: "check",
-            },
-            onPress: "checkbox",
-        },
+        // {
+        //     text: "Checkboxes",
+        //     icon: {
+        //         type: "material-icons",
+        //         name: "check",
+        //     },
+        //     onPress: "checkbox",
+        // },
     ],
     checklistAdd: [
         {
@@ -1051,13 +1061,13 @@ const noteItemMenuItems = {
             },
             onPress: "delete",
         },
-        {
-            text: "Collaborators",
-            icon: {
-                type: "material-icons",
-                name: "person-add",
-            },
-            onPress: "collaborator",
-        },
+        // {
+        //     text: "Collaborators",
+        //     icon: {
+        //         type: "material-icons",
+        //         name: "person-add",
+        //     },
+        //     onPress: "collaborator",
+        // },
     ],
 };
